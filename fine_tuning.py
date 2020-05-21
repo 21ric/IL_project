@@ -180,28 +180,40 @@ def main():
 
     if i != 0:
 
-      #creating dataset for current iteration
+      # Creating dataset for current iteration
       train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
       test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
+      
+      # Create indices for train and validation
+      train_indices, val_indices = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
 
-      #creating dataset for test on previous classes
+      val_dataset = Subset(train_dataset, val_indices)
+      train_dataset = Subset(train_dataset, train_indices)
+
+      # Creating dataset for test on previous classes
       previous_classes = np.array([])
       for j in range(i):
         previous_classes = np.concatenate((previous_classes, classes_groups[j]))
       test_prev_dataset = CIFAR100(root='data/', classes=previous_classes,  train=False, download=True, transform=test_transform)
 
-      #creating dataset for all classes
+      # Creating dataset for all classes
       all_classes = np.concatenate((previous_classes, classes_groups[i]))
       test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
 
-      #creating dataloaders
+      # Prepare Dataloaders
       train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
+      val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
       test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
       test_prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
       test_all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+      
+      
+      # Check dataset sizes
+      print('Train Dataset: {}'.format(len(train_dataset)))
+      print('Valid Dataset: {}'.format(len(val_dataset)))
+      print('Test Dataset (new classes): {}'.format(len(test_dataset)))
 
-
-      net = train(net, train_dataloader)
+      net = train(net, train_dataloader, val_dataloader)
       print('Test on new classes')
       test(net, test_dataloader)
       print('Test on old classes')
