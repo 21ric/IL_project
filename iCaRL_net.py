@@ -9,6 +9,8 @@ from PIL import Image
 
 from resnet import resnet32
 
+import math
+
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -139,7 +141,7 @@ class iCaRL(nn.Module):
                 sum += el
             temp = math.sqrt(sum)
             candidates.append(temp)
-            
+
         i = np.argmin(candidates)
 
         exemplar_set.append(images[i])
