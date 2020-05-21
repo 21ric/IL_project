@@ -120,6 +120,8 @@ class iCaRL(nn.Module):
         feature = feature_extractor.extract_features(img).data.cpu().numpy()
         features.append(feature)
 
+    print(features)
+    return
     class_mean = np.mean(np.array(features))
 
     print('LUNGHEZA IMMAGINI')
