@@ -152,7 +152,7 @@ class iCaRL(nn.Module):
 
         features = np.delete(features, i)
         #print(type(images))
-        images.remove(i)
+        images.pop(i)
 
 
     self.exemplars.append(exemplar_set)
