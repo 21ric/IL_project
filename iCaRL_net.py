@@ -134,7 +134,7 @@ class iCaRL(nn.Module):
             candidates[i]=candidates[i].flatten()
             candidates[i]=candidates[i]-class_mean
             candidates[i]=candidates[i]**2
-            candidates[i]=np.sqrt(np.sum(candidates[i]))
+            candidates[i]=np.sqrt(np.sum(candidates[i], axis=1))
 
         print('LUNGHEZZA POSSIBILI')
         print(len(candidates))
