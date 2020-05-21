@@ -39,7 +39,7 @@ def train(net, train_dataloader, val_dataloader):
   optimizer = optim.SGD(parameters_to_optimize, lr=LR, weight_decay=WEIGHT_DECAY)
   #scheduler = optim.lr_scheduler.StepLR(optimizer)#, step_size=STEP_SIZE, gamma=GAMMA)
   net.to(DEVICE)
-  
+
   best_acc = 0 #this is the validation accuracy for model selection
 
   for epoch in range(70):
@@ -59,7 +59,7 @@ def train(net, train_dataloader, val_dataloader):
       valid_loss = 0.0
       running_corrects_train = 0
       running_corrects_val = 0
-      
+
       #
       # TRAINING
       #
@@ -81,7 +81,7 @@ def train(net, train_dataloader, val_dataloader):
           # statistics
           running_loss += loss.item() * inputs.size(0)
           running_corrects_train += torch.sum(preds == labels.data)
-      
+
       #
       # VALIDATION
       #
@@ -98,28 +98,28 @@ def train(net, train_dataloader, val_dataloader):
           # statistics
           valid_loss += loss.item() * inputs.size(0)
           running_corrects_val += torch.sum(preds == labels.data)
-                
+
       # Calculate average losses
       epoch_loss = running_loss / len(train_dataloader.dataset)
       valid_loss = valid_loss / len(val_dataloader.dataset)
       # Calculate accuracy
       epoch_acc = running_corrects_train.double() / len(train_dataloader.dataset)
       valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
-      
+
       #Save the model with the best validation accuracy
       if (valid_acc > best_acc):
         best_acc = valid_acc
         best_net = copy.deepcopy(net.state_dict())
-          
+
       #scheduler.step()
-      
+
       if(epoch%5 == 0 ):
         print('Train Loss: {:.4f} Train Acc: {:.4f}'.format(epoch_loss, epoch_acc))
         print('Val Loss: {:.4f} Val Acc: {:.4f}'.format(valid_loss, valid_acc))
-          
+
   #at the end, load best model weights
   net.load_state_dict(best_net)
-  
+
   return net
 
 
@@ -210,27 +210,27 @@ def main():
       test(net, test_all_dataloader)
 
     else: # First iteration
-      
+
       # Create train and test dataset
       train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
       test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
-      
-      # Create indices for train and validation 
-      train_indices, val_indices = train_test_split(train_dataset, test_size=0.1, stratify=train_dataset.targets)
-      
+
+      # Create indices for train and validation
+      train_indices, val_indices = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
+
       val_dataset = Subset(train_dataset, val_indices)
       train_dataset = Subset(train_dataset, train_indices)
-      
+
       # Check dataset sizes
       print('Train Dataset: {}'.format(len(train_dataset)))
       print('Valid Dataset: {}'.format(len(val_dataset)))
       print('Test Dataset: {}'.format(len(test_dataset)))
-      
+
       # Prepare Dataloaders
       train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
       test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
       val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-      
+
       net = train(net, train_dataloader, val_dataloader)
       print('Test on first 10 classes')
       test(net, test_dataloader)
