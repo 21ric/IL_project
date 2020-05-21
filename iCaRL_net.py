@@ -132,7 +132,9 @@ class iCaRL(nn.Module):
         candidates = (features + exemplar_sum)*1.0/(k+1)
         for i, _ in enumerate(candidates):
             candidates[i]=candidates[i].flatten()
-        candidates = np.sqrt(np.sum((class_mean-candidates)**2))
+            candidates[i]=candidates[i]-class_mean
+            candidates[i]=candidates[i]**2
+            condidates[i]=np.sqrt(np.sum(candidates[i]))
 
         print('LUNGHEZZA POSSIBILI')
         print(len(candidates))
