@@ -247,8 +247,8 @@ def main():
       print('Test on first 10 classes')
       test(net, test_dataloader)
 
-    if i==1:
-        return #per fare solo la prima iterazione (10 classi) fin quando non si replicano i risultati
+    #if i==1:
+        #return #per fare solo la prima iterazione (10 classi) fin quando non si replicano i risultati
 
 if __name__ == '__main__':
     main()
