@@ -120,7 +120,7 @@ class iCaRL(nn.Module):
         feature = feature_extractor.extract_features(img).data.cpu().numpy().squeeze()
         features.append(feature)
 
-    print(features)
+    #print(features)
 
     class_mean = np.mean(np.array(features))
 
@@ -145,12 +145,17 @@ class iCaRL(nn.Module):
             candidates.append(temp)
 
         i = np.argmin(candidates)
+        print('Primi cinque distanza candidate')
+        print(candidates[:5])
+
+        print('INDICE SCELTO:{}'.format(i))
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-
+        """
         features = np.delete(features, i)
-        images = np.delete(images.numpy())
+        images = np.delete(np.array(images), i)
+        """
 
     self.exemplars.append(exemplar_set)
 
