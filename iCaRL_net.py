@@ -137,7 +137,6 @@ class iCaRL(nn.Module):
         phi = features
         mu = class_mean
         mu_p = 1.0/(k+1) * (phi + S)
-        mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
         exemplar_set.append(images[i])
