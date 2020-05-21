@@ -15,7 +15,7 @@ import math
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 10
+NUM_EPOCHS = 5
 DEVICE = 'cuda'
 ########################
 
@@ -151,7 +151,8 @@ class iCaRL(nn.Module):
         exemplar_features.append(features[i])
 
         features = np.delete(features, i)
-        images = np.delete(images.numpy(), i)
+        print(type(images))
+        #images = np.delete(images.numpy(), i)
 
 
     self.exemplars.append(exemplar_set)
