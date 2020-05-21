@@ -145,17 +145,14 @@ class iCaRL(nn.Module):
             candidates.append(temp)
 
         i = np.argmin(candidates)
-        print('Primi cinque distanza candidate')
-        print(candidates[:5])
-
         print('INDICE SCELTO:{}'.format(i))
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-        """
+        
         features = np.delete(features, i)
         images = np.delete(np.array(images), i)
-        """
+
 
     self.exemplars.append(exemplar_set)
 
