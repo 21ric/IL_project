@@ -128,19 +128,9 @@ class iCaRL(nn.Module):
     exemplar_set = []
     exemplar_features = []
     for k in range(m):
-
-        S = np.sum(exemplar_features, axis=0)
-        phi = features
-        mu = class_mean
-        mu_p = 1.0/(k+1) * (phi + S)
-        i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
-
-        exemplar_set.append(images[i])
-        exemplar_features.append(features[i])
-        """
         exemplar_sum = np.sum(exemplar_features)
         candidates = (features + exemplar_sum)*1.0/(k+1)
-        candidates = np.sqrt(np.sum((class_mean-candidates)**2, axis=1))
+        candidates = np.sqrt(np.sum((class_mean-candidates)**2))
 
         print('LUNGHEZZA POSSIBILI')
         print(len(candidates))
@@ -151,12 +141,11 @@ class iCaRL(nn.Module):
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-        """
 
         features = np.delete(features, i)
         images = np.delete(images.numpy())
 
-    self.exemplars.append(np.array(exemplar_set))
+    self.exemplars.append(exemplar_set)
 
   #da cambiare completamente
   def classify(self, x):

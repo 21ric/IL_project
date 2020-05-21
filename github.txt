@@ -21,8 +21,9 @@ istruzioni per utilizzo github:
   ** mettete sempre un messaggio, pure a caso
   questo comando aggiunge le modifiche da fare al commit
 
-  -git push origin master
+  -git push origin master -u tuo_nome_utente
   le modifiche vengono inviate su github e rese effettive
+  Ti chiederà la password
 
 
   ogni volta che iniziate a lavorare (si presuppone che abbiate già inviato le modifiche
