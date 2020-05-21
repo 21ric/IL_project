@@ -10,6 +10,5 @@ LAURA:
 
 
 LINDA:
-- in resnet.py:
-    out = self.relu(out) oppure  y = F.relu(y) , import torch.nn.functional as F
 - TODO: architettura resnet
+- nel fine tuning è giusto lavorare sempre sulla stessa rete? non dovremmo aggiungere 10 nodi alla fine di ogni iterazione? Come l'abbiamo implementato è finetuning si, ma non in un approccio multi-class..
