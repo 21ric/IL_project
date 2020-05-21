@@ -132,26 +132,23 @@ class iCaRL(nn.Module):
     exemplar_set = []
     exemplar_features = []
     for k in range(m):
-        exemplar_sum = np.sum(exemplar_features)
 
-        candidates = []
-        for f in features:
-            temp = (f + exemplar_sum)*1.0/(k+1)
-            temp = (temp-class_mean)**2
-            sum = 0
-            for el in temp:
-                sum += el
-            temp = math.sqrt(sum)
-            candidates.append(temp)
+        S = np.sum(exemplar_features, axis=0)
+        phi = features
+        mu = class_mean
+        mu_p = 1.0/(k+1) * (phi + S)
+        mu_p = mu_p / np.linalg.norm(mu_p)
+        i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
-        i = np.argmin(candidates)
+        exemplar_set.append(images[i])
+        exemplar_features.append(features[i])
+
         print('INDICE SCELTO:{}'.format(i))
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
 
         features = np.delete(features, i)
-        #print(type(images))
         images.pop(i)
 
 
