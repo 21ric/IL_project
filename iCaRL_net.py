@@ -173,7 +173,7 @@ class iCaRL(nn.Module):
         
         if exemplar_means.shape[0] != self.num_classes:
             raise ValueError(
-                "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])"
+                "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
 
         ypred = []
