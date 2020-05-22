@@ -64,7 +64,7 @@ class LwF(nn.Module):
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
 
         # Save FC layer in attributes
-        self.fc = self.feature_extractor.fc
+        self.fc = self.model.fc
         # Save other layers in attributes
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
