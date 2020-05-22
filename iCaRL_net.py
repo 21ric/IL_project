@@ -143,7 +143,6 @@ class iCaRL(nn.Module):
         features.pop(i)
         images.pop(i)
 
-
     self.exemplars.append(exemplar_set)
 
   #da cambiare completamente

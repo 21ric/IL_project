@@ -2,6 +2,7 @@ from PIL import Image
 import os
 import os.path
 import numpy as np
+import torch
 import pickle
 
 from torchvision.datasets.vision import VisionDataset
