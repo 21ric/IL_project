@@ -166,11 +166,11 @@ class LwF(nn.Module):
 					seen_labels = []
 					
 					images = images.to(DEVICE)
-					labels = labels.to(DEVICE)
+					#labels = labels.to(DEVICE)
 					indices = indices.to(DEVICE)
 					#images = Variable(torch.FloatTensor(images)).cuda()
 					seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-					#labels = Variable(seen_labels).cuda()
+					labels = Variable(seen_labels).cuda()
 					# indices = indices.cuda()
 
 					optimizer.zero_grad()
