@@ -14,7 +14,7 @@ DEVICE = 'cuda'
 NUM_CLASSES = 10
 BATCH_SIZE = 128
 ClASSES_BATCH = 10
-MEMORY_SIZE = 2000
+MEMORY_SIZE = 200
 ########################
 
 def main():

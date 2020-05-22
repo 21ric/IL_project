@@ -125,10 +125,12 @@ class iCaRL(nn.Module):
 
     class_mean = np.mean(np.array(features))
 
+    """
     print('LUNGHEZA IMMAGINI')
     print(len(images))
     print('LUNGHEZZA FEATURES')
     print(len(features))
+    """
 
     exemplar_set = []
     exemplar_features = []
@@ -165,8 +167,9 @@ class iCaRL(nn.Module):
         for exemplars in self.exemplars:
             features = []
 
+            print('forse qui?')
             for ex in exemplars:
-            	features.append(self.feature_extractor.extract_features(ex))
+            	features.append(self.feature_extractor.extract_features(ex.unqsueeze(0)))
             exemplar_means.append(np.mean(features))
 
         if exemplar_means is None:
