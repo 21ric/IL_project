@@ -209,6 +209,7 @@ class iCaRL(nn.Module):
 
             preds = np.array(pred_labels)
 
+            print('qui2?')
             ypred.extend(preds)
             ytrue.extend(targets)
 
