@@ -11,6 +11,8 @@ from resnet import resnet32
 
 import math
 
+import copy
+
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -136,7 +138,7 @@ class iCaRL(nn.Module):
 
         candidates = []
         for f in features:
-            temp = (f + exemplar_sum)*1.0/(k+1)
+            temp = (copy.deepcopy(f) + exemplar_sum)*1.0/(k+1)
             temp = (temp-class_mean)**2
             sum = 0
             for el in temp:

@@ -10,7 +10,7 @@ LAURA:
 
 
 LINDA:
-- TODO: architettura resnet
-- nel fine tuning è giusto lavorare sempre sulla stessa rete? non dovremmo aggiungere 10 nodi 
+- TODO: architettura resnet (già discusso)
+- nel fine tuning è giusto lavorare sempre sulla stessa rete? non dovremmo aggiungere 10 nodi
 alla fine di ogni iterazione? 
 Come l'abbiamo implementato è finetuning si, ma non in un approccio multi-class..
