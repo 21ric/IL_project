@@ -49,27 +49,17 @@ def MultiClassCrossEntropy(logits, labels, T):
     return Variable(outputs.data, requires_grad=True).cuda()
 
 def kaiming_normal_init(m):
-<<<<<<< HEAD
+
   if isinstance(m, nn.Conv2d):
 	nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
   elif isinstance(m, nn.Linear):
 	nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
-class LwF(nn.Module):
-	
-  def __init__(self, num_classes, classes_map):
-	super(LwF,self).__init__()
-=======
-    if isinstance(m, nn.Conv2d):
-        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
-    elif isinstance(m, nn.Linear):
-        nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
 class LwF(nn.Module):
 	
     def __init__(self, num_classes, classes_map):
         super(LwF,self).__init__()
->>>>>>> 3548c464f4211c65c237896cf7d70ef5d8a98882
 		
         self.model = resnet32()
         self.model.apply(kaiming_normal_init)
