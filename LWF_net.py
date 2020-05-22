@@ -49,14 +49,14 @@ def MultiClassCrossEntropy(logits, labels, T):
     return Variable(outputs.data, requires_grad=True).cuda()
 
 def kaiming_normal_init(m):
-    if isinstance(m, nn.Conv2d):
+  if isinstance(m, nn.Conv2d):
 	nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
-    elif isinstance(m, nn.Linear):
+  elif isinstance(m, nn.Linear):
 	nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
 class LwF(nn.Module):
 	
-    def __init__(self, num_classes, classes_map):
+  def __init__(self, num_classes, classes_map):
 	super(LwF,self).__init__()
 		
 	self.model = resnet32()
@@ -85,13 +85,13 @@ class LwF(nn.Module):
 		
 		
 		
-    def forward(self, x):
+  def forward(self, x):
 	x = self.feature_extractor(x)
 	x = x.view(x.size(0), -1)
 	x = self.fc(x)
 	return(x)
 
-    def increment_classes(self, new_classes):
+  def increment_classes(self, new_classes):
 	"""Add n classes in the final fc layer"""
 	n = len(new_classes)
 	print('new classes: ', n)
@@ -116,7 +116,7 @@ class LwF(nn.Module):
 	self.fc.weight.data[:out_features] = weight
 	self.n_classes += n
     
-    def classify(self, images):
+   def classify(self, images):
 	"""Classify images by softmax
 	Args:
 	    x: input image batch
@@ -128,7 +128,7 @@ class LwF(nn.Module):
 	
 	
 	
-    def update(self, dataset, class_map, args):
+  def update(self, dataset, class_map, args):
 
 	self.compute_means = True
 
