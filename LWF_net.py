@@ -50,9 +50,9 @@ def MultiClassCrossEntropy(logits, labels, T):
 
 def kaiming_normal_init(m):
     if isinstance(m, nn.Conv2d):
-	nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
     elif isinstance(m, nn.Linear):
-	nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
+        nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
 class LwF(nn.Module):
 	
