@@ -158,18 +158,45 @@ class iCaRL(nn.Module):
     self.exemplars.append(exemplar_set)
 
   #da cambiare completamente
-  def classify(self, x):
-    #computing exemplars mean
-    exemplars_mean=[]
-    for exemplars in self.exemplars:
-        features = []
-        for ex in exemplars:
-            features.append(self.feature_extractor.extract_features(ex))
-        exemplars_mean.append(np.mean(features))
+  def classify(self, dataloader):
+       
+        #compute the mean for each examplars 
+        exemplar_means=[]
+        for exemplars in self.exemplars:
+            features = []
+        
+            for ex in exemplars:
+            	features.append(self.feature_extractor.extract_features(ex))
+            exemplar_means.append(np.mean(features))
+        
+        if exemplar_means is None:
+            raise ValueError(
+                "Cannot classify without built examplar means,"
+            )
+        
+        if exemplar_means.shape[0] != self._n_classes:
+            raise ValueError(
+                "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
+            )
 
-    feature = self.feature_extractor(x)
+        ypred = []
+        ytrue = []
 
-    distances = np.sqrt([(feature - mean)**2 for mean in exemplars_mean])
-    pred = np.argmin(distances)
+        for _, inputs, targets in dataloader:
+            inputs = inputs.to(DEVICE)
+            #compute the feature map of the input 
+            features = self.feature_extractor(inputs)
+            
+            pred_labels = []
+            
+            for feature in features:
+              #computing L2 distance
+              distances = torch.pow(examplar_mean - feature, 2).sum(-1)
+              pred_labels.append(distances.argmin().item())
+              
+            preds = np.array(pred_labels)
 
-    return preds
+            ypred.extend(preds)
+            ytrue.extend(targets)
+
+        return np.array(ypred), np.array(ytrue)
