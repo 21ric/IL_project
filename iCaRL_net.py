@@ -166,12 +166,6 @@ class iCaRL(nn.Module):
         exemplar_means=[]
         for exemplars in self.exemplars:
 
-            print('forse qui?')
-            """
-            for ex in exemplars:
-            	features.append(self.feature_extractor.extract_features(torch.unsqueeze(ex, 0)))
-            exemplar_means.append(np.mean(features))
-            """
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
             for ex in exemplars:
@@ -197,7 +191,7 @@ class iCaRL(nn.Module):
         ytrue = []
 
         for inputs, targets, _ in dataloader:
-            imputs = inputs.unsqueeze(0)
+            imputs = inputs
 
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
@@ -208,7 +202,8 @@ class iCaRL(nn.Module):
 
             for feature in features:
               #computing L2 distance
-              distances = torch.pow(examplar_means - feature, 2).sum(-1)
+              print('qui?')
+              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               pred_labels.append(distances.argmin().item())
 
             preds = np.array(pred_labels)
