@@ -145,7 +145,7 @@ class iCaRL(nn.Module):
             candidates.append(math.sqrt(sum))
 
         i = np.argmin(candidates)
-        print('INDICE SCELTO:{}'.format(i))
+        #print('INDICE SCELTO:{}'.format(i))
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
@@ -184,8 +184,10 @@ class iCaRL(nn.Module):
 
         for inputs, targets, _ in dataloader:
             imputs = inputs.unsqueeze(0)
+
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
+            print('forward')
             features = self.feature_extractor.extract_features(inputs)
 
             pred_labels = []
