@@ -71,6 +71,8 @@ def main():
 
         net.update_representation(dataset = train_dataset)
 
+        print('done upd')
+
         m = int(math.ceil(MEMORY_SIZE/net.num_classes))
 
         net.reduce_exemplars_set(m)
