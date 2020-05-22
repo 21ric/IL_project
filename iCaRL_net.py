@@ -165,7 +165,7 @@ class iCaRL(nn.Module):
         #compute the mean for each examplars
         exemplar_means=[]
         for exemplars in self.exemplars:
-            
+
             print('forse qui?')
             """
             for ex in exemplars:
@@ -181,6 +181,7 @@ class iCaRL(nn.Module):
                 features.append(feature)
             exemplar_means.append(np.mean(features))
 
+        """
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -190,6 +191,7 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
+        """
 
         ypred = []
         ytrue = []
