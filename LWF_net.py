@@ -138,6 +138,8 @@ class LwF(nn.Module):
         classes = list(set(dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
+	
+	dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
         '''
         if self.n_classes == 1 and self.n_known == 0:
@@ -170,7 +172,7 @@ class LwF(nn.Module):
                 # 		param_group['lr'] = self.lr
 
 
-                for  images, labels, indices in dataset:
+                for  images, labels, indices in dataloader:
 					
                     seen_labels = []
 					
