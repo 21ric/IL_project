@@ -43,7 +43,7 @@ def kaiming_normal_init(m):
 
 
 class LwF(nn.Module):
-  	def __init__(self, num_classes):
+  	def __init__(self, num_classes, classes_map):
 		super(LwF,self).__init__()
 		self.model = resnet32()
 		self.model.apply(kaiming_normal_init)
@@ -65,6 +65,7 @@ class LwF(nn.Module):
 		# n_known is set to n_classes after all data for an iteration has been processed
 		self.n_classes = 0
 		self.n_known = 0
+		self.classes_map = classes_map
 
 		#self.num_classes = num_classes
 		#self.num_known = 0
@@ -97,7 +98,7 @@ class LwF(nn.Module):
 		
 		# Initialize weights with kaiming normal
 		kaiming_normal_init(self.fc.weight)
-		# Upload old FC weights
+		# Upload old FC weights on first "out_features" nodes
 		self.fc.weight.data[:out_features] = weight
 		self.n_classes += n
     
@@ -122,10 +123,10 @@ class LwF(nn.Module):
 
 		# Save a copy to compute distillation outputs
 		prev_model = copy.deepcopy(self)
-		prev_model.cuda()
+		prev_model.to(DEVICE)
 		
 		# Save true labels (new images)
-		classes = list(set(dataset.targets))
+		classes = list(set(dataset.targets)) #list of true labels
 		print("Classes: ", classes)
 		print('Known: ', self.n_known)
 		
@@ -138,14 +139,20 @@ class LwF(nn.Module):
 		new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 		
 		if len(new_classes) > 0:
+			# Change last FC layer
 			self.increment_classes(new_classes)
 			self.cuda()
 
 		optimizer = self.optimizer
 		#optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
-
+		
+		self.to(DEVICE)
 		with tqdm(total=NUM_EPOCHS) as pbar:
-			for epoch in range(NUM_EPOCHS):
+			i = 0
+			for epoch in range(NUM_EPOCHS):	
+				if i%5 == 0:
+					print('-'*30)
+					print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
 
 				# Modify learning rate
 				# if (epoch+1) in lower_rate_epoch:
@@ -167,13 +174,25 @@ class LwF(nn.Module):
 					# indices = indices.cuda()
 
 					optimizer.zero_grad()
-					logits = self.forward(images)
+					
+					# Compute outputs on the new model 
+					logits = self.forward(images) 
+					
+					# Compute classification loss 
 					cls_loss = nn.CrossEntropyLoss()(logits, labels)
+					
+					# If not first iteration
 					if self.n_classes//len(new_classes) > 1:
+						# Compute outputs on the previous model
 						dist_target = prev_model.forward(images)
+						# Save logits of the first "old" nodes of the network
 						logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+						# Compute distillation loss
 						dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
+						# Compute total loss
 						loss = dist_loss+cls_loss
+					
+					# If first iteration
 					else:
 						loss = cls_loss
 
@@ -182,11 +201,12 @@ class LwF(nn.Module):
 
 					loss.backward()
 					optimizer.step()
-
-					if (i+1) % 1 == 0:
-						tqdm.write('Epoch [%d/%d], Iter [%d/%d] Loss: %.4f' 
-							   %(epoch+1, self.num_epochs, i+1, np.ceil(len(dataset)/self.batch_size), loss.data))
-
+				
+				if i%5 == 0:
+            				print("Loss: {:.4f}".format(loss.item()))
+				
+				i+=1
+	
 				pbar.update(1)
 
 """
