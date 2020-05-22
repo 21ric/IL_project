@@ -197,18 +197,18 @@ class iCaRL(nn.Module):
         ytrue = []
 
         for inputs, targets, _ in dataloader:
-            imputs = inputs
+            imputs = inputs.unsqueeze(0)
 
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             print('forward')
-            features = feature_extractor.extract_features(inputs)
+            features = self.feature_extractor.extract_features(inputs)
 
             pred_labels = []
 
             for feature in features:
               #computing L2 distance
-              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
+              distances = torch.pow(examplar_means - feature, 2).sum(-1)
               pred_labels.append(distances.argmin().item())
 
             preds = np.array(pred_labels)
