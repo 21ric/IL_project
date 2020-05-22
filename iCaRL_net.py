@@ -222,5 +222,6 @@ class iCaRL(nn.Module):
         
           
         accuracy = running_corrects / float(len(dataloader.dataset))
+        print(f"Test accuracy: {accuracy}")
 
         return np.array(ypred), np.array(ytrue)
