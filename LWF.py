@@ -60,7 +60,7 @@ def main():
 	print ("Map Reverse:", map_reverse)
 
 	# Create Network
-	net = LwF(0)
+	net = LwF(NUM_CLASSES,class_map)
 
 	#for i in range(int(total_classes//CLASSES_BATCH)):
 	for i in range(1):
