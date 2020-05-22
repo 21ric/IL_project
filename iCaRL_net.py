@@ -138,8 +138,11 @@ class iCaRL(nn.Module):
 
         candidates = []
         for f in features:
+            print('inzion', temp)
             temp = (copy.deepcopy(f) + exemplar_sum)*1.0/(k+1)
+            print('metà', temp)
             temp = (temp-class_mean)**2
+            print('inizio iterazioni', temp)
             sum = 0
             for el in temp:
                 sum += el
