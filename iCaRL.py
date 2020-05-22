@@ -41,7 +41,7 @@ def main():
 
     net = iCaRL(0)
 
-    for i in (int(100/ClASSES_BATCH)):
+    for i in range(int(100/ClASSES_BATCH)):
 
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
