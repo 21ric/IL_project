@@ -34,8 +34,16 @@ def main():
   #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
   #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
-  range_classes = np.arange(100)
-  classes_groups = np.array_split(range_classes, 10)
+  #range_classes = np.arange(100)
+  total_classes = 100
+  perm_id = np.random.permutation(total_classes)
+  all_classes = np.arange(total_classes)
+  for i in range(len(all_classes)):
+	  all_classes[i] = perm_id[all_classes[i]]
+  
+  # Create groups of 10
+  classes_groups = np.array_split(all_classes, 10)
+  print(classes_groups)
 
 
   net = LwF(0)
