@@ -144,7 +144,7 @@ class iCaRL(nn.Module):
         images.pop(i)
 
 
-    self.exemplars.append(np.array(exemplar_set))
+    self.exemplars.append(exemplar_set)
 
   #da cambiare completamente
   def classify(self, dataloader):
