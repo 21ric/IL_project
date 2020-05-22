@@ -154,7 +154,7 @@ class CIFAR10(VisionDataset):
 
     def append(self, data, targets):
         for d, t in zip(data, targets):
-            self.data = np.append(self.data, d.numpy())
+            self.data = np.append(self.data, [d.numpy()])
             self.targets = np.append(self.targets, t)
 
         #self.data = self.data + data
