@@ -29,17 +29,24 @@ def kaiming_normal_init(m):
 
 class LwF(nn.Module):
   def __init__(self, num_classes):
-    super(LwF,self).__init__()
-    self.feature_extractor = resnet32()
-    self.feature_extractor.apply(kaiming_normal_init)
-    self.feature_extractor.fc = nn.Linear(64, num_classes)
+	super(LwF,self).__init__()
+	self.model = resnet32()
+	self.model.apply(kaiming_normal_init)
+	self.model.fc = nn.Linear(64, num_classes)
+	
+	# Save FC layer in attributes
+	self.fc = self.feature_extractor.fc
+	# Save other layers in attributes
+	self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
+	self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-    self.loss = nn.CrossEntropyLoss()
-    self.dist_loss = nn.BCEWithLogitsLoss()
 
-    self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-    self.num_classes = num_classes
-    self.num_known = 0
+	self.loss = nn.CrossEntropyLoss()
+	self.dist_loss = nn.BCEWithLogitsLoss()
+
+	self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+	self.num_classes = num_classes
+	self.num_known = 0
 
     
   def increment_classes(self, new_classes):
