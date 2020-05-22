@@ -52,12 +52,15 @@ class iCaRL(nn.Module):
     for y, exemplars in enumerate(self.exemplars):
         dataset.append(exemplars, [y]*len(exemplars))
 
+    print('Len dataset+exemplar', len(dataset))
+
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
     #Store network outputs with pre-updated parameters
     print('loding data')
     q = torch.zeros(len(dataset), self.num_classes).to(DEVICE)
     for images, labels, indexes in dataloader:
+        print('iter')
         images = images.to(DEVICE)
         indexes = indexes.to(DEVICE)
         q[indexes] = self(images)
