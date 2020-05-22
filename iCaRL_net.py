@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
 
             preds = np.array(pred_labels)
             
-            running_corrects += np.sum(preds == targets)
+            running_corrects += np.sum(preds == targets.data())
 
             print('qui2?')
             ypred.extend(preds)
