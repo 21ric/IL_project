@@ -160,7 +160,7 @@ class CIFAR10(VisionDataset):
         """
         #self.data = self.data + data
         self.targets = self.targets + targets
-        self.data = torch.cat([self.data, data], dim=0)
+        self.data = torch.cat([torch.from_numpy(self.data), data], dim=0)
         #self.data = np.concatenate((self.data, data), axis = 0)
         #self.targets = np.concatenate((self.targets, targets))
 
