@@ -28,34 +28,40 @@ def kaiming_normal_init(m):
 
 
 class LwF(nn.Module):
-  def __init__(self, num_classes):
-	super(LwF,self).__init__()
-	self.model = resnet32()
-	self.model.apply(kaiming_normal_init)
-	self.model.fc = nn.Linear(64, num_classes) # Modify output layers
-	
-	# Save FC layer in attributes
-	self.fc = self.feature_extractor.fc
-	# Save other layers in attributes
-	self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
-	self.feature_extractor = nn.DataParallel(self.feature_extractor) 
+  	def __init__(self, num_classes):
+		super(LwF,self).__init__()
+		self.model = resnet32()
+		self.model.apply(kaiming_normal_init)
+		self.model.fc = nn.Linear(64, num_classes) # Modify output layers
+
+		# Save FC layer in attributes
+		self.fc = self.feature_extractor.fc
+		# Save other layers in attributes
+		self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
+		self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
 
-	self.loss = nn.CrossEntropyLoss()
-	self.dist_loss = nn.BCEWithLogitsLoss()
+		self.loss = nn.CrossEntropyLoss()
+		self.dist_loss = nn.BCEWithLogitsLoss()
 
-	self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-	
-	# n_classes is incremented before processing new data in an iteration
-	# n_known is set to n_classes after all data for an iteration has been processed
-	self.n_classes = 0
-	self.n_known = 0
-	
-	#self.num_classes = num_classes
-	#self.num_known = 0
+		self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
-    
-  def increment_classes(self, new_classes):
+		# n_classes is incremented before processing new data in an iteration
+		# n_known is set to n_classes after all data for an iteration has been processed
+		self.n_classes = 0
+		self.n_known = 0
+
+		#self.num_classes = num_classes
+		#self.num_known = 0
+		
+		
+ 	def forward(self, x):
+		x = self.feature_extractor(x)
+		x = x.view(x.size(0), -1)
+		x = self.fc(x)
+		return(x)
+
+    	def increment_classes(self, new_classes):
 		"""Add n classes in the final fc layer"""
 		n = len(new_classes)
 		print('new classes: ', n)
@@ -75,10 +81,7 @@ class LwF(nn.Module):
 		self.fc.weight.data[:out_features] = weight
 		self.n_classes += n
     
-    
-  def forward(self, x):
-    x = self.feature_extractor(x)
-    return(x)
+
 
   def update_representation(self, dataset):
 
