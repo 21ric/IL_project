@@ -71,6 +71,10 @@ def main():
             print(len(el))
         """
 
+        preds, _ = net.classify(test_dataloader)
+
+        print(preds)
+
 
 if __name__ == '__main__':
     main()
