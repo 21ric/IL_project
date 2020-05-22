@@ -173,6 +173,7 @@ def main():
 
   #net = resnet18()
   net = resnet32()
+  print(net)
 
   for i in range(int(100/ClASSES_BATCH)):
     #cambio il numero di classi di output
