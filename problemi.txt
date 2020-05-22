@@ -15,3 +15,5 @@ LINDA:
 alla fine di ogni iterazione? 
 Come l'abbiamo implementato è finetuning si, ma non in un approccio multi-class..
 Ric - Riga 180 fine-tuning, già era fatto
+
+- LwF iplementation in iCarL paper?? che differenze ci sono??
