@@ -163,9 +163,9 @@ class iCaRL(nn.Module):
         for exemplars in self.exemplars:
             features = []
         
-        for ex in exemplars:
-            features.append(self.feature_extractor.extract_features(ex))
-        exemplar_means.append(np.mean(features))
+            for ex in exemplars:
+            	features.append(self.feature_extractor.extract_features(ex))
+            exemplar_means.append(np.mean(features))
         
         if exemplar_means is None:
             raise ValueError(
