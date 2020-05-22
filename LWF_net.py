@@ -126,7 +126,7 @@ class LwF(nn.Module):
         _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
         return preds	
 	
-    def update(self, dataset, class_map, args):
+    def update(self, dataset, class_map):
 
         self.compute_means = True
 
