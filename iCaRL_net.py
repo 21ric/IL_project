@@ -11,7 +11,6 @@ from resnet import resnet32
 
 import math
 
-import copy
 
 ####Hyper-parameters####
 LR = 2
@@ -138,7 +137,7 @@ class iCaRL(nn.Module):
 
         candidates = []
         for f in features:
-            temp = (copy.deepcopy(f) + exemplar_sum)*1.0/(k+1)
+            temp = (f + exemplar_sum)*1.0/(k+1)
             print('inizio', temp)
             temp = (temp-class_mean)**2
             print('inizio iterazioni', temp)
@@ -153,7 +152,7 @@ class iCaRL(nn.Module):
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
 
-        features = np.delete(features, i)
+        features.pop(i)
         #print(type(images))
         images.pop(i)
 
