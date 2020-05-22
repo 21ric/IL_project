@@ -50,7 +50,7 @@ class iCaRL(nn.Module):
 
     #merge new data and exemplars
     for y, exemplars in enumerate(self.exemplars):
-        dataset.append(exemplars, [y]*len(exemplars))
+        dataset.append(np.array(exemplars).squeeze(), [y]*len(exemplars))
 
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
