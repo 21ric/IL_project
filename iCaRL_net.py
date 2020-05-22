@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
 
         ypred = []
         ytrue = []
-         
+
 
         running_corrects = 0
         for inputs, targets, _ in dataloader:
@@ -200,14 +200,14 @@ class iCaRL(nn.Module):
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
-            
-            running_corrects += np.sum(preds == targets.data())
+
+            running_corrects += np.sum(preds == targets.data).data.item()
 
             print('qui2?')
             ypred.extend(preds)
             ytrue.extend(targets)
-        
-          
+
+
         accuracy = running_corrects / float(len(dataloader.dataset))
         print(f"Test accuracy: {accuracy}")
 

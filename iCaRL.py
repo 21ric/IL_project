@@ -11,7 +11,6 @@ import math
 
 ####Hyper-parameters####
 DEVICE = 'cuda'
-NUM_CLASSES = 10
 BATCH_SIZE = 128
 ClASSES_BATCH = 10
 MEMORY_SIZE = 2000
