@@ -139,7 +139,7 @@ class LwF(nn.Module):
         print("Classes: ", classes)
         print('Known: ', self.n_known)
 	
-	dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
+        dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
         '''
         if self.n_classes == 1 and self.n_known == 0:
