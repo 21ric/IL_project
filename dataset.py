@@ -159,7 +159,8 @@ class CIFAR10(VisionDataset):
         """
         #self.data = self.data + data
         self.targets = self.targets + targets
-        self.data = np.concatenate((self.data, data), axis = 0)
+        self.data = torch.cat([self.data, data], dim=1)
+        #self.data = np.concatenate((self.data, data), axis = 0)
         #self.targets = np.concatenate((self.targets, targets))
 
     def get_class_imgs(self, target):
