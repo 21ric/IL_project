@@ -13,7 +13,7 @@ from numpy import random
 DEVICE = 'cuda'
 NUM_CLASSES = 10
 BATCH_SIZE = 128
-ClASSES_BATCH = 10
+CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
@@ -72,6 +72,8 @@ def main():
 		test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
 		# UPDATE STEP on train set
+		net.update(train_dataloader, class_map)
+		#net.eval()
 		# net.update(dataset = train_dataset)
 
 		# EVALUATION STEP on training set and test set     
