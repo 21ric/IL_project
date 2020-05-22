@@ -152,7 +152,7 @@ class CIFAR10(VisionDataset):
         return "Split: {}".format("Train" if self.train is True else "Test")
 
     def append(self, data, targets):
-        self.data = np.concatenate((self.data, np.array(data)))
+        self.data = np.concatenate((self.data, data), axis = 0)
         self.targets = np.concatenate((self.targets, targets))
 
     def get_class_imgs(self, target):
