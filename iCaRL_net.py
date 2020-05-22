@@ -208,7 +208,7 @@ class iCaRL(nn.Module):
 
             for feature in features:
               #computing L2 distance
-              distances = torch.pow(examplar_means - feature, 2).sum(-1)
+              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               pred_labels.append(distances.argmin().item())
 
             preds = np.array(pred_labels)
