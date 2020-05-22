@@ -165,11 +165,20 @@ class iCaRL(nn.Module):
         #compute the mean for each examplars
         exemplar_means=[]
         for exemplars in self.exemplars:
-            features = []
-
+            
             print('forse qui?')
+            """
             for ex in exemplars:
-            	features.append(self.feature_extractor.extract_features(torch.unsqueeze(ex.to(DEVICE), 0)))
+            	features.append(self.feature_extractor.extract_features(torch.unsqueeze(ex, 0)))
+            exemplar_means.append(np.mean(features))
+            """
+            feature_extractor = self.feature_extractor.to(DEVICE)
+            features = []
+            for ex in exemplars:
+                ex = torch.unsqueeze(ex, 0)
+                ex = ex.to(DEVICE)
+                feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
+                features.append(feature)
             exemplar_means.append(np.mean(features))
 
         if exemplar_means is None:
