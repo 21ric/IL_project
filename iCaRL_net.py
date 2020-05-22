@@ -183,6 +183,7 @@ class iCaRL(nn.Module):
         ytrue = []
 
         for inputs, targets, _ in dataloader:
+            imputs = inputs.unsqueeze(0)
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs)
