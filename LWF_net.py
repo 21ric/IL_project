@@ -49,12 +49,10 @@ def MultiClassCrossEntropy(logits, labels, T):
     return Variable(outputs.data, requires_grad=True).cuda()
 
 def kaiming_normal_init(m):
-
-  if isinstance(m, nn.Conv2d):
-	nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
-  elif isinstance(m, nn.Linear):
-	nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
-
+    if isinstance(m, nn.Conv2d):
+        nn.init.kaiming_normal_(m.weight, nonlinearity='relu')
+    elif isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
 class LwF(nn.Module):
 	
@@ -63,159 +61,157 @@ class LwF(nn.Module):
 		
         self.model = resnet32()
         self.model.apply(kaiming_normal_init)
-	self.model.fc = nn.Linear(64, num_classes) # Modify output layers
+        self.model.fc = nn.Linear(64, num_classes) # Modify output layers
 
-	# Save FC layer in attributes
-	self.fc = self.feature_extractor.fc
-	# Save other layers in attributes
-	self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
-	self.feature_extractor = nn.DataParallel(self.feature_extractor) 
+        # Save FC layer in attributes
+        self.fc = self.feature_extractor.fc
+        # Save other layers in attributes
+        self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
+        self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-	self.loss = nn.CrossEntropyLoss()
-	self.dist_loss = nn.BCEWithLogitsLoss()
+        self.loss = nn.CrossEntropyLoss()
+        self.dist_loss = nn.BCEWithLogitsLoss()
 
-	self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+        self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
-	# n_classes is incremented before processing new data in an iteration
-	# n_known is set to n_classes after all data for an iteration has been processed
-	self.n_classes = 0
-	self.n_known = 0
-	self.classes_map = classes_map
+        # n_classes is incremented before processing new data in an iteration
+        # n_known is set to n_classes after all data for an iteration has been processed
+        self.n_classes = 0
+        self.n_known = 0
+        self.classes_map = classes_map
 
-	#self.num_classes = num_classes
-	#self.num_known = 0
+        #self.num_classes = num_classes
+        #self.num_known = 0
 		
 		
 		
-  def forward(self, x):
-	x = self.feature_extractor(x)
-	x = x.view(x.size(0), -1)
-	x = self.fc(x)
-	return(x)
+    def forward(self, x):
+        x = self.feature_extractor(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return(x)
 
-  def increment_classes(self, new_classes):
-	"""Add n classes in the final fc layer"""
-	n = len(new_classes)
-	print('new classes: ', n)
-	in_features = self.fc.in_features
-	out_features = self.fc.out_features
-	weight = self.fc.weight.data
+    def increment_classes(self, new_classes):
+        """Add n classes in the final fc layer"""
+        n = len(new_classes)
+        print('new classes: ', n)
+        in_features = self.fc.in_features
+        out_features = self.fc.out_features
+        weight = self.fc.weight.data
 
-	if self.n_known == 0: # First iteration
-	    new_out_features = n
-	else: # Other iterations
-	    new_out_features = out_features + n
+        if self.n_known == 0: # First iteration
+            new_out_features = n
+        else: # Other iterations
+            new_out_features = out_features + n
 			
-	print('new out features: ', new_out_features)
-	# Update model, changing last FC layer
-	self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
-	# Update attribute self.fc
-	self.fc = self.model.fc
+        print('new out features: ', new_out_features)
+        # Update model, changing last FC layer
+        self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
+        # Update attribute self.fc
+        self.fc = self.model.fc
 
-	# Initialize weights with kaiming normal
-	kaiming_normal_init(self.fc.weight)
-	# Upload old FC weights on first "out_features" nodes
-	self.fc.weight.data[:out_features] = weight
-	self.n_classes += n
+        # Initialize weights with kaiming normal
+        kaiming_normal_init(self.fc.weight)
+        # Upload old FC weights on first "out_features" nodes
+        self.fc.weight.data[:out_features] = weight
+        self.n_classes += n
     
-   def classify(self, images):
-	"""Classify images by softmax
-	Args:
-	    x: input image batch
-	Returns:
-	    preds: Tensor of size (batch_size,)
-	"""
-	_, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
-	return preds
+    def classify(self, images):
+        """Classify images by softmax
+        Args:
+            x: input image batch
+        Returns:
+            preds: Tensor of size (batch_size,)
+        """
+        _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
+        return preds	
 	
-	
-	
-  def update(self, dataset, class_map, args):
+    def update(self, dataset, class_map, args):
 
-	self.compute_means = True
+        self.compute_means = True
 
-	# Save a copy to compute distillation outputs
-	prev_model = copy.deepcopy(self)
-	prev_model.to(DEVICE)
+        # Save a copy to compute distillation outputs
+        prev_model = copy.deepcopy(self)
+        prev_model.to(DEVICE)
 
-	# Save true labels (new images)
-	classes = list(set(dataset.targets)) #list of true labels
-	print("Classes: ", classes)
-	print('Known: ', self.n_known)
+        # Save true labels (new images)
+        classes = list(set(dataset.targets)) #list of true labels
+        print("Classes: ", classes)
+        print('Known: ', self.n_known)
 
-	'''
-	if self.n_classes == 1 and self.n_known == 0:
-	    new_classes = [classes[i] for i in range(1,len(classes))]
-	else:
-	    new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
-	'''
-	new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
+        '''
+        if self.n_classes == 1 and self.n_known == 0:
+            new_classes = [classes[i] for i in range(1,len(classes))]
+        else:
+            new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
+        '''
+        new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
-	if len(new_classes) > 0:
-	    # Change last FC layer
-    	    self.increment_classes(new_classes)  
-	    self.cuda()
+        if len(new_classes) > 0:
+            # Change last FC layer
+            self.increment_classes(new_classes)  
+            self.cuda()
 
-	optimizer = self.optimizer
-	#optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
+        optimizer = self.optimizer
+        #optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
 		
-	self.to(DEVICE)
-	with tqdm(total=NUM_EPOCHS) as pbar:
-	    i = 0
-	    for epoch in range(NUM_EPOCHS):	
-		if i%5 == 0:
-		    print('-'*30)
-		    print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
+        self.to(DEVICE)
+        with tqdm(total=NUM_EPOCHS) as pbar:
+            i = 0
+            for epoch in range(NUM_EPOCHS):	
+                if i%5 == 0:
+                    print('-'*30)
+                    print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
 
-	        # Modify learning rate
-	        # if (epoch+1) in lower_rate_epoch:
-	        # 	self.lr = self.lr * 1.0/lr_dec_factor
-	        # 	for param_group in optimizer.param_groups:
-	        # 		param_group['lr'] = self.lr
+                # Modify learning rate
+                # if (epoch+1) in lower_rate_epoch:
+                # 	self.lr = self.lr * 1.0/lr_dec_factor
+                # 	for param_group in optimizer.param_groups:
+                # 		param_group['lr'] = self.lr
 
 
-		for  images, labels, indices in dataset:
+                for  images, labels, indices in dataset:
 					
-		    seen_labels = []
+                    seen_labels = []
 					
-		    images = images.to(DEVICE)
-		    #labels = labels.to(DEVICE)
-		    indices = indices.to(DEVICE)
-		    #images = Variable(torch.FloatTensor(images)).cuda()
-		    seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-		    labels = Variable(seen_labels).cuda()
-		    # indices = indices.cuda()
+                    images = images.to(DEVICE)
+                    #labels = labels.to(DEVICE)
+                    indices = indices.to(DEVICE)
+                    #images = Variable(torch.FloatTensor(images)).cuda()
+                    seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                    labels = Variable(seen_labels).cuda()
+                    # indices = indices.cuda()
 
-		    optimizer.zero_grad()
+                    optimizer.zero_grad()
 					
-		    # Compute outputs on the new model 
-		    logits = self.forward(images) 
+                    # Compute outputs on the new model 
+                    logits = self.forward(images) 
 					
-		    # Compute classification loss 
-		    cls_loss = nn.CrossEntropyLoss()(logits, labels)
+                    # Compute classification loss 
+                    cls_loss = nn.CrossEntropyLoss()(logits, labels)
 					
-		    # If not first iteration
-		    if self.n_classes//len(new_classes) > 1:
-			# Compute outputs on the previous model
-			dist_target = prev_model.forward(images)
-			# Save logits of the first "old" nodes of the network
-			logits_dist = logits[:,:-(self.n_classes-self.n_known)]
-			# Compute distillation loss
-			dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
-			# Compute total loss
-			loss = dist_loss+cls_loss
+                    # If not first iteration
+                    if self.n_classes//len(new_classes) > 1:
+                        # Compute outputs on the previous model
+                        dist_target = prev_model.forward(images)
+                        # Save logits of the first "old" nodes of the network
+                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+                        # Compute distillation loss
+                        dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
+                        # Compute total loss
+                        loss = dist_loss+cls_loss
 					
-		    # If first iteration
-		    else:
-			loss = cls_loss
+                    # If first iteration
+                    else:
+                        loss = cls_loss
 
-		    loss.backward()
-		    optimizer.step()
+                    loss.backward()
+                    optimizer.step()
 				
-		if i%5 == 0:
-            	    print("Loss: {:.4f}".format(loss.item()))
+                if i%5 == 0:
+                    print("Loss: {:.4f}".format(loss.item()))
 				
-		i+=1
+                i+=1
 	
-		pbar.update(1)
+                pbar.update(1)
 
