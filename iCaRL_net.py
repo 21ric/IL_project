@@ -169,7 +169,7 @@ class iCaRL(nn.Module):
 
             print('forse qui?')
             for ex in exemplars:
-            	features.append(self.feature_extractor.extract_features(torch.unqsueeze(ex, 0)))
+            	features.append(self.feature_extractor.extract_features(torch.unsqueeze(ex, 0)))
             exemplar_means.append(np.mean(features))
 
         if exemplar_means is None:
