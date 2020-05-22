@@ -197,12 +197,12 @@ class iCaRL(nn.Module):
         ytrue = []
 
         for inputs, targets, _ in dataloader:
-            imputs = inputs.unsqueeze(0)
+            imputs = inputs
 
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             print('forward')
-            features = self.feature_extractor.extract_features(inputs)
+            features = feature_extractor.extract_features(inputs)
 
             pred_labels = []
 
