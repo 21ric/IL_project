@@ -201,7 +201,7 @@ class iCaRL(nn.Module):
 
             preds = np.array(pred_labels)
 
-            running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
+            #running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
 
             print('qui2?')
             ypred.extend(preds)
