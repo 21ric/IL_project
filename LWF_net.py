@@ -32,7 +32,7 @@ class LwF(nn.Module):
 	super(LwF,self).__init__()
 	self.model = resnet32()
 	self.model.apply(kaiming_normal_init)
-	self.model.fc = nn.Linear(64, num_classes)
+	self.model.fc = nn.Linear(64, num_classes) # Modify output layers
 	
 	# Save FC layer in attributes
 	self.fc = self.feature_extractor.fc
@@ -45,8 +45,14 @@ class LwF(nn.Module):
 	self.dist_loss = nn.BCEWithLogitsLoss()
 
 	self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-	self.num_classes = num_classes
-	self.num_known = 0
+	
+	# n_classes is incremented before processing new data in an iteration
+	# n_known is set to n_classes after all data for an iteration has been processed
+	self.n_classes = 0
+	self.n_known = 0
+	
+	#self.num_classes = num_classes
+	#self.num_known = 0
 
     
   def increment_classes(self, new_classes):
