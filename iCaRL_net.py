@@ -16,7 +16,7 @@ import math
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -135,20 +135,7 @@ class iCaRL(nn.Module):
         mu_p = 1.0/(k+1) * (phi + S)
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
-        """
-        exemplar_sum = np.sum(exemplar_features)
 
-        candidates = []
-        for f in features:
-            temp = (f + exemplar_sum)*1.0/(k+1)
-            temp = (temp-class_mean)**2
-            sum = 0
-            for el in temp:
-                sum += el
-            candidates.append(math.sqrt(sum))
-
-        i = np.argmin(candidates)
-        """
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
 

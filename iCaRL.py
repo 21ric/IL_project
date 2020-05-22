@@ -14,7 +14,7 @@ DEVICE = 'cuda'
 NUM_CLASSES = 10
 BATCH_SIZE = 128
 ClASSES_BATCH = 10
-MEMORY_SIZE = 200
+MEMORY_SIZE = 2000
 ########################
 
 def main():
@@ -42,14 +42,33 @@ def main():
 
     net = iCaRL(0)
 
-    for i in range(1): #range(int(100/ClASSES_BATCH)):
-
+    for i in (int(100/ClASSES_BATCH)):
 
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
-        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+        if i != 0:
+
+            #creating dataset for previous classes
+            previous_classes = np.array([])
+            for j in range(i):
+              previous_classes = np.concatenate((previous_classes, classes_groups[j]))
+            test_prev_dataset = CIFAR100(root='data/', classes=previous_classes,  train=False, download=True, transform=test_transform)
+
+            # Creating dataset for all classes
+            all_classes = np.concatenate((previous_classes, classes_groups[i]))
+            test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
+
+            # Prepare Dataloaders
+            train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+            test_prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+            test_all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+
+        else:
+
+            train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
         net.update_representation(dataset = train_dataset)
 
@@ -57,24 +76,19 @@ def main():
 
         net.reduce_exemplars_set(m)
 
-        #print('classes')
-        #print(net.num_classes,net.num_known )
-
         for y in range(net.num_known, net.num_classes):
             net.construct_exemplars_set(train_dataset.get_class_imgs(y), m)
 
-        """
-        print('Lunghezze exemplar set')
-        print(len(net.exemplars))
-        print('Lunghezza di ogni set')
-        for el in net.exemplars:
-            print(len(el))
-        """
 
-        preds, _ = net.classify(test_dataloader)
+        if i !=0:
+            preds_new, _ = net.classify(test_dataloader)
+            preds_old, _ = net.classify(test_prev_dataloader)
+            preds_all, _ = net.classify(test_all_dataloader)
+        else:
+            preds, _ = net.classify(test_dataloader)
 
-        print(preds)
-
+        if i == 1:
+            return
 
 if __name__ == '__main__':
     main()
