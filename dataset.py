@@ -152,9 +152,9 @@ class CIFAR10(VisionDataset):
         return "Split: {}".format("Train" if self.train is True else "Test")
 
     def append(self, data, targets):
-        for d, t in zip(data, targets)
+        for d, t in zip(data, targets):
             self.data.append(d)
-            self.targets.append(t)        
+            self.targets.append(t)
         #self.data = np.concatenate((self.data, data), axis = 0)
         #self.targets = np.concatenate((self.targets, targets))
 
