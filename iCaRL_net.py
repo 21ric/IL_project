@@ -55,13 +55,14 @@ class iCaRL(nn.Module):
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
     #Store network outputs with pre-updated parameters
+    print('loding data')
     q = torch.zeros(len(dataset), self.num_classes).to(DEVICE)
     for images, labels, indexes in dataloader:
         images = images.to(DEVICE)
         indexes = indexes.to(DEVICE)
         q[indexes] = self(images)
     q.to(DEVICE)
-
+    print('success')
 
     #Increment classes
     in_features = self.feature_extractor.fc.in_features
