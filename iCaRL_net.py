@@ -125,16 +125,17 @@ class iCaRL(nn.Module):
 
     class_mean = np.mean(np.array(features))
 
-    """
-    print('LUNGHEZA IMMAGINI')
-    print(len(images))
-    print('LUNGHEZZA FEATURES')
-    print(len(features))
-    """
-
     exemplar_set = []
     exemplar_features = []
     for k in range(m):
+
+        S = np.sum(exemplar_features, axis=0)
+        phi = features
+        mu = class_mean
+        mu_p = 1.0/(k+1) * (phi + S)
+        #mu_p = mu_p / np.linalg.norm(mu_p)
+        i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
+        """
         exemplar_sum = np.sum(exemplar_features)
 
         candidates = []
@@ -147,13 +148,11 @@ class iCaRL(nn.Module):
             candidates.append(math.sqrt(sum))
 
         i = np.argmin(candidates)
-        #print('INDICE SCELTO:{}'.format(i))
-
+        """
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
 
         features.pop(i)
-        #print(type(images))
         images.pop(i)
 
 
@@ -174,6 +173,8 @@ class iCaRL(nn.Module):
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
                 features.append(feature)
             exemplar_means.append(np.mean(features))
+
+
 
         """
         if exemplar_means is None:
@@ -203,8 +204,8 @@ class iCaRL(nn.Module):
             for feature in features:
               #computing L2 distance
               print('qui?')
-              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
-              pred_labels.append(distances.argmin().item())
+              #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
+              pred_labels.append(np.argmin(np.sqrt(np.sum((exemplar_means - feaure) ** 2, axis=1))))
 
             preds = np.array(pred_labels)
 
