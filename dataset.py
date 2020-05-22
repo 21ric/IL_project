@@ -178,7 +178,7 @@ class CIFAR10(VisionDataset):
 
                 images.append(img)
 
-        return np.array(images)
+        return images
 
 
 class CIFAR100(CIFAR10):
