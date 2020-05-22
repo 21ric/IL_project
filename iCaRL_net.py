@@ -145,8 +145,7 @@ class iCaRL(nn.Module):
             sum = 0
             for el in temp:
                 sum += el
-            temp = math.sqrt(sum)
-            candidates.append(temp)
+            candidates.append(math.sqrt(sum))
 
         i = np.argmin(candidates)
         print('INDICE SCELTO:{}'.format(i))
