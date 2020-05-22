@@ -157,9 +157,9 @@ class CIFAR10(VisionDataset):
             self.data = np.append(self.data, np.array(d))
             self.targets = np.append(self.targets, np.array(t))
         """
-        self.data = self.data + data
+        #self.data = self.data + data
         self.targets = self.targets + targets
-        #self.data = np.concatenate((self.data, data), axis = 0)
+        self.data = np.concatenate((self.data, data), axis = 0)
         #self.targets = np.concatenate((self.targets, targets))
 
     def get_class_imgs(self, target):
