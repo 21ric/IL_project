@@ -57,13 +57,13 @@ def main():
     class_map = {}
     for i, cl in enumerate(all_classes):
         class_map[cl] = i
-    print ("Class map:", class_map)
+    print (f"Class map:{class_map}\n")
     
     # Create class map reversed
     map_reverse = {}
     for cl, map_cl in class_map.items():
         map_reverse[map_cl] = int(cl)
-    print ("Map Reverse:", map_reverse)
+    print ("Map Reverse:{map_reverse}\n")
 
     # Create Network
     net = LwF(CLASSES_BATCH,class_map)
@@ -74,7 +74,7 @@ def main():
                                                       #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
    
 
-        print(f"Iteration: {s/CLASSES_BATCH}\n")
+        print(f"ITERATION: {s//CLASSES_BATCH}\n")
         #print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
         print("\n")
         
@@ -98,11 +98,11 @@ def main():
         #test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
         # UPDATE STEP on train set
-        print("UPDATE STEP\n")
+        print("Update step\n")
         net.update(train_dataset, class_map)
         # net.update(dataset = train_dataset)
 
-        print("EVALUATION STEP on training and test set\n")
+        print("evalutation step on training and test set\n")
         # EVALUATION STEP on training set and test set   
         net.eval()
 
