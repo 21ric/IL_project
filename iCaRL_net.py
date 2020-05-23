@@ -124,6 +124,7 @@ class iCaRL(nn.Module):
         feature = feature_extractor.extract_features(img).data.cpu().numpy().squeeze()
         features.append(feature)
 
+    print('caricato immagini per costruzione')
     #print(features)
 
     class_mean = np.mean(np.array(features))
