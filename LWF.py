@@ -76,7 +76,7 @@ def main():
                                                       #ora s parte da zero, salta di 10 in 10, fino ad arrivare a 100.. in totale fa 10 iter
    
 
-        print(f"ITERATION: {s//CLASSES_BATCH}\n")
+        print(f"ITERATION: {s//CLASSES_BATCH} / {total_classes//CLASSES_BATCH}\n")
       
         print("\n")
         
