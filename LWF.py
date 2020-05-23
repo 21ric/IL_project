@@ -68,8 +68,8 @@ def main():
     # Create Network
     net = LwF(CLASSES_BATCH,class_map)
  
-
-    
+      
+    #iterating until the net knows total_classes with 10 by 10 steps 
 
     for s in range(0, total_classes, CLASSES_BATCH):  #c'era (0, num_iter,CLASSES_BATCH), modificato perchè altrimenti avevamo num_iter=10
                                                       #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
@@ -136,6 +136,8 @@ def main():
         #print ('%.2f' % (100.0 * correct / total), file=file)
         print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
+
+        #set the net to train for the next iteration 
         net.train()
 
 #for i in range(int(total_classes//CLASSES_BATCH)):
