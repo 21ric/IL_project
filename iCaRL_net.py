@@ -90,7 +90,7 @@ class iCaRL(nn.Module):
             #zero-ing the gradients
             optimizer.zero_grad()
             #hidden.detach_()
-            out, hidden = self(images, hidden)
+            out, hidden = self(images)
             #classification Loss
             loss = self.loss(out, labels)
             #distillation Loss
@@ -101,10 +101,8 @@ class iCaRL(nn.Module):
 
                 loss += dist_loss
 
-            loss.backward()
+            loss.backward(retain_graph=True)
             optimizer.step()
-
-            hidden.detach_()
 
         if i%5 == 0:
             print("Loss: {:.4f}".format(loss.item()))
