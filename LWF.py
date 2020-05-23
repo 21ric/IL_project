@@ -37,7 +37,7 @@ def main():
 	#classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
 	#range_classes = np.arange(100)
-	total_classes = 100
+	total_classes = 20   #try with 2 iterations 
 	perm_id = np.random.permutation(total_classes)
 	all_classes = np.arange(total_classes)
 	
@@ -64,13 +64,29 @@ def main():
 	net = LwF(NUM_CLASSES,class_map)
 
 	#for i in range(int(total_classes//CLASSES_BATCH)):
-	for i in range(1):
+
+        for s in range(0, num_iters, NUM_CLASSES):
+
+		# Load Datasets
+		print('Iteration: ', s)
+		print("Loading training examples for classes", all_classes[s: s+NUM_CLASSES])
+
+		train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+NUM_CLASSES],download=True,transform=train_transform)
+							 
+		train_dataloader = CIFAR100(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
+										   
+		test_dataset = cifar100(root='data',train=False,classes=all_classes[:s+NUM_CLASSES],download=True, transform=test_transform)
+		
+                test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
+												   
+
+	'''for i in range(1):
 
 		train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
 		test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
 		#train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-		test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+		test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
 		# UPDATE STEP on train set
 		net.update(train_dataset, class_map)
@@ -78,10 +94,33 @@ def main():
 
 		# EVALUATION STEP on training set and test set   
 		net.eval()
+
+                net.n_known = net.n_classes
+		
+		print ("model classes : %d, " % net.n_known)
+
+		total = 0.0
+		correct = 0.0
+
+		for images, labels, indices in train_dataloader:
+
+			images = Variable(images).cuda()
+			preds = net.classify(images)
+			preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+			total += labels.size(0)
+			correct += (preds == labels.numpy()).sum()
+
+		# Train Accuracy
+		#print ('%.2f ,' % (100.0 * correct / total), file=file, end="")
+		print ('Train Accuracy : %.2f ,' % (100.0 * correct / total))
+
+
+
 		# net.classify(...)
 		total = 0.0
 		correct = 0.0
 		for images, labels, indices in test_dataloader:
+
 			images = Variable(images).cuda()
 			preds = net.classify(images)
 			preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
@@ -92,7 +131,7 @@ def main():
 		#print ('%.2f' % (100.0 * correct / total), file=file)
 		print ('Test Accuracy : %.2f' % (100.0 * correct / total))
 
-
+                net.train()
 
 
 if __name__ == '__main__':
