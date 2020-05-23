@@ -94,7 +94,8 @@ class iCaRL(nn.Module):
             out = self(images)
 
             #classification Loss
-            loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
+            #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
+            loss = nn.CrossEntropyLoss(out, labels)
             #distillation Loss
             if self.num_known > 0:
                 y=11
