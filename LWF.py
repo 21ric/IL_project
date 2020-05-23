@@ -75,7 +75,7 @@ def main():
    
 
         print(f"ITERATION: {s//CLASSES_BATCH}\n")
-        #print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
+      
         print("\n")
         
         
