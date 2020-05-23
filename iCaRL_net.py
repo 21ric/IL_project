@@ -78,6 +78,7 @@ class iCaRL(nn.Module):
 
     i = 0
 
+    self.cuda()
     for epoch in range(NUM_EPOCHS):
         if i%5 == 0:
             print('-'*30)
