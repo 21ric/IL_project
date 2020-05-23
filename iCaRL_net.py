@@ -64,8 +64,6 @@ class iCaRL(nn.Module):
         q[indexes] = self(images).data
     q.cuda()
 
-    lab = torch.zeroes(len(dataset), (self.num_classes-self.num_known))
-
 
     #Increment classes
     in_features = self.feature_extractor.fc.in_features
