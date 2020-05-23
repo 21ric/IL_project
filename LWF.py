@@ -96,7 +96,7 @@ def main():
         net.update(train_dataset, class_map)
         # net.update(dataset = train_dataset)
 
-        print("evalutation step on training and test set\n")
+        print("\nevalutation step on training and test set\n")
         # EVALUATION STEP on training set and test set   
         net.eval()
 
