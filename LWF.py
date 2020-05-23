@@ -90,7 +90,7 @@ def main():
         # EVALUATION STEP on training set and test set   
         net.eval()
 
-                net.n_known = net.n_classes
+        net.n_known = net.n_classes
         
         print ("model classes : %d, " % net.n_known)
 
@@ -126,7 +126,7 @@ def main():
         #print ('%.2f' % (100.0 * correct / total), file=file)
         print ('Test Accuracy : %.2f' % (100.0 * correct / total))
 
-                net.train()
+        net.train()
 
 
 if __name__ == '__main__':
