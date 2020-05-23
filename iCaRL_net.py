@@ -145,12 +145,13 @@ class iCaRL(nn.Module):
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
 
+        """
         features.pop(i)
         print(i)
         images = images.tolist()
         images.pop(i)
         images = np.array(images)
-
+        """
 
 
     print(exemplar_set[:3])
