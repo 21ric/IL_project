@@ -72,8 +72,8 @@ def main():
         print('Iteration: ', s)
         print("Loading training examples for classes", all_classes[s: s+NUM_CLASSES])
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+NUM_CLASSES],download=True,transform=train_transform)
-        train_dataloader = CIFAR100(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
-        test_dataset = cifar100(root='data',train=False,classes=all_classes[:s+NUM_CLASSES],download=True, transform=test_transform)
+        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
+        test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+NUM_CLASSES],download=True, transform=test_transform)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
                                                    
 
