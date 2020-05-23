@@ -35,8 +35,12 @@ def main():
     #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
+    print("\n")
+
     #range_classes = np.arange(100)
+
     total_classes = 20   #try with 2 iterations 
+
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
     
@@ -44,10 +48,10 @@ def main():
       all_classes[i] = perm_id[all_classes[i]]
 
     # Create groups of 10
-    classes_groups = np.array_split(all_classes, 10)
-    print(classes_groups)
+    #classes_groups = np.array_split(all_classes, 10)
+    #print(classes_groups)
 
-    num_iters = total_classes//CLASSES_BATCH
+    num_iters = total_classes//CLASSES_BATCH        #con 20 classi e classes_batch = 10 fa 2 iterazioni
 
     # Create class map
     class_map = {}
@@ -66,16 +70,21 @@ def main():
 
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
-    for s in range(0, num_iters):  #terzo param CLASSES_BATCH
+    for s in range(0, num_iters):  #c'era un terzo parametro CLASSES_BATCH, tolto altrimenti non itera.
    
-        # Load Datasets
-        print('Iteration: ', s)
+        print(f"Iteration: {s}\n")
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
+        
+        
+        # Load Datasets
+
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
+
         test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+CLASSES_BATCH],download=True, transform=test_transform)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
-                                                   
+        
+        print("\n")                                       
 
         #for i in range(1):
 
@@ -96,7 +105,7 @@ def main():
 
         net.n_known = net.n_classes
         
-        print ("model classes : %d, " % net.n_known)
+        print ("model classes : %d\n " % net.n_known)
 
         total = 0.0
         correct = 0.0
