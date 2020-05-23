@@ -72,7 +72,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.loss = nn.CrossEntropyLoss() #classification loss
-        #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss: not used
+        self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
@@ -160,7 +160,7 @@ class LwF(nn.Module):
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
         criterion = self.loss
-        #dist_loss = self.dist_loss
+        criterion_dist = self.dist_loss
 		
         self.to(DEVICE)
         with tqdm(total=NUM_EPOCHS) as pbar:
@@ -200,22 +200,22 @@ class LwF(nn.Module):
             
 					
                     # If not first iteration
-                    if self.n_classes//len(new_classes) > 1:
-                        print("We are finally computing dist loss!")
+                    if self.n_known > 0:
+                    #if self.n_classes//len(new_classes) > 0:
                         # Compute outputs on the previous model
+                        print("DISTILLATION")
                         dist_target = prev_model.forward(images)
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
-                        dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
+                        dist_loss = criterion_dist(logits_dist, dist_target)
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
 					
                     # If first iteration
                     else:
-                        print("First iteration!")
                         loss = cls_loss
 
                     loss.backward()
