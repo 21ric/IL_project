@@ -201,7 +201,7 @@ class LwF(nn.Module):
                         # Compute outputs on the previous model
                         dist_target = prev_model.forward(images)
                         # Save logits of the first "old" nodes of the network
-                        # LwF doesn't use examplars, it use the network outputs itselfs 
+                        # LwF doesn't use examplars, it uses the network outputs itselfs 
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
                         dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
