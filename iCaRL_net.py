@@ -103,6 +103,7 @@ class iCaRL(nn.Module):
                 loss += dist_loss
             print('LOSS')
             loss.backward()
+            print('NO')
             optimizer.step()
 
         if i%5 == 0:
@@ -148,14 +149,6 @@ class iCaRL(nn.Module):
         print('Indice scelto:{}'.format(i))
         images = np.concatenate((images[:i], images[i+1:]))
         features = np.concatenate((features[:i], features[i+1:]))
-        """
-        features.pop(i)
-        print(i)
-        images = images.tolist()
-        images.pop(i)
-        images = np.array(images)
-        """
-
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
@@ -169,10 +162,7 @@ class iCaRL(nn.Module):
 
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
-            #print('exemplar1')
-            #print(exemplars[1])
-            #print('exemplar2')
-            #print(exemplars[2])
+
             for ex in exemplars:
                 print('tipo exemplar')
                 print(type(ex))

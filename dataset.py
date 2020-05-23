@@ -153,43 +153,11 @@ class CIFAR10(VisionDataset):
         return "Split: {}".format("Train" if self.train is True else "Test")
 
     def append(self, data, targets):
-        """
-        cond = True
-        for d, t in zip(data, targets):
-            if cond:
-                con = False
-                print('Dato da appendere')
-                print(d.numpy())
-                print('tipo')
-                print(type(d.numpy()))
-            print('tipo lista dei dati')
-            print(type(self.data))
-            self.data += [d.numpy()]
-            self.targets = np.append(self.targets, t)
-        """
-        #self.data = self.data + data
         self.targets = self.targets + targets
-        #self.data = torch.cat([torch.from_numpy(self.data), torch.FloatTensor(data)], dim=0)
         self.data = np.concatenate((self.data, data), axis = 0)
-        #self.targets = np.concatenate((self.targets, targets))
 
     def get_class_imgs(self, target):
-        """
-        images = []
-        for i, img in enumerate(self.data):
-            if self.targets[i] == target:
 
-                #img = Image.fromarray(img)
-
-                if self.transform is not None:
-                    img = self.transform(img)
-
-                if self.target_transform is not None:
-                    target = self.target_transform(target)
-
-                images.append(img)
-        return images
-        """
         return self.data[np.array(self.targets) == target]
 
 
