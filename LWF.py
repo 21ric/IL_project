@@ -72,7 +72,7 @@ def main():
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+NUM_CLASSES],download=True,transform=train_transform)
         train_dataloader = CIFAR100(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
         test_dataset = cifar100(root='data',train=False,classes=all_classes[:s+NUM_CLASSES],download=True, transform=test_transform)
-                test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
+        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
                                                    
 
     '''for i in range(1):
