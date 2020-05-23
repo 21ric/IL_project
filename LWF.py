@@ -39,7 +39,7 @@ def main():
 
     #range_classes = np.arange(100)
 
-    total_classes = 100   #try with 2 iterations 
+    total_classes = 20   #try with 2 iterations 
 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
@@ -70,7 +70,7 @@ def main():
 
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
-    for s in range(0, num_iters, 10):  #c'era un terzo parametro CLASSES_BATCH, tolto altrimenti non itera.
+    for s in range(0, total_classes, CLASSES_BATCH):  #c'era un terzo parametro CLASSES_BATCH, tolto altrimenti non itera.
    
         print(f"Iteration: {s}\n")
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
