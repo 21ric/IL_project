@@ -173,21 +173,23 @@ class CIFAR10(VisionDataset):
         #self.targets = np.concatenate((self.targets, targets))
 
     def get_class_imgs(self, target):
+        """
         images = []
         for i, img in enumerate(self.data):
             if self.targets[i] == target:
 
                 #img = Image.fromarray(img)
-                """
+
                 if self.transform is not None:
                     img = self.transform(img)
 
                 if self.target_transform is not None:
                     target = self.target_transform(target)
-                """
-                images.append(img)
 
+                images.append(img)
         return images
+        """
+        return self.data[np.array(self.targets) == target]
 
 
 class CIFAR100(CIFAR10):
