@@ -201,9 +201,7 @@ class LwF(nn.Module):
 					
                     # If not first iteration
                     if self.n_known > 0:
-                    #if self.n_classes//len(new_classes) > 0:
                         # Compute outputs on the previous model
-                        print("DISTILLATION")
                         dist_target = prev_model.forward(images)
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
