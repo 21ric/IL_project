@@ -73,11 +73,23 @@ def main():
 
 		# UPDATE STEP on train set
 		net.update(train_dataset, class_map)
-		#net.eval()
 		# net.update(dataset = train_dataset)
 
-		# EVALUATION STEP on training set and test set     
+		# EVALUATION STEP on training set and test set   
+		net.eval()
 		# net.classify(...)
+		total = 0.0
+		correct = 0.0
+		for images, labels, indices in test_loader:
+			images = Variable(images).cuda()
+			preds = net.classify(images)
+			preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+			total += labels.size(0)
+			correct += (preds == labels.numpy()).sum()
+
+		# Test Accuracy
+		#print ('%.2f' % (100.0 * correct / total), file=file)
+		print ('Test Accuracy : %.2f' % (100.0 * correct / total))
 
 
 
