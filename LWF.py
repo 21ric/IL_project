@@ -47,7 +47,9 @@ def main():
     # Create groups of 10
     classes_groups = np.array_split(all_classes, 10)
     print(classes_groups)
-    
+
+    num_iters = total_classes//NUM_CLASSES
+
     # Create class map
     class_map = {}
     for i, cl in enumerate(all_classes):
