@@ -218,5 +218,5 @@ class LwF(nn.Module):
                 i+=1
 	
                 pbar.update(1)
-                print("\n")
+                
 
