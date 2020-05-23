@@ -121,7 +121,7 @@ def main():
 
 
         #EValuating on test set
-        print(f"Ready to evaluate test set, len= {len(test_dataloader)}")
+        print(f"Ready to evaluate test set, len= {len(test_dataset)}")
        
         total = 0.0
         correct = 0.0
