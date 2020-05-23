@@ -77,7 +77,7 @@ class iCaRL(nn.Module):
     optimizer = self.optimizer
 
     i = 0
-    self.to(DEVICE)
+
     for epoch in range(NUM_EPOCHS):
         if i%5 == 0:
             print('-'*30)
@@ -101,7 +101,7 @@ class iCaRL(nn.Module):
 
                 loss += dist_loss
 
-            loss.backward(retain_graph=True)
+            loss.backward()
             optimizer.step()
 
         if i%5 == 0:
