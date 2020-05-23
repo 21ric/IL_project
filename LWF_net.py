@@ -157,7 +157,9 @@ class LwF(nn.Module):
             self.increment_classes(new_classes)  
             self.cuda()
 
-        optimizer = self.optimizer
+        
+		self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+		optimizer = self.optimizer
         #optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
 		
         self.to(DEVICE)
@@ -174,12 +176,6 @@ class LwF(nn.Module):
                 if epoch in STEPDOWN_EPOCHS:
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
-
-                # Modify learning rate
-                # if (epoch+1) in lower_rate_epoch:
-                # 	self.lr = self.lr * 1.0/lr_dec_factor
-                # 	for param_group in optimizer.param_groups:
-                # 		param_group['lr'] = self.lr
 
                 # train phase, the model weights are update such that it is good with the new task
                 # and also with the old one
