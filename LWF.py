@@ -39,7 +39,7 @@ def main():
 
     #range_classes = np.arange(100)
 
-    total_classes = 20   #try with 2 iterations 
+    total_classes = 30   #try with 2 iterations 
 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
@@ -123,7 +123,7 @@ def main():
 
         # Train Accuracy
         #print ('%.2f ,' % (100.0 * correct / total), file=file, end="")
-        print ('Train Accuracy : %.2f ,' % (100.0 * correct / total))
+        print ('Train Accuracy : %.2f\n' % (100.0 * correct / total))
 
 
 
@@ -140,7 +140,7 @@ def main():
 
         # Test Accuracy
         #print ('%.2f' % (100.0 * correct / total), file=file)
-        print ('Test Accuracy : %.2f' % (100.0 * correct / total))
+        print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
         net.train()
 
