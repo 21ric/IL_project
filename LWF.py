@@ -12,7 +12,6 @@ from numpy import random
 
 ####Hyper-parameters####
 DEVICE = 'cuda'
-NUM_CLASSES = 10
 BATCH_SIZE = 128
 CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
@@ -48,7 +47,7 @@ def main():
     classes_groups = np.array_split(all_classes, 10)
     print(classes_groups)
 
-    num_iters = total_classes//NUM_CLASSES
+    num_iters = total_classes//CLASSES_BATCH
 
     # Create class map
     class_map = {}
@@ -63,17 +62,17 @@ def main():
     print ("Map Reverse:", map_reverse)
 
     # Create Network
-    net = LwF(NUM_CLASSES,class_map)
+    net = LwF(CLASSES_BATCH,class_map)
 
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
-    for s in range(0, num_iters, NUM_CLASSES):
+    for s in range(0, num_iters, CLASSES_BATCH):
                 # Load Datasets
         print('Iteration: ', s)
-        print("Loading training examples for classes", all_classes[s: s+NUM_CLASSES])
-        train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+NUM_CLASSES],download=True,transform=train_transform)
+        print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
+        train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
-        test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+NUM_CLASSES],download=True, transform=test_transform)
+        test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+CLASSES_BATCH],download=True, transform=test_transform)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
                                                    
 
