@@ -88,10 +88,9 @@ class iCaRL(nn.Module):
             indexes = indexes.to(DEVICE)
 
             #zero-ing the gradients
-            hidden.detach_()
             optimizer.zero_grad()
             #hidden.detach_()
-            out = self(images)
+            out, hidden = self(images, hidden)
             #classification Loss
             loss = self.loss(out, labels)
             #distillation Loss
@@ -104,6 +103,8 @@ class iCaRL(nn.Module):
 
             loss.backward()
             optimizer.step()
+
+            hidden.detach_()
 
         if i%5 == 0:
             print("Loss: {:.4f}".format(loss.item()))
