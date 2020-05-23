@@ -80,7 +80,7 @@ def main():
 		# net.classify(...)
 		total = 0.0
 		correct = 0.0
-		for images, labels, indices in test_loader:
+		for images, labels, indices in test_dataloader:
 			images = Variable(images).cuda()
 			preds = net.classify(images)
 			preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
