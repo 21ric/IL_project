@@ -201,7 +201,7 @@ class LwF(nn.Module):
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
                         dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
-                        print("distill_loss: {:.4}".format(dist_loss.item()))
+                      
                         # Compute total loss
                         loss = dist_loss+cls_loss
 					
@@ -214,7 +214,7 @@ class LwF(nn.Module):
 				
                 if i%5 == 0:
                    print("class_loss: {:.4}".format(cls_loss.item()))
-              
+                   print("distill_loss: {:.4}".format(dist_loss.item()))
                    print("Loss: {:.4f}".format(loss.item()))
 				
                 i+=1
