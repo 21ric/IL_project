@@ -44,6 +44,7 @@ def main():
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
     
+    #mix the classes indexes
     for i in range(len(all_classes)):
       all_classes[i] = perm_id[all_classes[i]]
 
@@ -55,9 +56,10 @@ def main():
     # Create class map
 
     class_map = {}
+    #takes 10 new classes randomly
     for i, cl in enumerate(all_classes):
         class_map[cl] = i
-    print (f"Class map:{class_map}\n")
+    print (f"Class map:{class_map}\n")     
     
     # Create class map reversed
     map_reverse = {}
