@@ -16,7 +16,7 @@ import math
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -28,7 +28,7 @@ class iCaRL(nn.Module):
     self.feature_extractor.fc = nn.Linear(64, num_classes)
 
     self.loss = nn.CrossEntropyLoss()
-    self.dist_loss = nn.BCEWithLogitsLoss()
+    self.dist_loss = nn.BCELoss()
 
     self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     self.num_classes = num_classes
@@ -61,7 +61,7 @@ class iCaRL(nn.Module):
     for images, labels, indexes in dataloader:
         images = images.cuda()
         indexes = indexes.cuda()
-        q[indexes] = self(images).data
+        q[indexes] = self(F.sigmoid(images)).data
     q.cuda()
 
 
@@ -99,12 +99,9 @@ class iCaRL(nn.Module):
             loss = self.loss(F.sigmoid(out), labels)
             #distillation Loss
             if self.num_known > 0:
-                y=5
-                #print('dist loss')
                 q_i = q[indexes]
-                print(q_i[:, y])
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
-
+                print(dist_loss.item())
                 loss += dist_loss
 
             loss.backward()
