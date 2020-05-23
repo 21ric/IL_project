@@ -67,7 +67,8 @@ def main():
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
     for s in range(0, num_iters, CLASSES_BATCH):
-                # Load Datasets
+
+        # Load Datasets
         print('Iteration: ', s)
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
@@ -85,9 +86,11 @@ def main():
         #test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
         # UPDATE STEP on train set
+        print("UPDATE STEP\n")
         net.update(train_dataset, class_map)
         # net.update(dataset = train_dataset)
 
+        print("EVALUATION STEP on training and test set\n")
         # EVALUATION STEP on training set and test set   
         net.eval()
 
