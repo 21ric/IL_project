@@ -71,8 +71,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.loss = nn.CrossEntropyLoss()
-        self.dist_loss = nn.BCEWithLogitsLoss()
+        self.loss = nn.CrossEntropyLoss() #classification loss
+        #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss: not used
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
@@ -155,12 +155,12 @@ class LwF(nn.Module):
             # Change last FC layer
             # adding 10 new output neurons
             self.increment_classes(new_classes)  
-            self.cuda()
-
-        
+            
+        # Define optimizer and classification loss
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
-        #optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
+        criterion = self.loss
+        #dist_loss = self.dist_loss
 		
         self.to(DEVICE)
         with tqdm(total=NUM_EPOCHS) as pbar:
@@ -172,7 +172,7 @@ class LwF(nn.Module):
                     for param_group in optimizer.param_groups:
                         print('Learning rate:{}'.format(param_group['lr']))
 		
-                #divide learning rate by 5 after 49 63 epochs
+                # Divide learning rate by 5 after 49 63 epochs
                 if epoch in STEPDOWN_EPOCHS:
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
@@ -184,25 +184,24 @@ class LwF(nn.Module):
                     seen_labels = []
 					
                     images = images.to(DEVICE)
-                    #labels = labels.to(DEVICE)
                     indices = indices.to(DEVICE)
-                    #images = Variable(torch.FloatTensor(images)).cuda()
+                    # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-                    labels = Variable(seen_labels).cuda()
-                    # indices = indices.cuda()
+                    labels = Variable(seen_labels).to(DEVICE)
 
-                    #zeroing the gradient
+                    # Zero-ing the gradient
                     optimizer.zero_grad()
 					
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
 					
                     # Compute classification loss 
-                    cls_loss = nn.CrossEntropyLoss()(logits, labels)
+                    cls_loss = criterion(logits, labels)
             
 					
                     # If not first iteration
                     if self.n_classes//len(new_classes) > 1:
+                        print("We are finally computing dist loss!")
                         # Compute outputs on the previous model
                         dist_target = prev_model.forward(images)
                         # Save logits of the first "old" nodes of the network
@@ -216,6 +215,7 @@ class LwF(nn.Module):
 					
                     # If first iteration
                     else:
+                        print("First iteration!")
                         loss = cls_loss
 
                     loss.backward()
