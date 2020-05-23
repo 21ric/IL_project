@@ -87,22 +87,22 @@ class iCaRL(nn.Module):
             labels = labels.to(DEVICE)
             indexes = indexes.to(DEVICE)
 
-            print('OPT')
             #zero-ing the gradients
+            hidden.detach_()
             optimizer.zero_grad()
+            #hidden.detach_()
             out = self(images)
             #classification Loss
             loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
-                print('dist loss')
+                #print('dist loss')
                 q_i = q[indexes]
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
 
                 loss += dist_loss
-            print('LOSS')
+
             loss.backward()
-            print('NO')
             optimizer.step()
 
         if i%5 == 0:
