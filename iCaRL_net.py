@@ -98,7 +98,7 @@ class iCaRL(nn.Module):
             loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
-                y=11
+                y=5
                 #print('dist loss')
                 q_i = q[indexes]
                 print(q_i[:, y])
