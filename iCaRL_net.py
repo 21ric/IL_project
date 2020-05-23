@@ -27,7 +27,7 @@ class iCaRL(nn.Module):
     self.feature_extractor = resnet32()
     self.feature_extractor.fc = nn.Linear(64, num_classes)
 
-    self.loss = nn.BCEWithLogitsLoss()
+    self.loss = nn.CrossEntropyLoss()
     self.dist_loss = nn.BCEWithLogitsLoss()
 
     self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -95,7 +95,7 @@ class iCaRL(nn.Module):
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
-            loss = nn.CrossEntropyLoss(out, labels)
+            loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
                 y=11
