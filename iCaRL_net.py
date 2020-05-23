@@ -89,7 +89,7 @@ class iCaRL(nn.Module):
             labels = labels.to(DEVICE)
             indexes = indexes.to(DEVICE)
 
-
+            print('OPT')
             #zero-ing the gradients
             optimizer.zero_grad()
             out = self(images)
@@ -101,7 +101,7 @@ class iCaRL(nn.Module):
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
 
                 loss += dist_loss
-
+            print('LOSS')
             loss.backward()
             optimizer.step()
 
@@ -126,7 +126,7 @@ class iCaRL(nn.Module):
         feature = feature_extractor.extract_features(img).data.cpu().numpy().squeeze()
         features.append(feature)
 
-    print('caricato immagini per costruzione')
+    #print('caricato immagini per costruzione')
     #print(features)
 
     class_mean = np.mean(np.array(features))
@@ -144,7 +144,7 @@ class iCaRL(nn.Module):
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-
+        print('Indice scelto:{}'.format(i))
         """
         features.pop(i)
         print(i)
@@ -166,10 +166,10 @@ class iCaRL(nn.Module):
 
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
-            print('exemplar1')
-            print(exemplars[1])
-            print('exemplar2')
-            print(exemplars[2])
+            #print('exemplar1')
+            #print(exemplars[1])
+            #print('exemplar2')
+            #print(exemplars[2])
             for ex in exemplars:
                 print('tipo exemplar')
                 print(type(ex))
