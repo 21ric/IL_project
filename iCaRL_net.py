@@ -97,6 +97,8 @@ class iCaRL(nn.Module):
             loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
             #distillation Loss
             if self.num_known > 0:
+                y=11
+                print(q_i[:, y])
                 #print('dist loss')
                 q_i = q[indexes]
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
