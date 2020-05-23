@@ -191,6 +191,7 @@ class LwF(nn.Module):
 					
                     # Compute classification loss 
                     cls_loss = nn.CrossEntropyLoss()(logits, labels)
+                    print("class_loss: {:.4}".format(cls_loss.item()))
 					
                     # If not first iteration
                     if self.n_classes//len(new_classes) > 1:
@@ -200,6 +201,7 @@ class LwF(nn.Module):
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
                         dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
+                        print("distill_loss: {:.4}".format(dist_loss.item()))
                         # Compute total loss
                         loss = dist_loss+cls_loss
 					
@@ -211,9 +213,8 @@ class LwF(nn.Module):
                     optimizer.step()
 				
                 if i%5 == 0:
-                    print("distill_loss: {:.4}".format(dist_loss.item()))
-                    print("class_loss: {:.4}".format(cls_loss.item()))
-                    print("Loss: {:.4f}".format(loss.item()))
+              
+                   print("Loss: {:.4f}".format(loss.item()))
 				
                 i+=1
 	
