@@ -158,8 +158,8 @@ class LwF(nn.Module):
             self.cuda()
 
         
-		self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-		optimizer = self.optimizer
+        self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+        optimizer = self.optimizer
         #optim.SGD(self.parameters(), lr=self.init_lr, momentum = self.momentum, weight_decay=self.weight_decay)
 		
         self.to(DEVICE)
