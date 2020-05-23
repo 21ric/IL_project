@@ -72,7 +72,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.loss = nn.CrossEntropyLoss() #classification loss
-        self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
+        self.dist_loss = nn.BCELoss()
+        #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
