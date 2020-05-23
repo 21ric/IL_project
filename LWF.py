@@ -71,8 +71,9 @@ def main():
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
     for s in range(0, total_classes, CLASSES_BATCH):  #c'era (0, num_iter,CLASSES_BATCH), modificato perchè altrimenti avevamo num_iter=10
-                                                      #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava.
+                                                      #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
    
+
         print(f"Iteration: {s}\n")
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
         
