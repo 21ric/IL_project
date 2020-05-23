@@ -76,6 +76,7 @@ def main():
 
         print(f"Iteration: {s}\n")
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
+        print("\n")
         
         
         # Load Datasets
