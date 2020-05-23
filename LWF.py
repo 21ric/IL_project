@@ -51,7 +51,7 @@ def main():
     #classes_groups = np.array_split(all_classes, 10)
     #print(classes_groups)
 
-    num_iters = total_classes//CLASSES_BATCH        #con 20 classi e classes_batch = 10 fa 2 iterazioni
+    num_iters = total_classes//CLASSES_BATCH        #con total_classes=20 e classes_batch = 10 fa 2 iterazioni
 
     # Create class map
     class_map = {}
