@@ -163,7 +163,7 @@ class CIFAR10(VisionDataset):
                 print(type(d))
             print('tipo lista dei dati')
             print(type(self.data))
-            self.data = np.append(self.data, np.array(d))
+            self.data = np.append(self.data, np.array(d.numpy()))
             self.targets = np.append(self.targets, t)
 
         #self.data = self.data + data
