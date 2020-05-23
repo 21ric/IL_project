@@ -57,14 +57,12 @@ class iCaRL(nn.Module):
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
     #Store network outputs with pre-updated parameters
-    print('loding data')
     q = torch.zeros(len(dataset), self.num_classes).to(DEVICE)
     for images, labels, indexes in dataloader:
         images = images.to(DEVICE)
         indexes = indexes.to(DEVICE)
         q[indexes] = self(images)
     q.to(DEVICE)
-    print('success')
 
     #Increment classes
     in_features = self.feature_extractor.fc.in_features
@@ -97,6 +95,7 @@ class iCaRL(nn.Module):
             loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
+                print('dist loss')
                 q_i = q[indexes]
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
 
@@ -164,11 +163,7 @@ class iCaRL(nn.Module):
             features = []
 
             for ex in exemplars:
-                print('tipo exemplar')
-                print(type(ex))
-                print('qui?')
                 ex = Image.fromarray(ex)
-                print('no')
                 ex = transform(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
