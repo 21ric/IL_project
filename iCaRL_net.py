@@ -121,6 +121,7 @@ class iCaRL(nn.Module):
     for img in images:
         img = Image.fromarray(img)
         img = transform(img)
+        img = img.unsqueeze(0)
         img = img.to(DEVICE)
         feature = feature_extractor.extract_features(img).data.cpu().numpy().squeeze()
         features.append(feature)
