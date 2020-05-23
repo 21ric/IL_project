@@ -63,7 +63,7 @@ def main():
     map_reverse = {}
     for cl, map_cl in class_map.items():
         map_reverse[map_cl] = int(cl)
-    print ("Map Reverse:{map_reverse}\n")
+    print (f"Map Reverse:{map_reverse}\n")
 
     # Create Network
     net = LwF(CLASSES_BATCH,class_map)
