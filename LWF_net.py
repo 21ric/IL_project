@@ -213,7 +213,7 @@ class LwF(nn.Module):
                     optimizer.step()
 				
                 if i%5 == 0:
-                   print("Loss: {:.4f}".format(loss.item()))
+                   print("Loss: {:.4f}\n".format(loss.item()))
 				
                 i+=1
 	

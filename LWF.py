@@ -74,7 +74,7 @@ def main():
                                                       #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
    
 
-        print(f"Iteration: {s}\n")
+        print(f"Iteration: {s-CLASSES_BATCH}\n")
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
         print("\n")
         
