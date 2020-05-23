@@ -191,7 +191,7 @@ class LwF(nn.Module):
 					
                     # Compute classification loss 
                     cls_loss = nn.CrossEntropyLoss()(logits, labels)
-                    print("class_loss: {:.4}".format(cls_loss.item()))
+            
 					
                     # If not first iteration
                     if self.n_classes//len(new_classes) > 1:
@@ -213,6 +213,7 @@ class LwF(nn.Module):
                     optimizer.step()
 				
                 if i%5 == 0:
+                   print("class_loss: {:.4}".format(cls_loss.item()))
               
                    print("Loss: {:.4f}".format(loss.item()))
 				
