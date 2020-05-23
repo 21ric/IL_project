@@ -151,7 +151,7 @@ class iCaRL(nn.Module):
     self.exemplars.append(exemplar_set)
 
   #da cambiare completamente
-  def classify(self, dataloader):
+  def classify(self, dataloader, transform):
 
         #compute the mean for each examplars
         exemplar_means=[]

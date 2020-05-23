@@ -86,11 +86,11 @@ def main():
 
 
         if i !=0:
-            preds_new, _ = net.classify(test_dataloader)
-            preds_old, _ = net.classify(test_prev_dataloader)
-            preds_all, _ = net.classify(test_all_dataloader)
+            preds_new, _ = net.classify(test_dataloader, test_dataset.transform)
+            preds_old, _ = net.classify(test_prev_dataloader, test_dataset.transform)
+            preds_all, _ = net.classify(test_all_dataloader, test_dataset.transform)
         else:
-            preds, _ = net.classify(test_dataloader)
+            preds, _ = net.classify(test_dataloader, test_dataset.transform)
 
         if i == 1:
             return
