@@ -177,8 +177,7 @@ class CIFAR10(VisionDataset):
         for i, img in enumerate(self.data):
             if self.targets[i] == target:
 
-                img = Image.fromarray(img)
-
+                #img = Image.fromarray(img)
                 """
                 if self.transform is not None:
                     img = self.transform(img)
