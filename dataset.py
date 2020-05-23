@@ -158,10 +158,11 @@ class CIFAR10(VisionDataset):
             if cond:
                 con = False
                 print('Dato da appendere')
-                print(d)
+                print(d.numpy())
                 print('tipo')
                 print(type(d))
-            self.data = self.data.append()
+            print('tipo lista dei dati')
+            print(type(self.data))
             self.targets = np.append(self.targets, t)
 
         #self.data = self.data + data
