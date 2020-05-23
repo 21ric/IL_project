@@ -97,13 +97,14 @@ def main():
         # net.update(dataset = train_dataset)
 
         print("\nevalutation step on training and test set\n")
-        # EVALUATION STEP on training set and test set   
+        # EVALUATION STEP    
         net.eval()
 
         net.n_known = net.n_classes
         
-        print ("model classes : %d\n " % net.n_known)
-
+        print ("the model knows %d classes:\n " % net.n_known)
+  
+        #Evaluating on train set
         total = 0.0
         correct = 0.0
 
@@ -120,8 +121,8 @@ def main():
         print ('Train Accuracy : %.2f\n' % (100.0 * correct / total))
 
 
-
-        # net.classify(...)
+        #EValuating on test set
+       
         total = 0.0
         correct = 0.0
         for images, labels, indices in test_dataloader:
