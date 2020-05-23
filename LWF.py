@@ -66,8 +66,7 @@ def main():
 	#for i in range(int(total_classes//CLASSES_BATCH)):
 
         for s in range(0, num_iters, NUM_CLASSES):
-
-		# Load Datasets
+                # Load Datasets
 		print('Iteration: ', s)
 		print("Loading training examples for classes", all_classes[s: s+NUM_CLASSES])
 		train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+NUM_CLASSES],download=True,transform=train_transform)
