@@ -33,6 +33,8 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
+STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
+STEPDOWN_FACTOR = 5
 ########################
 
 
@@ -165,6 +167,13 @@ class LwF(nn.Module):
                 if i%5 == 0:
                     print('-'*30)
                     print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
+					for param_group in optimizer.param_groups:
+                        print('Learning rate:{}'.format(param_group['lr']))
+		
+		        #divide learning rate by 5 after 49 63 epochs
+                if epoch in STEPDOWN_EPOCHS:
+                    for param_group in optimizer.param_groups:
+                        param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
                 # Modify learning rate
                 # if (epoch+1) in lower_rate_epoch:
