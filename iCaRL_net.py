@@ -160,7 +160,11 @@ class iCaRL(nn.Module):
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
             for ex in exemplars:
+                print('tipo exemplar')
+                print(type(ex))
+                print('qui?')
                 ex = Image.fromarray(ex)
+                print('no')
                 ex = transform(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
