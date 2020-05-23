@@ -160,7 +160,9 @@ class iCaRL(nn.Module):
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
             for ex in exemplars:
-                ex = torch.unsqueeze(ex, 0)
+                ex = Image.fromarray(ex)
+                ex = transform(ex)
+                ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
                 features.append(feature)
