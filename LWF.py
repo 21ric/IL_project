@@ -75,8 +75,8 @@ def main():
                                                       #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
                                                       #ora s parte da zero, salta di 10 in 10, fino ad arrivare a 100.. in totale fa 10 iter
    
-
-        print(f"ITERATION: {s//CLASSES_BATCH} / {total_classes//CLASSES_BATCH}\n")
+       
+        print(f"ITERATION: {(s//CLASSES_BATCH)+1} / {total_classes//CLASSES_BATCH}\n")
       
         print("\n")
         
