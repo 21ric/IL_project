@@ -32,14 +32,11 @@ def main():
                      #transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
                     ])
 
-    #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
-    #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
     print("\n")
 
-    #range_classes = np.arange(100)
 
-    total_classes = 20   #try with 2 iterations 
+    total_classes = 100    
 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
@@ -124,6 +121,7 @@ def main():
 
 
         #EValuating on test set
+        print(f"Ready to evaluate test set, len= {len(test_dataloader)}")
        
         total = 0.0
         correct = 0.0
