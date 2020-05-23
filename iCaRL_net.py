@@ -114,7 +114,7 @@ class iCaRL(nn.Module):
         self.exemplars[y] = exemplars[:m]
 
 
-  def construct_exemplars_set(self, images, m, transofrm):
+  def construct_exemplars_set(self, images, m, transform):
 
     feature_extractor = self.feature_extractor.to(DEVICE)
     features = []
