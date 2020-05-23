@@ -151,6 +151,7 @@ class LwF(nn.Module):
 
         if len(new_classes) > 0:
             # Change last FC layer
+            # adding 10 new output neurons
             self.increment_classes(new_classes)  
             self.cuda()
 
@@ -171,7 +172,8 @@ class LwF(nn.Module):
                 # 	for param_group in optimizer.param_groups:
                 # 		param_group['lr'] = self.lr
 
-
+                # train phase, the model weights are update such that it is good with the new task
+                # and also with the old one
                 for  images, labels, indices in dataloader:
 					
                     seen_labels = []
@@ -184,6 +186,7 @@ class LwF(nn.Module):
                     labels = Variable(seen_labels).cuda()
                     # indices = indices.cuda()
 
+                    #zeroing the gradient
                     optimizer.zero_grad()
 					
                     # Compute outputs on the new model 
@@ -198,6 +201,7 @@ class LwF(nn.Module):
                         # Compute outputs on the previous model
                         dist_target = prev_model.forward(images)
                         # Save logits of the first "old" nodes of the network
+                        # LwF doesn't use examplars, it uses the ouput of the network outputs itselfs 
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
                         dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)
