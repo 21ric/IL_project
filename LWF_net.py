@@ -208,7 +208,8 @@ class LwF(nn.Module):
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
                         logits_dist = logits[:,:-(self.n_classes-self.n_known)]
                         # Compute distillation loss
-                        dist_loss = criterion_dist(logits_dist, dist_target)
+                        dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.num_known))
+                        #dist_loss = criterion_dist(logits_dist, dist_target)
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
