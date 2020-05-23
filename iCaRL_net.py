@@ -147,7 +147,7 @@ class iCaRL(nn.Module):
 
         features.pop(i)
         print(i)
-        images = imges.tolist()
+        images = images.tolist()
         images.pop(i)
         images = np.array(images)
 
