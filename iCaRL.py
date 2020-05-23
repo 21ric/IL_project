@@ -13,7 +13,7 @@ import math
 DEVICE = 'cuda'
 BATCH_SIZE = 128
 ClASSES_BATCH = 10
-MEMORY_SIZE = 200
+MEMORY_SIZE = 40
 ########################
 
 def main():
