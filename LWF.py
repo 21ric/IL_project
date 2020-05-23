@@ -47,13 +47,13 @@ def main():
     for i in range(len(all_classes)):
       all_classes[i] = perm_id[all_classes[i]]
 
-    # Create groups of 10
+    #Create groups of 10
     #classes_groups = np.array_split(all_classes, 10)
     #print(classes_groups)
 
-    num_iters = total_classes//CLASSES_BATCH        #con total_classes=20 e classes_batch = 10 fa 2 iterazioni
-
+    #num_iters = total_classes//CLASSES_BATCH      
     # Create class map
+
     class_map = {}
     for i, cl in enumerate(all_classes):
         class_map[cl] = i
@@ -67,11 +67,13 @@ def main():
 
     # Create Network
     net = LwF(CLASSES_BATCH,class_map)
+ 
 
-    #for i in range(int(total_classes//CLASSES_BATCH)):
+    
 
     for s in range(0, total_classes, CLASSES_BATCH):  #c'era (0, num_iter,CLASSES_BATCH), modificato perchè altrimenti avevamo num_iter=10
                                                       #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
+                                                      #ora s parte da zero, salta di 10 in 10, fino ad arrivare a 100.. in totale fa 10 iter
    
 
         print(f"ITERATION: {s//CLASSES_BATCH}\n")
@@ -79,23 +81,15 @@ def main():
         print("\n")
         
         
-        # Load Datasets
-                                                                       
+        # Load Datasets                                            
+                                                             #train data_loader carica le classi [0:10] poi [10:20] ecc..          
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
-
+                                                             #test data_loader carica le classi [0:10] poi [0:20] ecc..
         test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+CLASSES_BATCH],download=True, transform=test_transform)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
         
         print("\n")                                       
-
-        #for i in range(1):
-
-        #train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
-        #test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
-
-        #train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-        #test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
         # UPDATE STEP on train set
         print("Update step\n")
@@ -143,6 +137,14 @@ def main():
         print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
         net.train()
+
+#for i in range(int(total_classes//CLASSES_BATCH)):
+#for i in range(1):
+
+        #train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
+        #test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
+        #train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
+        #test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
 
 if __name__ == '__main__':
