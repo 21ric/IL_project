@@ -60,7 +60,6 @@ class iCaRL(nn.Module):
     print('loding data')
     q = torch.zeros(len(dataset), self.num_classes).to(DEVICE)
     for images, labels, indexes in dataloader:
-        print('iter')
         images = images.to(DEVICE)
         indexes = indexes.to(DEVICE)
         q[indexes] = self(images)
