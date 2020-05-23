@@ -108,6 +108,7 @@ class iCaRL(nn.Module):
         if i%5 == 0:
             print("Loss: {:.4f}".format(loss.item()))
         i+=1
+    print('end epoch')
 
   def reduce_exemplars_set(self, m):
     for y, exemplars in enumerate(self.exemplars):
@@ -145,6 +146,8 @@ class iCaRL(nn.Module):
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
         print('Indice scelto:{}'.format(i))
+        images = np.concatenate((images[:i], images[i+1:]))
+        features = np.concatenate((features[:i], features[i+1:]))
         """
         features.pop(i)
         print(i)
@@ -154,7 +157,7 @@ class iCaRL(nn.Module):
         """
 
 
-    print(exemplar_set[:3])
+    #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
   #da cambiare completamente

@@ -71,10 +71,10 @@ def main():
 
         net.update_representation(dataset = train_dataset)
 
-        print('Dato train sample')
-        print(train_dataset.data[:1])
-        print('tipo')
-        print(type(train_dataset.data[:1]))
+        #print('Dato train sample')
+        #print(train_dataset.data[:1])
+        #print('tipo')
+        #print(type(train_dataset.data[:1]))
         print('done upd')
 
         m = int(math.ceil(MEMORY_SIZE/net.num_classes))
