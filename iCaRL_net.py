@@ -64,6 +64,9 @@ class iCaRL(nn.Module):
         q[indexes] = self(images).data
     q.cuda()
 
+    lab = torch.zeroes(len(dataset), (self.num_classes-self.num_known))
+
+
     #Increment classes
     in_features = self.feature_extractor.fc.in_features
     out_features = self.feature_extractor.fc.out_features
@@ -95,7 +98,7 @@ class iCaRL(nn.Module):
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
-            loss = self.loss(out, labels)
+            loss = self.loss(F.sigmoid(out), labels)
             #distillation Loss
             if self.num_known > 0:
                 y=5
