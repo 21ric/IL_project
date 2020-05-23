@@ -159,6 +159,10 @@ class iCaRL(nn.Module):
 
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
+            print('exemplar1')
+            print(exemplars[1])
+            print('exemplar2')
+            print(exemplars[2])
             for ex in exemplars:
                 print('tipo exemplar')
                 print(type(ex))
