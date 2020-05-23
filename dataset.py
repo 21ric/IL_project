@@ -153,17 +153,17 @@ class CIFAR10(VisionDataset):
         return "Split: {}".format("Train" if self.train is True else "Test")
 
     def append(self, data, targets):
+        cond = True
         for d, t in zip(data, targets):
-            cond = True
             if cond:
                 con = False
                 print('Dato da appendere')
                 print(d.numpy())
                 print('tipo')
-                print(type(d))
+                print(type(d.numpy()))
             print('tipo lista dei dati')
             print(type(self.data))
-            self.data = np.append(self.data, np.array(d.numpy()))
+            self.data += [d.numpy()]
             self.targets = np.append(self.targets, t)
 
         #self.data = self.data + data
