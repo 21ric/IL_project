@@ -45,7 +45,7 @@ class iCaRL(nn.Module):
 
     targets = list(set(dataset.targets))
     n = len(targets)
-    self.to(DEVICE)
+    self.cuda()
     print('{} new classes'.format(len(targets)))
 
     #merge new data and exemplars
@@ -59,10 +59,10 @@ class iCaRL(nn.Module):
     #Store network outputs with pre-updated parameters
     q = torch.zeros(len(dataset), self.num_classes).to(DEVICE)
     for images, labels, indexes in dataloader:
-        images = images.to(DEVICE)
-        indexes = indexes.to(DEVICE)
+        images = images.cuda()
+        indexes = indexes.cuda()
         q[indexes] = self(images)
-    q.to(DEVICE)
+    q.cuda()
 
     #Increment classes
     in_features = self.feature_extractor.fc.in_features
@@ -83,9 +83,9 @@ class iCaRL(nn.Module):
             print('-'*30)
             print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
         for images, labels, indexes in dataloader:
-            images = images.to(DEVICE)
-            labels = labels.to(DEVICE)
-            indexes = indexes.to(DEVICE)
+            images = images.cuda()
+            labels = labels.cuda()
+            indexes = indexes.cuda()
 
             #zero-ing the gradients
             optimizer.zero_grad()
