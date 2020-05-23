@@ -36,7 +36,7 @@ def main():
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
     #range_classes = np.arange(100)
-    total_classes = 100   #try with 2 iterations 
+    total_classes = 20   #try with 2 iterations 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
     
@@ -66,8 +66,8 @@ def main():
 
     #for i in range(int(total_classes//CLASSES_BATCH)):
 
-    for s in range(0, num_iters, CLASSES_BATCH):
-
+    for s in range(0, num_iters):  #terzo param CLASSES_BATCH
+   
         # Load Datasets
         print('Iteration: ', s)
         print("Loading training examples for classes", all_classes[s: s+CLASSES_BATCH])
