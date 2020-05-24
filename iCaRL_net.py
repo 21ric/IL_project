@@ -16,6 +16,8 @@ import math
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
+STEPDOWN_EPOCHS = [49, 63]
+STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
@@ -61,7 +63,8 @@ class iCaRL(nn.Module):
     for images, labels, indexes in dataloader:
         images = images.cuda()
         indexes = indexes.cuda()
-        q[indexes] = self(images).data
+        g =  torch.sigmoid(self(images))
+        q[indexes] = g.data
     q.cuda()
 
 
@@ -75,12 +78,17 @@ class iCaRL(nn.Module):
     self.num_known = self.num_classes
     self.num_classes += n
 
+    self.optimizer   = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     optimizer = self.optimizer
 
-    i = 0
 
     self.cuda()
     for epoch in range(NUM_EPOCHS):
+
+        if epoch in STEPDOWN_EPOCHS:
+            for param_group in optimizer.param_groups:
+              param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
         if i%5 == 0:
             print('-'*30)
             print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
@@ -92,7 +100,7 @@ class iCaRL(nn.Module):
             #zero-ing the gradients
             optimizer.zero_grad()
             #hidden.detach_()
-            out = self(images)
+            out = torch.sigmoid(self(images))
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
