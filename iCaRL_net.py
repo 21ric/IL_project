@@ -241,8 +241,8 @@ class iCaRL(nn.Module):
             print('Running corrects')
             print(running_corrects)
 
-            ypred.extends(preds)
-            ytrue.extends(targets)
+            ypred.extend(preds)
+            ytrue.extend(targets)
 
 
         print(ypred)
