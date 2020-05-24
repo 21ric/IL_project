@@ -164,7 +164,7 @@ class LwF(nn.Module):
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
         
-        if self.n_classes == CLASSESE_BATCH and self.n_known == 0:
+        if self.n_classes == CLASSES_BATCH and self.n_known == 0:
             new_classes = [classes[i] for i in range(1,len(classes))]
         else:
             new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
