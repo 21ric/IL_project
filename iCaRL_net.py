@@ -86,7 +86,7 @@ class iCaRL(nn.Module):
 
     self.cuda()
     i=0
-    for epoch in range(NUM_EPOCHS):
+    for epoch in range(2):
 
         if epoch in STEPDOWN_EPOCHS:
             for param_group in optimizer.param_groups:
@@ -226,6 +226,7 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
             targets = targets.to(DEVICE)
             feature = self.feature_extractor.extract_features(inputs) # (batch_size, feature_size)
+            print(features.shape())
             #for i in xrange(feature.size(0)): # Normalize
             #    feature.data[i] = feature.data[i] / feature.data[i].norm()
             feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
