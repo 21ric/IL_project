@@ -191,7 +191,7 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
-
+  """
   #da cambiare completamente
   def classify(self, dataloader, transform):
 
@@ -234,7 +234,7 @@ class iCaRL(nn.Module):
 
 
 
-        """
+
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -244,7 +244,7 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
-        """
+
 
 
         ypred = []
@@ -271,7 +271,7 @@ class iCaRL(nn.Module):
 
             running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
 
-            """
+
             pred_labels = []
             a = 0
 
@@ -301,7 +301,7 @@ class iCaRL(nn.Module):
 
             ypred.extend(preds)
             ytrue.extend(targets)
-            """
+
 
         print(ypred)
 
@@ -309,11 +309,10 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return ypred, ytrue
-
   """
-  def classify(self, x, dataloader):
 
 
+  def classify(self, dataloader):
 
         if self.compute_means:
             print("Computing mean of exemplars...")
@@ -340,15 +339,24 @@ class iCaRL(nn.Module):
         means = torch.stack([means] * BATCH_SIZE) # (batch_size, n_classes, feature_size)
         means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
 
-        feature = self.feature_extractor(x) # (batch_size, feature_size)
-        for i in xrange(feature.size(0)): # Normalize
-            feature.data[i] = feature.data[i] / feature.data[i].norm()
-        feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
-        feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
+        preds = []
+        running_corrects = 0
+        for inputs, targets, _ in dataloader:
 
-        dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-        _, preds = dists.min(1)
+            feature = self.feature_extractor(input) # (batch_size, feature_size)
+            #for i in xrange(feature.size(0)): # Normalize
+            #    feature.data[i] = feature.data[i] / feature.data[i].norm()
+            feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
+            feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
 
+            dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+            _, predictions = dists.min(1)
+
+            running_corrects += torch.sum(torch.from_numpy(predictions) == targets.data).data.item()
+            preds.extend(predictions)
+
+        accuracy = running_corrects/len(dataloader.dataset)
+        print(f"Test accuracy: {accuracy}")
 
         return preds
   """
