@@ -71,8 +71,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.class_loss = nn.CrossEntropyLoss() #classification loss
-        self.dist_loss = nn.BCELoss()
+        self.class_loss = nn.BCEWithLogitsLoss(reduction='mean') #classification loss
+        self.dist_loss = nn.BCEWithLogitsLoss(reduction='mean')    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
@@ -146,6 +146,7 @@ class LwF(nn.Module):
         classes = list(set(dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
+
 	
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 	
@@ -162,13 +163,24 @@ class LwF(nn.Module):
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
-        if len(new_classes) > 0:
+        
+        if self.n_classes == CLASSESE_BATCH and self.n_known == 0:
+			new_classes = [classes[i] for i in range(1,len(classes))]
+		else:
+			new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
+
+		if len(new_classes) > 0:
+			self.increment_classes(new_classes)
+			self.cuda()
+
+        #if len(new_classes) > 0:
 
             # Change last FC layer
             # adding 10 new output neurons and change self.n_classes attribute
-            self.increment_classes(new_classes)  
+         #   self.increment_classes(new_classes)  
 	           
         # Define optimizer and classification loss
+
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
         criterion_class = self.class_loss
@@ -195,8 +207,10 @@ class LwF(nn.Module):
 					
                     seen_labels = []
 					
-                    images = Variable(torch.FloatTensor(images)).to(DEVICE)
+                    images = Variable(torch.FloatTensor(images))
+                    images = images.to(DEVICE)
                     indices = indices.to(DEVICE)
+
                     # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
@@ -206,10 +220,10 @@ class LwF(nn.Module):
 					
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    logits = torch.sigmoid(logits)
+                    #logits = torch.sigmoid(logits)
 					
                     # Compute classification loss 
-                    cls_loss = nn.CrossEntropyLoss()(logits, labels)
+                    cls_loss = criterion_class(logits, labels)
           
             
 					
@@ -242,8 +256,13 @@ class LwF(nn.Module):
                     loss.backward()
                     optimizer.step()
 				
-                if i%5 == 0:
+                if i%5 == 0 and i!= 0:
+
+                   print(f"dist loss: {dist_loss}, class loss:{class_loss}")
                    print("Loss: {:.4f}\n".format(loss.item()))
+                
+                else:
+                   print("Loss: {:.4f}\n".format(loss.item()))    
 				
                 i+=1
 	
