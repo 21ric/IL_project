@@ -211,7 +211,7 @@ class LwF(nn.Module):
                     # If not first iteration
                     if self.n_known > 0:
                         # Save outputs on the previous model on the current batch
-			dist_target_i = dist_target[indices] 
+                        dist_target_i = dist_target[indices] 
                         #dist_target = prev_model.forward(images)
 			
                         # Save logits of the first "old" nodes of the network
