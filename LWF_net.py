@@ -163,6 +163,7 @@ class LwF(nn.Module):
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
         if len(new_classes) > 0:
+
             # Change last FC layer
             # adding 10 new output neurons and change self.n_classes attribute
             self.increment_classes(new_classes)  
