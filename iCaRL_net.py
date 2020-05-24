@@ -170,7 +170,7 @@ class iCaRL(nn.Module):
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
-        print('chosen i:{}'.formt(i))
+        print('chosen i:{}'.format(i))
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
