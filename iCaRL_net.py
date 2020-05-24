@@ -172,7 +172,7 @@ class iCaRL(nn.Module):
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-        print('Indice scelto:{}'.format(i))
+        #print('Indice scelto:{}'.format(i))
 
         images = np.concatenate((images[:i], images[i+1:]))
 
@@ -233,7 +233,7 @@ class iCaRL(nn.Module):
             dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
             _, predictions = dists.min(1)
 
-            running_corrects += torch.sum(torch.from_numpy(predictions) == targets.data).data.item()
+            running_corrects += torch.sum(predictions == targets.data).data.item()  #torch.from_numpy(
             preds.extend(predictions)
 
         accuracy = running_corrects/len(dataloader.dataset)
