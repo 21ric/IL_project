@@ -252,7 +252,7 @@ class iCaRL(nn.Module):
         ypred = []
         ytrue = []
 
-        for inputs, targets, _ in data_loader:
+        for inputs, targets, _ in dataloader:
             inputs = inputs.to(DEVICE)
 
             features = self.feature_extractor.extract_features(inputs).detach()
