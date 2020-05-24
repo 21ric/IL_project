@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
 
             for ex in exemplars:
                 ex = Image.fromarray(ex)
-                ex = transform(ex)
+                ex = transform.toTensor(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
@@ -223,10 +223,14 @@ class iCaRL(nn.Module):
             preds = np.array(pred_labels)
 
             running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
+            print('Running corrects')
+            print(running_corrects)
 
-            ypred.extend(preds)
-            ytrue.extend(targets)
+            ypred.append(preds)
+            ytrue.append(targets)
 
+
+        print(ypred)
 
         accuracy = running_corrects / float(len(dataloader.dataset))
         print(f"Test accuracy: {accuracy}")
