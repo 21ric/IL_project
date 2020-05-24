@@ -176,6 +176,8 @@ def main():
   print(net)
 
   for i in range(int(100/ClASSES_BATCH)):
+
+    print(f"ITERATION {i+1} / {100/CLASSES_BATCH}")
     #cambio il numero di classi di output
     net.fc = nn.Linear(64, 10+i*10)
 
