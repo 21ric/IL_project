@@ -192,13 +192,29 @@ class iCaRL(nn.Module):
                 feature = feature / np.linalg.norm(feature)
                 features.append(feature)
 
-            if cond:
-                print('FEATURE')
-                print(features[0])
-                cond = False
+
+
             class_means = np.mean(features)
 
+            if cond:
+                print('FEATURE')
+                print(features)
+
+            if cond:
+                print('A class mean befor norm')
+                print(class_means)
+
+            if cond:
+                print('A class mean after norm')
+
+
             class_means = class_means/ np.linalg.norm(class_means)
+
+            if cond:
+                print('A class mean after norm')
+                print(class_means)
+                cond = False
+                
             exemplar_means.append(class_means)
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
