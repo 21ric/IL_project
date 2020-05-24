@@ -144,9 +144,9 @@ class iCaRL(nn.Module):
 
     #print('caricato immagini per costruzione')
     #print(features)
-    features = features / np.linalg.norm(features)
+    #features = features / np.linalg.norm(features)
     class_mean = np.mean(np.array(features))
-    class_mean = class_mean / np.linalg.norm(class_mean)
+    #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
     exemplar_set = []
@@ -157,7 +157,7 @@ class iCaRL(nn.Module):
         phi = features
         mu = class_mean
         mu_p = 1.0/(k+1) * (phi + S)
-        mu_p = mu_p / np.linalg.norm(mu_p)
+        #mu_p = mu_p / np.linalg.norm(mu_p)
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
-                feature = feature / np.linalg.norm(feature)
+                #feature = feature / np.linalg.norm(feature)
                 features.append(feature)
 
 
@@ -217,7 +217,7 @@ class iCaRL(nn.Module):
                 print('A class mean after norm')
 
 
-            class_means = class_means/ np.linalg.norm(class_means)
+            #class_means = class_means/ np.linalg.norm(class_means)
 
             if cond:
                 print('A class mean after norm')
@@ -228,7 +228,7 @@ class iCaRL(nn.Module):
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
         #print('Medie per classi')
-        print(exemplar_means)
+        #print(exemplar_means)
 
 
 
