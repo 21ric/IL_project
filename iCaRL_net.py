@@ -170,7 +170,7 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
-"""
+  """
   #da cambiare completamente
   def classify(self, dataloader, transform):
 
@@ -243,7 +243,7 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return np.array(ypred), np.array(ytrue)
-"""
+  """
   def classify(self, x, transform):
         """Classify images by neares-means-of-exemplars
         Args:
