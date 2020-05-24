@@ -13,7 +13,7 @@ from resnet import resnet32
 import math
 
 transform = transforms.Compose([transforms.ToTensor(),
-                                tranforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                tranforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)))
 
 ####Hyper-parameters####
 LR = 2
