@@ -359,4 +359,3 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return preds
-  """
