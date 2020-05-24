@@ -252,13 +252,9 @@ class LwF(nn.Module):
                     loss.backward()
                     optimizer.step()
                 
-                if i%5 == 0 and i!= 0:
+                if i%5 == 0:
 
-                   print(f"dist loss: {dist_loss}, class loss:{class_loss}")
-                   print("Loss: {:.4f}\n".format(loss.item()))
-                
-                else:
-                   print("Loss: {:.4f}\n".format(loss.item()))    
+                	print("Loss: {:.4f}\n".format(loss.item()))    
                 
                 i+=1
     
