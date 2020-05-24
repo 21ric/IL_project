@@ -162,7 +162,6 @@ class LwF(nn.Module):
             dist_target = Variable(dist_target).cuda()
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
-
         
 
         if len(new_classes) > 0:
