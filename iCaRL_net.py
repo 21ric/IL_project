@@ -323,7 +323,7 @@ class iCaRL(nn.Module):
                 # Extract feature for each exemplar in P_y
                 for ex in P_y:
                     ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
-                    feature = self.feature_extractor(ex.unsqueeze(0))
+                    feature = self.feature_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
                     feature.data = feature.data / feature.data.norm() # Normalize
                     features.append(feature)
@@ -343,8 +343,8 @@ class iCaRL(nn.Module):
         preds = []
         running_corrects = 0
         for inputs, targets, _ in dataloader:
-
-            feature = self.feature_extractor(input) # (batch_size, feature_size)
+            print('qui?')
+            feature = self.feature_extractor.extract_features(input) # (batch_size, feature_size)
             #for i in xrange(feature.size(0)): # Normalize
             #    feature.data[i] = feature.data[i] / feature.data[i].norm()
             feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
