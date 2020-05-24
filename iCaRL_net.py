@@ -145,7 +145,15 @@ class iCaRL(nn.Module):
     #print('caricato immagini per costruzione')
     #print(features)
     #features = features / np.linalg.norm(features)
-    class_mean = np.mean(np.array(features))
+    #class_mean = np.mean(np.array(features))
+    class_mean = None
+    for feature in features:
+        if class_mean is None:
+            class_mean = feature
+        else:
+            class_mean += feature
+    class_means = class_mean / len(features)
+
     print('Costruzione exemp---class_mean:{}'.format(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
