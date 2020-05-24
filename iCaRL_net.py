@@ -146,7 +146,7 @@ class iCaRL(nn.Module):
     #print(features)
     #features = features / np.linalg.norm(features)
     class_mean = np.mean(np.array(features))
-    print('Costruzione exemp---class_mean:{}'.f(class_mean))
+    print('Costruzione exemp---class_mean:{}'.format(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
