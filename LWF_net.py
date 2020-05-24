@@ -197,16 +197,18 @@ class LwF(nn.Module):
                     logits = self.forward(images) 
 					
                     # Compute classification loss 
-                    cls_loss = criterion(logits, labels)
+                    cls_loss = criterion(F.sigmoid(logits), labels)
             
 					
                     # If not first iteration
                     if self.n_known > 0:
                         # Compute outputs on the previous model
-                        dist_target = prev_model.forward(images)
+                        dist_target = prev_model.forward(F.sigmoid(images))
+			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
-                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+			
                         # Compute distillation loss
                         dist_target = dist_target.detach()
                         dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
