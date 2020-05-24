@@ -201,7 +201,9 @@ class iCaRL(nn.Module):
         """
         return torch.pow(a - b, 2).sum(-1)
 
-  def get_closest(centers, features):
+
+  def get_the_closest(centers, features):
+
         """Returns the center index being the closest to each feature.
         :param centers: Centers to compare, in this case the class means.
         :param features: A tensor of features extracted by the convnet.
@@ -257,7 +259,7 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
 
             features = self.feature_extractor.extract_features(inputs).detach()
-            preds = get_closest(exemplar_means,features)
+            preds = get_the_closest(exemplar_means,features)
 
             ypred.extend(preds)
             ytrue.extend(targets)
