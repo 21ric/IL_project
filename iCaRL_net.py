@@ -245,7 +245,7 @@ class iCaRL(nn.Module):
             )
  
         else:
-           print("number of examplar means {} is costistent".format(exemplar_means.shape[0])
+           print(f"number of examplar means {exemplar_means.shape[0]} is costistent")
         
 
 

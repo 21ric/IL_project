@@ -93,7 +93,7 @@ def main():
             print('All classes')
             preds_all, _ = net.classify(test_all_dataloader,test_all_dataset.transform)
         else:
-            preds, _ = net.classify(test_dataloader)
+            preds, _ = net.classify(test_dataloader,test_dataset.transform)
 
         if i == 1:
             return
