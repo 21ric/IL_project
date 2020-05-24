@@ -135,8 +135,8 @@ class LwF(nn.Module):
         self.compute_means = True
 
         # Save a copy to compute distillation outputs
-        prev_model = copy.deepcopy(self)
-        prev_model.to(DEVICE)
+        #prev_model = copy.deepcopy(self)
+        #prev_model.to(DEVICE)
 
         # Save true labels (new images)
         classes = list(set(dataset.targets)) #list of true labels
@@ -149,10 +149,11 @@ class LwF(nn.Module):
         if (self.n_known > 0) :
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indices in dataloader:
-                images = images.cuda()
+                images = Variable(images).cuda()
                 indexes = indices.cuda()
-                dist_target[indices] = self(F.sigmoid(images)).data
-            dist_target.cuda()
+                g = F.sigmoid(self.forward(images))
+                dist_target[indices] = g.data
+            dist_target = Variable(dist_target).cuda()
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
@@ -211,14 +212,15 @@ class LwF(nn.Module):
                         #dist_target = prev_model.forward(images)
 			
                         # Save logits of the first "old" nodes of the network
-                        # LwF doesn't use examplars, it uses the network outputs itselfs 
-                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+                        # LwF doesn't use examplars, it uses the network outputs itselfs
+                        logits = F.sigmoid(logits)
+                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]
 			
                         # Compute distillation loss
                         #dist_target = dist_target.detach()
                         dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                         #dist_loss = criterion_dist(logits_dist, dist_target_i)
-                        print(dist_loss.item())
+                        #print(dist_loss.item())
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
