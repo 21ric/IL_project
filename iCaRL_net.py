@@ -177,8 +177,8 @@ class iCaRL(nn.Module):
         print()
         #images = np.concatenate((images[:i], images[i+1:]))
         #features = np.concatenate((features[:i], features[i+1:]))
-        print('F1',features[:i])
-        print('F2',features[i+1:])
+        print('F1',features[i-2:i])
+        print('F2',features[i+1: i+3])
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
