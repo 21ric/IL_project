@@ -72,8 +72,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.loss = nn.CrossEntropyLoss() #classification loss
-        #self.dist_loss = nn.BCELoss()
-        self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
+        self.dist_loss = nn.BCELoss()
+        #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
@@ -143,6 +143,14 @@ class LwF(nn.Module):
         print('Known: ', self.n_known)
 	
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
+	
+        #Store network outputs with pre-updated parameters
+        dist_target = torch.zeros(len(dataset), self.num_classes).cuda()
+        for images, labels, indices in dataloader:
+            images = images.cuda()
+            indexes = indices.cuda()
+            dist_target[indices] = self(F.sigmoid(images)).data
+        dist_target.cuda()
 
         '''
         if self.n_classes == 1 and self.n_known == 0:
@@ -202,8 +210,9 @@ class LwF(nn.Module):
 					
                     # If not first iteration
                     if self.n_known > 0:
-                        # Compute outputs on the previous model
-                        dist_target = prev_model.forward(images)
+                        # Save outputs on the previous model on the current batch
+			dist_target_i = dist_target[indices] 
+                        #dist_target = prev_model.forward(images)
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
@@ -212,7 +221,7 @@ class LwF(nn.Module):
                         # Compute distillation loss
                         #dist_target = dist_target.detach()
                         #dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
-                        dist_loss = criterion_dist(logits_dist, dist_target)
+                        dist_loss = criterion_dist(logits_dist, dist_target_i)
                         print(dist_loss.item())
                       
                         # Compute total loss
