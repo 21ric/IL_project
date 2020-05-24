@@ -194,7 +194,7 @@ class iCaRL(nn.Module):
 
 
 
-            class_means = np.mean(features)
+            class_means = np.mean(features, axis=1)
 
             if cond:
                 print('FEATURE')
@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
                 print('A class mean after norm')
                 print(class_means)
                 cond = False
-                
+
             exemplar_means.append(class_means)
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
