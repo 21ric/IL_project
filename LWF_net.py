@@ -71,7 +71,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.loss = nn.CrossEntropyLoss() #classification loss
+        self.class_loss = nn.CrossEntropyLoss() #classification loss
         self.dist_loss = nn.BCELoss()
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
@@ -166,7 +166,7 @@ class LwF(nn.Module):
         # Define optimizer and classification loss
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
-        criterion = self.loss
+        criterion_class = self.class_loss
         criterion_dist = self.dist_loss
 		
         self.to(DEVICE)
@@ -204,7 +204,7 @@ class LwF(nn.Module):
                     logits = torch.sigmoid(logits)
 					
                     # Compute classification loss 
-                    cls_loss = criterion(logits, labels)
+                    cls_loss = criterion_class(logits, labels)
           
             
 					
