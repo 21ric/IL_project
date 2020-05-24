@@ -151,7 +151,7 @@ class LwF(nn.Module):
         for images, labels, indices in dataloader:
             images = images.cuda()
             indexes = indices.cuda()
-            dist_target[indices] = prev_model(F.sigmoid(images)).data
+            dist_target[indices] = self(F.sigmoid(images)).data
         dist_target.cuda()
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
