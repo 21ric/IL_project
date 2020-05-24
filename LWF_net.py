@@ -79,7 +79,7 @@ class LwF(nn.Module):
 
         # n_classes is incremented before processing new data in an iteration
         # n_known is set to n_classes after all data for an iteration has been processed
-        self.n_classes = 0
+        self.n_classes = num_classes
         self.n_known = 0
         self.classes_map = classes_map
 
@@ -103,6 +103,7 @@ class LwF(nn.Module):
         weight = self.fc.weight.data
 
         if self.n_known == 0: # First iteration
+            self.n_classes = 0
             new_out_features = n
         else: # Other iterations
             new_out_features = out_features + n
@@ -144,6 +145,14 @@ class LwF(nn.Module):
         print('Known: ', self.n_known)
 	
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
+	
+        #Store network outputs with pre-updated parameters
+        dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
+        for images, labels, indices in dataloader:
+            images = images.cuda()
+            indexes = indices.cuda()
+            dist_target[indices] = prev_model(F.sigmoid(images)).data
+        dist_target.cuda()
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
@@ -151,15 +160,7 @@ class LwF(nn.Module):
             # Change last FC layer
             # adding 10 new output neurons and change self.n_classes attribute
             self.increment_classes(new_classes)  
-	
-	#Store network outputs with pre-updated parameters
-        dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
-        for images, labels, indices in dataloader:
-            images = images.cuda()
-            indexes = indices.cuda()
-            dist_target[indices] = self(F.sigmoid(images)).data
-        dist_target.cuda()
-            
+	           
         # Define optimizer and classification loss
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
