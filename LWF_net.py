@@ -155,7 +155,7 @@ class LwF(nn.Module):
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
 
             for images, labels, indices in dataloader:
-                images = Variable(torch.FloatTensor(images)).cuda()
+                images = Variable(images).cuda()
                 indexes = indices.cuda()
                 g = torch.sigmoid(self.forward(images))
                 dist_target[indices] = g.data
@@ -203,7 +203,7 @@ class LwF(nn.Module):
                     
                     seen_labels = []
                     
-                    images = Variable(torch.FloatTensor(images))
+                    images = Variable(images)
                     images = images.to(DEVICE)
                     indices = indices.to(DEVICE)
 
