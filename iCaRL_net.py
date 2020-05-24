@@ -318,7 +318,7 @@ class iCaRL(nn.Module):
         if compute_means:
             print("Computing mean of exemplars...")
             exemplar_means = []
-            for P_y in self.exemplar_sets:
+            for P_y in self.exemplars:
                 features = []
                 # Extract feature for each exemplar in P_y
                 for ex in P_y:
@@ -358,5 +358,5 @@ class iCaRL(nn.Module):
 
         accuracy = running_corrects/len(dataloader.dataset)
         print(f"Test accuracy: {accuracy}")
-
+        print(preds)
         return preds
