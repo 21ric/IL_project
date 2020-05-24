@@ -232,7 +232,7 @@ class iCaRL(nn.Module):
               for mean in exemplar_means:
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
 
-              distances = distances / np.linalg(distances)
+              distances = distances / np.linalg.norm(distances)
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
