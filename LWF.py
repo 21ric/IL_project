@@ -22,6 +22,7 @@ def main():
     #  Define images transformation
     train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                       transforms.RandomHorizontalFlip(),
+                      transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)
                       transforms.ToTensor(),
                       transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
                       #transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
@@ -64,6 +65,7 @@ def main():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
 
+
     # Create Network
     net = LwF(CLASSES_BATCH,class_map)
  
@@ -78,8 +80,7 @@ def main():
         print(f"ITERATION: {(s//CLASSES_BATCH)+1} / {total_classes//CLASSES_BATCH}\n")
       
         print("\n")
-        
-        
+                
         # Load Datasets                                            
                                                              #train data_loader loads images in classes [0:10] then in [10:20] etc..          
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
