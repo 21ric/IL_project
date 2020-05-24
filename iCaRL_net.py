@@ -259,7 +259,16 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
 
             features = self.feature_extractor.extract_features(inputs).detach()
-            preds = get_the_closest(exemplar_means,features)
+            #preds = get_the_closest(exemplar_means,features)
+
+            pred_labels = []
+
+      
+            for feature in features:
+          	  distances = dist(centers, feature)
+          	  pred_labels.append(distances.argmin().item())
+
+            preds = np.array(pred_labels)
 
             ypred.extend(preds)
             ytrue.extend(targets)
