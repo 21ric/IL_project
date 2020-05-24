@@ -257,7 +257,7 @@ class iCaRL(nn.Module):
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
 
             dist =[]
-            for mean in exemplar_mean:
+            for mean in exemplar_means:
                 dists.append(features - exemplar_means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
             preds = np.argmin(np.array(dist), axis=1)
             print('len preds',len(preds))
