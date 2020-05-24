@@ -175,6 +175,7 @@ class iCaRL(nn.Module):
   def classify(self, dataloader, transform):
 
         #compute the mean for each examplars
+        cond = True
         exemplar_means=[]
         for exemplars in self.exemplars:
 
@@ -191,6 +192,10 @@ class iCaRL(nn.Module):
                 feature = feature / np.linalg.norm(feature)
                 features.append(feature)
 
+            if cond:
+                print('FEATURE')
+                print(features[0])
+                cond = False
             class_means = np.mean(features)
 
             class_means = class_means/ np.linalg.norm(class_means)
@@ -246,8 +251,8 @@ class iCaRL(nn.Module):
             print('Running corrects')
             print(running_corrects)
 
-            ypred.append(preds)
-            ytrue.append(targets)
+            ypred.extend(preds)
+            ytrue.extend(targets)
 
 
         print(ypred)
