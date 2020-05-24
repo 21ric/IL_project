@@ -37,7 +37,7 @@ def main():
     print("\n")
 
 
-    total_classes = 30    
+    total_classes = 100    
 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)

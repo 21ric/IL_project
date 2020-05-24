@@ -31,7 +31,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 70
+NUM_EPOCHS = 10
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -72,7 +72,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.loss = nn.CrossEntropyLoss() #classification loss
-        self.dist_loss = nn.BCELoss()
+        #self.dist_loss = nn.BCELoss()
+        self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -213,12 +214,12 @@ class LwF(nn.Module):
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
-                        logits = torch.sigmoid(logits)
-                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                        #logits = torch.sigmoid(logits)
+                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 			
                         # Compute distillation loss
-                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
-                        #dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)  #MCCE
+                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
+                        dist_loss = criterion_dist(logits_dist, dist_target_i)  #MCCE
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss

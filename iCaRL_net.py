@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
 
             for ex in exemplars:
                 ex = Image.fromarray(ex)
-                ex = transform.toTensor(ex)
+                ex = transform.ToTensor(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
