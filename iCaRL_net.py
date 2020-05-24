@@ -260,7 +260,7 @@ class iCaRL(nn.Module):
 
 
             pred_labels = []
-            a = 2
+            a = 0
 
             for feature in features:
               feature = feature / np.linalg.norm(feature)
