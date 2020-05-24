@@ -234,7 +234,6 @@ class iCaRL(nn.Module):
 
 
 
-        """
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -244,7 +243,10 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
-        """
+ 
+        else:
+           print("number of examplar means {} is costistent".format(exemplar_means.shape[0])
+        
 
 
         ypred = []
