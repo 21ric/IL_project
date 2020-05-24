@@ -207,20 +207,18 @@ class LwF(nn.Module):
 					
                     # If not first iteration
                     if self.n_known > 0:
-                        # Save outputs on the previous model on the current batch
+                        # Save outputs of the previous model on the current batch
                         dist_target_i = dist_target[indices] 
-                        #dist_target = prev_model.forward(images)
+                        #dist_target = prev_model.forward(images)  #MCCE
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
                         logits = F.sigmoid(logits)
-                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 			
                         # Compute distillation loss
-                        #dist_target = dist_target.detach()
                         dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
-                        #dist_loss = criterion_dist(logits_dist, dist_target_i)
-                        #print(dist_loss.item())
+                        #dist_loss = MultiClassCrossEntropy(logits_dist, dist_target, 2)  #MCCE
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
