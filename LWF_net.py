@@ -194,26 +194,27 @@ class LwF(nn.Module):
                     optimizer.zero_grad()
 					
                     # Compute outputs on the new model 
-                    logits = self.forward(images) 
+                    logits = self.forward(F.sigmoid(images)) 
 					
                     # Compute classification loss 
-                    cls_loss = criterion(F.sigmoid(logits), labels)
+                    cls_loss = criterion(logits, labels)
             
 					
                     # If not first iteration
                     if self.n_known > 0:
                         # Compute outputs on the previous model
                         dist_target = prev_model.forward(F.sigmoid(images))
-                        dist_target = dist_target[indices]
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
-                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]
+                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]
 			
                         # Compute distillation loss
-                        dist_target = dist_target.detach()
-                        dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
-                        #dist_loss = criterion_dist(logits_dist, dist_target.detach())
+                        y = torch.zeros(BATCH_SIZE, self.n_classes)
+                        y[range(y.shape[0]), dist_target]=1
+                        #dist_target = dist_target.detach()
+                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
+                        dist_loss = criterion_dist(logits_dist, y.detach())
                         print(dist_loss.item())
                       
                         # Compute total loss
