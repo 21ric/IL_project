@@ -216,6 +216,7 @@ class iCaRL(nn.Module):
 
         return np.array(pred_labels)
 
+
   def classify(self, dataloader):
 
 
@@ -256,12 +257,18 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
 
             features = self.feature_extractor.extract_features(inputs).detach()
-            preds = self._get_closest(exemplar_means,features)
+            preds = _get_closest(exemplar_means,features)
 
             ypred.extend(preds)
             ytrue.extend(targets)
 
         return np.array(ypred), np.array(ytrue)
+
+
+
+
+
+
 
  
 '''
