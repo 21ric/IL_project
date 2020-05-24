@@ -262,12 +262,14 @@ class iCaRL(nn.Module):
             #preds = get_the_closest(exemplar_means,features)
 
             pred_labels = []
-
-      
-            for feature in features:
-                #distances = dist(centers, feature)
-                  distances = torch.pow(exemplar_means - feature, 2).sum(-1)
-                  pred_labels.append(distances.argmin().item())
+            
+            #distances = dist(centers, feature)
+            for elem in examplar_means:
+                distances = []
+            	for feature in features:
+                  distances.append(torch.pow(elem - feature, 2).sum(-1))
+            
+            pred_labels.append(distances.argmin().item())
 
             preds = np.array(pred_labels)
 
