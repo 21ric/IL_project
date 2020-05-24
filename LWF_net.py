@@ -197,7 +197,7 @@ class LwF(nn.Module):
                     optimizer.zero_grad()
 					
                     # Compute outputs on the new model 
-                    logits = self.forward(F.sigmoid(images)) 
+                    logits = self.forward(images) 
 					
                     # Compute classification loss 
                     cls_loss = criterion(logits, labels)
