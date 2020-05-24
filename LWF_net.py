@@ -190,7 +190,7 @@ class LwF(nn.Module):
 					
                     seen_labels = []
 					
-                    images = images.to(DEVICE)
+                    images = Variable(torch.FloatTensor(images)).to(DEVICE)
                     indices = indices.to(DEVICE)
                     # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
@@ -204,7 +204,7 @@ class LwF(nn.Module):
                     logits = torch.sigmoid(logits)
 					
                     # Compute classification loss 
-                    cls_loss = criterion_class(logits, labels)
+                    cls_loss = nn.CrossEntropyLoss()(logits, labels)
           
             
 					
