@@ -256,23 +256,25 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
-            features = features / np.linalg.norm(features)
+
 
             pred_labels = []
+            a = 2
 
             for feature in features:
+              feature = feature / np.linalg.norm(feature)
               #computing L2 distance
               #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               distances = []
               for mean in exemplar_means:
-                  print('sottrazione')
-                  print(mean - feature)
+                  if a > 0:
+                      print('sottrazione')
+                      print(mean - feature)
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
-              cond1 = True
-              if cond1:
+              if a > 0:
                   print('DISTANCES')
                   print(distances)
-                  cond1=False
+                  a = a-1
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
