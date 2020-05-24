@@ -314,8 +314,8 @@ class iCaRL(nn.Module):
 
   def classify(self, dataloader):
 
-        self.compute_means = True
-        if self.compute_means:
+        compute_means = True
+        if compute_means:
             print("Computing mean of exemplars...")
             exemplar_means = []
             for P_y in self.exemplar_sets:
@@ -331,11 +331,11 @@ class iCaRL(nn.Module):
                 mu_y = features.mean(0).squeeze()
                 mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
                 exemplar_means.append(mu_y)
-            self.exemplar_means = exemplar_means
-            self.compute_means = False
+            #self.exemplar_means = exemplar_means
+            #self.compute_means = False
             print("Done")
 
-        exemplar_means = self.exemplar_means
+        #exemplar_means = self.exemplar_means
         means = torch.stack(exemplar_means) # (n_classes, feature_size)
         means = torch.stack([means] * BATCH_SIZE) # (batch_size, n_classes, feature_size)
         means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
