@@ -196,9 +196,9 @@ class iCaRL(nn.Module):
             class_means = class_means/ np.linalg.norm(class_means)
             exemplar_means.append(class_means)
 
-        print('Numero di classi in classify:{}'.format(len(class_means)))
+        #print('Numero di classi in classify:{}'.format(len(class_means)))
         print('Medie per classi')
-        print(class_means)
+        print(exemplar_means)
 
 
 
