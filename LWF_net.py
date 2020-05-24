@@ -130,6 +130,7 @@ class LwF(nn.Module):
         return preds	
 	
     def update(self, dataset, class_map):
+        self.cuda()
 
         self.compute_means = True
 
