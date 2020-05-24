@@ -109,7 +109,7 @@ def main():
 
         for images, labels, indices in train_dataloader:
 
-            images = Variable(images).cuda()
+            images = Variable(torch.FloatTensor(images)).cuda()
             preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
@@ -127,7 +127,7 @@ def main():
         correct = 0.0
         for images, labels, indices in test_dataloader:
 
-            images = Variable(images).cuda()
+            images = Variable(torch.FloatTensor(images)).cuda()
             preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
