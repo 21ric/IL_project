@@ -72,8 +72,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.loss = nn.CrossEntropyLoss() #classification loss
-        #self.dist_loss = nn.BCELoss()
-        self.dist_loss = nn.CrossEntropyLoss() #distillation loss
+        self.dist_loss = nn.BCELoss()
+        #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
@@ -201,28 +201,30 @@ class LwF(nn.Module):
 					
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
+                    logits = torch.sigmoid(logits)
 					
                     # Compute classification loss 
                     cls_loss = criterion(logits, labels)
+          
             
 					
                     # If not first iteration
                     if self.n_known > 0:
                         # Save outputs of the previous model on the current batch
-                        #dist_target_i = dist_target[indices] #BCE
-                        dist_target_raw = prev_model.forward(images)  #MCCE
+                        dist_target_i = dist_target[indices] #BCE
+                        #dist_target_raw = prev_model.forward(images)  #MCCE
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
-                        _, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
+                        #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
                         #logits = torch.sigmoid(logits) #BCE
-                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 			
                         # Compute distillation loss
-                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                        dist_loss = criterion_dist(logits_dist, dist_target)  #MCCE
+                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                        #dist_loss = criterion_dist(logits_dist, dist_target)  #MCCE
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
