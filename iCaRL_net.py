@@ -314,6 +314,7 @@ class iCaRL(nn.Module):
 
   def classify(self, dataloader):
 
+        self.compute_means = True
         if self.compute_means:
             print("Computing mean of exemplars...")
             exemplar_means = []
