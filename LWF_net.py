@@ -212,7 +212,7 @@ class LwF(nn.Module):
                         # Compute distillation loss
                         #dist_target = dist_target.detach()
                         #dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
-                        dist_loss = criterion_dist(logits_dist, dist_target.detach())
+                        dist_loss = criterion_dist(logits_dist, dist_target)
                         print(dist_loss.item())
                       
                         # Compute total loss
