@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torchvision import transforms
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 import numpy as np
@@ -134,7 +135,7 @@ class iCaRL(nn.Module):
     features = []
     for img in images:
         img = Image.fromarray(img)
-        img = transform(img)
+        img = transforms.ToTensor(img)
         img = img.unsqueeze(0)
         img = img.to(DEVICE)
         feature = feature_extractor.extract_features(img).data.cpu().numpy().squeeze()
@@ -177,7 +178,7 @@ class iCaRL(nn.Module):
 
             for ex in exemplars:
                 ex = Image.fromarray(ex)
-                ex = transform.ToTensor(ex)
+                ex = transforms.ToTensor(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
