@@ -223,25 +223,6 @@ class iCaRL(nn.Module):
             class_means = class_means / len(exemplars)
             #class_means = np.mean(features, axis=1)
 
-            if cond:
-                print('FEATURE')
-                print(features)
-
-            if cond:
-                print('A class mean befor norm')
-                print(class_means)
-
-            if cond:
-                print('A class mean after norm')
-
-
-            #class_means = class_means/ np.linalg.norm(class_means)
-
-            if cond:
-                print('A class mean after norm')
-                print(class_means)
-                cond = False
-
             exemplar_means.append(class_means)
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
@@ -275,20 +256,30 @@ class iCaRL(nn.Module):
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
 
+            dists = (features - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+            _, preds = dists.min(1)
 
+            ypred.extend(preds)
+            ytrue.extend(targets)
+
+            running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
+
+            """
             pred_labels = []
             a = 0
 
             for feature in features:
               #feature = feature / np.linalg.norm(feature)
               #computing L2 distance
-              #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
-              distances = []
+              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
+
+
+
               for mean in exemplar_means:
                   if a > 0:
                       print('sottrazione')
                       print(mean - feature)
-                  distances.append(np.sqrt(np.sum((mean - feature) ** 2, axis=1)))
+                  distances.append(np.sqrt(np.sum((mean - features) ** 2, axis=1)))
               if a > 0:
                   print('DISTANCES')
                   print(distances)
@@ -303,7 +294,7 @@ class iCaRL(nn.Module):
 
             ypred.extend(preds)
             ytrue.extend(targets)
-
+            """
 
         print(ypred)
 
