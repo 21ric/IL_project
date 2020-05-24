@@ -146,7 +146,7 @@ class LwF(nn.Module):
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 	
         #Store network outputs with pre-updated parameters
-        dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
+        dist_target = torch.zeros(len(dataset), (self.n_classes + 10)).cuda()
         for images, labels, indices in dataloader:
             images = images.cuda()
             indexes = indices.cuda()
