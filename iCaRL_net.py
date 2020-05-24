@@ -173,8 +173,8 @@ class iCaRL(nn.Module):
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
         #print('Indice scelto:{}'.format(i))
-        images = np.concatenate((images[:i], images[i+1:]))
-        features = np.concatenate((features[:i], features[i+1:]))
+        #images = np.concatenate((images[:i], images[i+1:]))
+        #features = np.concatenate((features[:i], features[i+1:]))
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
