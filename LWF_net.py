@@ -57,10 +57,10 @@ def kaiming_normal_init(m):
         nn.init.kaiming_normal_(m.weight, nonlinearity='sigmoid')
 
 class LwF(nn.Module):
-	
+    
     def __init__(self, num_classes, classes_map):
         super(LwF,self).__init__()
-		
+        
         self.model = resnet32()
         self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
@@ -87,9 +87,9 @@ class LwF(nn.Module):
 
         #self.num_classes = num_classes
         #self.num_known = 0
-		
-		
-		
+        
+        
+        
     def forward(self, x):
         x = self.feature_extractor(x)
         x = x.view(x.size(0), -1)
@@ -109,7 +109,7 @@ class LwF(nn.Module):
             new_out_features = n
         else: # Other iterations
             new_out_features = out_features + n
-			
+            
         print('new out features: ', new_out_features)
         # Update model, changing last FC layer
         self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
@@ -130,8 +130,8 @@ class LwF(nn.Module):
             preds: Tensor of size (batch_size,)
         """
         _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
-        return preds	
-	
+        return preds    
+    
     def update(self, dataset, class_map):
 
         self.cuda()
@@ -147,9 +147,9 @@ class LwF(nn.Module):
         print("Classes: ", classes)
         print('Known: ', self.n_known)
 
-	
+    
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
-	
+    
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -165,37 +165,37 @@ class LwF(nn.Module):
 
         
         if self.n_classes == CLASSESE_BATCH and self.n_known == 0:
-			new_classes = [classes[i] for i in range(1,len(classes))]
-		else:
-			new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
+            new_classes = [classes[i] for i in range(1,len(classes))]
+        else:
+            new_classes = [cl for cl in classes if class_map[cl] >= self.n_known]
 
-		if len(new_classes) > 0:
-			self.increment_classes(new_classes)
-			self.cuda()
+        if len(new_classes) > 0:
+            self.increment_classes(new_classes)
+            self.cuda()
 
         #if len(new_classes) > 0:
 
             # Change last FC layer
             # adding 10 new output neurons and change self.n_classes attribute
          #   self.increment_classes(new_classes)  
-	           
+               
         # Define optimizer and classification loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
         criterion_class = self.class_loss
         criterion_dist = self.dist_loss
-		
+        
         self.to(DEVICE)
         with tqdm(total=NUM_EPOCHS) as pbar:
             i = 0
-            for epoch in range(NUM_EPOCHS):	
+            for epoch in range(NUM_EPOCHS):    
                 if i%5 == 0:
                     print('-'*30)
                     print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
                     for param_group in optimizer.param_groups:
                         print('Learning rate:{}'.format(param_group['lr']))
-		
+        
                 # Divide learning rate by 5 after 49 63 epochs
                 if epoch in STEPDOWN_EPOCHS:
                     for param_group in optimizer.param_groups:
@@ -204,9 +204,9 @@ class LwF(nn.Module):
                 # train phase, the model weights are update such that it is good with the new task
                 # and also with the old one
                 for  images, labels, indices in dataloader:
-					
+                    
                     seen_labels = []
-					
+                    
                     images = Variable(torch.FloatTensor(images))
                     images = images.to(DEVICE)
                     indices = indices.to(DEVICE)
@@ -217,16 +217,16 @@ class LwF(nn.Module):
 
                     # Zero-ing the gradient
                     optimizer.zero_grad()
-					
+                    
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
                     #logits = torch.sigmoid(logits)
-					
+                    
                     # Compute classification loss 
                     cls_loss = criterion_class(logits, labels)
           
             
-					
+                    
                     # If not first iteration
                     if self.n_known > 0:
                         # Save outputs of the previous model on the current batch
@@ -235,12 +235,12 @@ class LwF(nn.Module):
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
                         #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
-			
+            
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
                         #logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
-			
+            
                         # Compute distillation loss
                         dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
                         #dist_loss = criterion_dist(logits_dist, dist_target)  #MCCE
@@ -248,15 +248,15 @@ class LwF(nn.Module):
                         # Compute total loss
                         loss = dist_loss+cls_loss
                         #print(dist_loss.item())
-				
-	
+                
+    
                     # If first iteration
                     else:
                         loss = cls_loss
 
                     loss.backward()
                     optimizer.step()
-				
+                
                 if i%5 == 0 and i!= 0:
 
                    print(f"dist loss: {dist_loss}, class loss:{class_loss}")
@@ -264,9 +264,9 @@ class LwF(nn.Module):
                 
                 else:
                    print("Loss: {:.4f}\n".format(loss.item()))    
-				
+                
                 i+=1
-	
+    
                 pbar.update(1)
                 
 
