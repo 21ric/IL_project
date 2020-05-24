@@ -218,7 +218,7 @@ class LwF(nn.Module):
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 			
                         # Compute distillation loss
-                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
+                        dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.n_known))
                         #dist_loss = criterion_dist(logits_dist, dist_target_i)  #MCCE
                       
                         # Compute total loss
