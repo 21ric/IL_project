@@ -71,7 +71,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.class_loss = nn.BCELoss() #classification loss
+        self.class_loss = nn.CrossEntropyLoss() #classification loss
         self.dist_loss = nn.BCELoss()    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
