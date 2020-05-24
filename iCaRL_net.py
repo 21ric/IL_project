@@ -223,6 +223,7 @@ class iCaRL(nn.Module):
         running_corrects = 0
         for inputs, targets, _ in dataloader:
             print('qui?')
+            inputs = inputs.to(DEVICE)
             feature = self.feature_extractor.extract_features(inputs) # (batch_size, feature_size)
             #for i in xrange(feature.size(0)): # Normalize
             #    feature.data[i] = feature.data[i] / feature.data[i].norm()
