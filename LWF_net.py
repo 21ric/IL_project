@@ -173,6 +173,7 @@ class LwF(nn.Module):
             self.increment_classes(new_classes)
             self.cuda()
 
+
         #if len(new_classes) > 0:
 
             # Change last FC layer
