@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -144,9 +144,9 @@ class iCaRL(nn.Module):
 
     #print('caricato immagini per costruzione')
     #print(features)
-    features = features / np.linalg.norm(features)
+    #features = features / np.linalg.norm(features)
     class_mean = np.mean(np.array(features))
-    class_mean = class_mean / np.linalg.norm(class_mean)
+    #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
     exemplar_set = []
@@ -157,7 +157,7 @@ class iCaRL(nn.Module):
         phi = features
         mu = class_mean
         mu_p = 1.0/(k+1) * (phi + S)
-        mu_p = mu_p / np.linalg.norm(mu_p)
+        #mu_p = mu_p / np.linalg.norm(mu_p)
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
@@ -175,7 +175,7 @@ class iCaRL(nn.Module):
   def classify(self, dataloader, transform):
 
         #compute the mean for each examplars
-        cond = True
+        cond = False
 
         class_means = None
 
@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
-                feature = feature / np.linalg.norm(feature)
+                #feature = feature / np.linalg.norm(feature)
                 features.append(feature)
 
 
@@ -217,7 +217,7 @@ class iCaRL(nn.Module):
                 print('A class mean after norm')
 
 
-            class_means = class_means/ np.linalg.norm(class_means)
+            #class_means = class_means/ np.linalg.norm(class_means)
 
             if cond:
                 print('A class mean after norm')
@@ -227,8 +227,8 @@ class iCaRL(nn.Module):
             exemplar_means.append(class_means)
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
-        print('Medie per classi')
-        print(exemplar_means)
+        #print('Medie per classi')
+        #print(exemplar_means)
 
 
 
@@ -256,18 +256,25 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
-            features = features / np.linalg.norm(features)
+
 
             pred_labels = []
+            a = 2
 
             for feature in features:
+              feature = feature / np.linalg.norm(feature)
               #computing L2 distance
               #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               distances = []
               for mean in exemplar_means:
+                  if a > 0:
+                      print('sottrazione')
+                      print(mean - feature)
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
-
-              distances = distances / np.linalg.norm(distances)
+              if a > 0:
+                  print('DISTANCES')
+                  print(distances)
+                  a = a-1
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
