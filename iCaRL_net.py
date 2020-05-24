@@ -154,7 +154,7 @@ class iCaRL(nn.Module):
             class_mean += feature
     class_means = class_mean / len(features)
 
-    print('Costruzione exemp---class_mean:{}'.format(class_mean))
+    #print('Costruzione exemp---class_mean:{}'.format(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
@@ -178,6 +178,9 @@ class iCaRL(nn.Module):
 
         if i == 0:
             features = features[i+1:]
+
+        elif i == len(features):
+            features = features[:i-1]
         else:
             features = np.concatenate((features[:i], features[i+1:]))
         #images = np.concatenate((images[:i], images[i+1:]))
@@ -256,8 +259,12 @@ class iCaRL(nn.Module):
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
 
-            dists = (features - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-            _, preds = dists.min(1)
+            dist =[]
+            for mean in exemplar_means:
+                dist.append(np.sqrt(np.sum((mean - features) ** 2, axis=1)))#(batch_size, n_classes)
+            preds = np.argmin(np.array(dist), axis=1)
+            print('len preds',len(preds))
+            #_, preds = dists.min(1)
 
             ypred.extend(preds)
             ytrue.extend(targets)
