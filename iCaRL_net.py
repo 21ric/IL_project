@@ -16,6 +16,8 @@ import math
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
+STEPDOWN_EPOCHS = [49, 63]
+STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
@@ -30,10 +32,10 @@ class iCaRL(nn.Module):
     self.loss = nn.CrossEntropyLoss()
     self.dist_loss = nn.BCELoss()
 
-    self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+    self.optimizer   = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     self.num_classes = num_classes
-    self.num_known = 0
-    self.exemplars = []
+    self.num_known   = 0
+    self.exemplars   = []
 
 
 
@@ -61,7 +63,8 @@ class iCaRL(nn.Module):
     for images, labels, indexes in dataloader:
         images = images.cuda()
         indexes = indexes.cuda()
-        q[indexes] = self(F.sigmoid(images)).data
+        g =  torch.sigmoid(self(images))
+        q[indexes] = g.data
     q.cuda()
 
 
@@ -75,15 +78,24 @@ class iCaRL(nn.Module):
     self.num_known = self.num_classes
     self.num_classes += n
 
+    self.optimizer   = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     optimizer = self.optimizer
 
-    i = 0
 
     self.cuda()
+    i=0
     for epoch in range(NUM_EPOCHS):
+
+        if epoch in STEPDOWN_EPOCHS:
+            for param_group in optimizer.param_groups:
+              param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
         if i%5 == 0:
             print('-'*30)
             print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
+            for param_group in optimizer.param_groups:
+                print('Learning rate:{}'.format(param_group['lr']))
+                
         for images, labels, indexes in dataloader:
             images = images.cuda()
             labels = labels.cuda()
@@ -92,16 +104,15 @@ class iCaRL(nn.Module):
             #zero-ing the gradients
             optimizer.zero_grad()
             #hidden.detach_()
-            out = self(images)
+            out = torch.sigmoid(self(images))
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
-            loss = self.loss(F.sigmoid(out), labels)
+            loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
                 q_i = q[indexes]
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
-                print(dist_loss.item())
                 loss += dist_loss
 
             loss.backward()
