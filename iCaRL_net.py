@@ -86,7 +86,7 @@ class iCaRL(nn.Module):
 
     self.cuda()
     i=0
-    for epoch in range(2):
+    for epoch in range(NUM_EPOCHS):
 
         if epoch in STEPDOWN_EPOCHS:
             for param_group in optimizer.param_groups:
@@ -191,8 +191,80 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
+
+  def _dist(a, b):
+        """Computes L2 distance between two tensors.
+        :param a: A tensor.
+        :param b: A tensor.
+        :return: A tensor of distance being of the shape of the "biggest" input
+                 tensor.
+        """
+        return torch.pow(a - b, 2).sum(-1)
+
+  def _get_closest(centers, features):
+        """Returns the center index being the closest to each feature.
+        :param centers: Centers to compare, in this case the class means.
+        :param features: A tensor of features extracted by the convnet.
+        :return: A numpy array of the closest centers indexes.
+        """
+        pred_labels = []
+
+        features = features
+        for feature in features:
+            distances = _dist(centers, feature)
+            pred_labels.append(distances.argmin().item())
+
+        return np.array(pred_labels)
+
   def classify(self, dataloader):
 
+
+        class_means = None
+
+        exemplar_means=[]
+        for exemplars in self.exemplars:
+
+            feature_extractor = self.feature_extractor.to(DEVICE)
+            features = []
+
+
+            for ex in exemplars:
+                ex = Image.fromarray(ex)
+                ex = transform(ex)
+                ex = ex.unsqueeze(0)
+                ex = ex.to(DEVICE)
+                feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
+                #feature = feature / np.linalg.norm(feature)
+                features.append(feature)
+
+
+
+            for feature in features:
+                if class_means is None:
+                    class_means = feature
+                else:
+                    class_means += feature
+            class_means = class_means / len(exemplars)
+            #class_means = np.mean(features, axis=1)
+
+            exemplar_means.append(class_means)
+     
+        ypred = []
+        ytrue = []
+
+        for inputs, targets, _ in data_loader:
+            inputs = inputs.to(DEVICE)
+
+            features = self.feature_extractor.extract_features(inputs).detach()
+            preds = self._get_closest(examplar_means, F.normalize(features))
+
+            ypred.extend(preds)
+            ytrue.extend(targets)
+
+        return np.array(ypred), np.array(ytrue)
+
+ 
+'''
         compute_means = True
         if compute_means:
             print("Computing mean of exemplars...")
@@ -226,7 +298,6 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
             targets = targets.to(DEVICE)
             feature = self.feature_extractor.extract_features(inputs) # (batch_size, feature_size)
-            print(features.shape())
             #for i in xrange(feature.size(0)): # Normalize
             #    feature.data[i] = feature.data[i] / feature.data[i].norm()
             feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
@@ -242,4 +313,4 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
         print(preds)
         return preds
-  
+'''
