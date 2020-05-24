@@ -254,7 +254,7 @@ class iCaRL(nn.Module):
         batch_size = x.size(0)
 
         if self.compute_means:
-            print "Computing mean of exemplars...",
+            print("Computing mean of exemplars...")
             exemplar_means = []
             for P_y in self.exemplar_sets:
                 features = []
@@ -271,7 +271,7 @@ class iCaRL(nn.Module):
                 exemplar_means.append(mu_y)
             self.exemplar_means = exemplar_means
             self.compute_means = False
-            print "Done"
+            print("Done")
 
         exemplar_means = self.exemplar_means
         means = torch.stack(exemplar_means) # (n_classes, feature_size)
