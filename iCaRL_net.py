@@ -170,17 +170,20 @@ class iCaRL(nn.Module):
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
-        print('chosen i:{}'.format(i))
-
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-        #print('Indice scelto:{}'.format(i))
+        print('Indice scelto:{}'.format(i))
 
-        print()
+        images = np.concatenate((images[:i], images[i+1:]))
+
+        if i == 0:
+            features = features[i+1:]
+        else:
+            features = np.concatenate((features[:i], features[i+1:]))
         #images = np.concatenate((images[:i], images[i+1:]))
         #features = np.concatenate((features[:i], features[i+1:]))
-        print('F1',features[i-2:i])
-        print('F2',features[i+1: i+3])
+        #print('F1',features[i-2:i])
+        #print('F2',features[i+1: i+3])
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
