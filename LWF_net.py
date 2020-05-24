@@ -221,7 +221,6 @@ class LwF(nn.Module):
                     # Compute classification loss 
                     cls_loss = criterion_class(logits, labels)
           
-                    print("qui")
                     
                     # If not first iteration
                     if self.n_known > 0:
