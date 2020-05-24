@@ -86,8 +86,11 @@ def main():
 
 
         if i !=0:
+            print('New classes')
             preds_new, _ = net.classify(test_dataloader, test_dataset.transform)
+            print('Old classes')
             preds_old, _ = net.classify(test_prev_dataloader, test_dataset.transform)
+            print('All classes')
             preds_all, _ = net.classify(test_all_dataloader, test_dataset.transform)
         else:
             preds, _ = net.classify(test_dataloader, test_dataset.transform)

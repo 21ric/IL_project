@@ -95,7 +95,7 @@ class iCaRL(nn.Module):
             print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
             for param_group in optimizer.param_groups:
                 print('Learning rate:{}'.format(param_group['lr']))
-                
+
         for images, labels, indexes in dataloader:
             images = images.cuda()
             labels = labels.cuda()
@@ -104,7 +104,7 @@ class iCaRL(nn.Module):
             #zero-ing the gradients
             optimizer.zero_grad()
             #hidden.detach_()
-            out = torch.sigmoid(self(images))
+            out = self(images)
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
