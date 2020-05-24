@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
 
@@ -146,6 +146,7 @@ class iCaRL(nn.Module):
     #print(features)
     #features = features / np.linalg.norm(features)
     class_mean = np.mean(np.array(features))
+    print('Costruzione exemp---class_mean:{}'.f(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
@@ -259,7 +260,7 @@ class iCaRL(nn.Module):
 
 
             pred_labels = []
-            a = 2
+            a = 0
 
             for feature in features:
               feature = feature / np.linalg.norm(feature)
