@@ -268,7 +268,11 @@ class iCaRL(nn.Module):
                   print('sottrazione')
                   print(mean - feature)
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
-
+              cond1 = True
+              if cond1:
+                  print('DISTANCES')
+                  print(distances)
+                  cond1=False
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
