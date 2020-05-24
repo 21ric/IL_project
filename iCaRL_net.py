@@ -28,12 +28,12 @@ class iCaRL(nn.Module):
     self.feature_extractor.fc = nn.Linear(64, num_classes)
 
     self.loss = nn.CrossEntropyLoss()
-    self.dist_loss = nn.BCELoss()
+    self.dist_loss = nn.BCEWithLogitsLoss()
 
-    self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
+    self.optimizer   = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     self.num_classes = num_classes
-    self.num_known = 0
-    self.exemplars = []
+    self.num_known   = 0
+    self.exemplars   = []
 
 
 
@@ -61,7 +61,7 @@ class iCaRL(nn.Module):
     for images, labels, indexes in dataloader:
         images = images.cuda()
         indexes = indexes.cuda()
-        q[indexes] = self(F.sigmoid(images)).data
+        q[indexes] = self(images).data
     q.cuda()
 
 
@@ -96,7 +96,7 @@ class iCaRL(nn.Module):
 
             #classification Loss
             #loss = sum(self.loss(out[:,y], 1 if y==labels else 0) for y in range(self.num_known, self.num_classes))
-            loss = self.loss(F.sigmoid(out), labels)
+            loss = self.loss(out, labels)
             #distillation Loss
             if self.num_known > 0:
                 q_i = q[indexes]
