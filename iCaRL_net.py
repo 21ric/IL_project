@@ -83,6 +83,7 @@ class iCaRL(nn.Module):
 
 
     self.cuda()
+    i=0
     for epoch in range(NUM_EPOCHS):
 
         if epoch in STEPDOWN_EPOCHS:
