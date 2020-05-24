@@ -191,7 +191,7 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
-  """
+
   #da cambiare completamente
   def classify(self, dataloader, transform):
 
@@ -234,7 +234,7 @@ class iCaRL(nn.Module):
 
 
 
-
+        """
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -244,7 +244,7 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
-
+        """
 
 
         ypred = []
@@ -309,9 +309,8 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return ypred, ytrue
+
   """
-
-
   def classify(self, dataloader):
 
         compute_means = True
@@ -360,3 +359,4 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
         print(preds)
         return preds
+    """
