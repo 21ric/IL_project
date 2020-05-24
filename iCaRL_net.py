@@ -154,7 +154,7 @@ class iCaRL(nn.Module):
             class_mean += feature
     class_means = class_mean / len(features)
 
-    print('Costruzione exemp---class_mean:{}'.format(class_mean))
+    #print('Costruzione exemp---class_mean:{}'.format(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
@@ -261,7 +261,7 @@ class iCaRL(nn.Module):
 
             dist =[]
             for mean in exemplar_means:
-                dist.append(np.sqrt(np.sum(mean - features) ** 2, axis=1))#(batch_size, n_classes)
+                dist.append(np.sqrt(np.sum((mean - features) ** 2, axis=1)))#(batch_size, n_classes)
             preds = np.argmin(np.array(dist), axis=1)
             print('len preds',len(preds))
             #_, preds = dists.min(1)
