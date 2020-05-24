@@ -135,8 +135,8 @@ class LwF(nn.Module):
         self.compute_means = True
 
         # Save a copy to compute distillation outputs
-        #prev_model = copy.deepcopy(self)
-        #prev_model.to(DEVICE)
+        prev_model = copy.deepcopy(self)
+        prev_model.to(DEVICE)
 
         # Save true labels (new images)
         classes = list(set(dataset.targets)) #list of true labels
