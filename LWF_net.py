@@ -146,12 +146,13 @@ class LwF(nn.Module):
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 	
         #Store network outputs with pre-updated parameters
-        dist_target = torch.zeros(len(dataset), (self.n_classes + 10)).cuda()
-        for images, labels, indices in dataloader:
-            images = images.cuda()
-            indexes = indices.cuda()
-            dist_target[indices] = self(F.sigmoid(images)).data
-        dist_target.cuda()
+        if (self.n_known > 0) :
+            dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
+            for images, labels, indices in dataloader:
+                images = images.cuda()
+                indexes = indices.cuda()
+                dist_target[indices] = self(F.sigmoid(images)).data
+            dist_target.cuda()
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
 
