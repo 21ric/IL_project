@@ -31,7 +31,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 70
+NUM_EPOCHS = 20
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -210,6 +210,7 @@ class LwF(nn.Module):
                         # Compute distillation loss
                         #dist_loss = sum(criterion_dist(logits[:, y], dist_target[:, y]) for y in range(self.num_known))
                         dist_loss = criterion_dist(logits_dist, dist_target.detach())
+                        print(dist_loss)
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
