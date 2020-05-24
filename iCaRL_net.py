@@ -12,6 +12,8 @@ from resnet import resnet32
 
 import math
 
+transform = transforms.Compose([transforms.ToTensor(),
+                                tranforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 
 ####Hyper-parameters####
 LR = 2
@@ -176,9 +178,10 @@ class iCaRL(nn.Module):
             feature_extractor = self.feature_extractor.to(DEVICE)
             features = []
 
+
             for ex in exemplars:
                 ex = Image.fromarray(ex)
-                ex = transforms.ToTensor(ex)
+                ex = transform(ex)
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
