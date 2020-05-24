@@ -79,7 +79,7 @@ class LwF(nn.Module):
 
         # n_classes is incremented before processing new data in an iteration
         # n_known is set to n_classes after all data for an iteration has been processed
-        self.n_classes = num_classes
+        self.n_classes = 0
         self.n_known = 0
         self.classes_map = classes_map
 
@@ -103,7 +103,6 @@ class LwF(nn.Module):
         weight = self.fc.weight.data
 
         if self.n_known == 0: # First iteration
-            self.n_classes = 0
             new_out_features = n
         else: # Other iterations
             new_out_features = out_features + n
