@@ -264,7 +264,7 @@ class iCaRL(nn.Module):
             pred_labels = []
             
             #distances = dist(centers, feature)
-            for elem in examplar_means:
+            for elem in exemplar_means:
                 distances = []
                 for feature in features:
                   distances.append(torch.pow(elem - feature, 2).sum(-1))
