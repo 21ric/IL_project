@@ -256,7 +256,7 @@ class iCaRL(nn.Module):
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
 
-            dists = (features - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+            dists = (features - exemplar_means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
             _, preds = dists.min(1)
 
             ypred.extend(preds)
