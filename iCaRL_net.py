@@ -175,7 +175,7 @@ class iCaRL(nn.Module):
   def classify(self, dataloader, transform):
 
         #compute the mean for each examplars
-        cond = True
+        cond = False
 
         class_means = None
 
@@ -227,7 +227,7 @@ class iCaRL(nn.Module):
             exemplar_means.append(class_means)
 
         #print('Numero di classi in classify:{}'.format(len(class_means)))
-        print('Medie per classi')
+        #print('Medie per classi')
         print(exemplar_means)
 
 
@@ -265,6 +265,8 @@ class iCaRL(nn.Module):
               #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               distances = []
               for mean in exemplar_means:
+                  print('sottrazione')
+                  print(mean - feature)
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
 
               distances = distances / np.linalg.norm(distances)
