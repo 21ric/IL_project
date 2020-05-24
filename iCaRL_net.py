@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 ########################
 
@@ -192,7 +192,10 @@ class iCaRL(nn.Module):
                 features.append(feature)
 
             class_means = np.mean(features)
+            print('Numero di classi in classify:{}'.format(len(class_mean)))
             class_means = class_means/ np.linalg.norm(class_means)
+            print('Medie per classi')
+            print(class_mean)
             exemplar_means.append(class_means)
 
 
@@ -241,8 +244,8 @@ class iCaRL(nn.Module):
             print('Running corrects')
             print(running_corrects)
 
-            ypred.extend(preds)
-            ytrue.extend(targets)
+            ypred.append(preds)
+            ytrue.append(targets)
 
 
         print(ypred)
@@ -250,7 +253,7 @@ class iCaRL(nn.Module):
         accuracy = running_corrects / float(len(dataloader.dataset))
         print(f"Test accuracy: {accuracy}")
 
-        return np.array(ypred), np.array(ytrue)
+        return ypred, ytrue
 
   """
   def classify(self, x, dataloader):
