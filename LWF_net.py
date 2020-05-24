@@ -71,8 +71,8 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.class_loss = nn.BCEWithLogitsLoss(reduction='mean') #classification loss
-        self.dist_loss = nn.BCEWithLogitsLoss(reduction='mean')    #distillation loss
+        self.class_loss = nn.BCELoss(reduction='mean') #classification loss
+        self.dist_loss = nn.BCELoss(reduction='mean')    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
@@ -221,12 +221,12 @@ class LwF(nn.Module):
                     
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    #logits = torch.sigmoid(logits)
+                    logits = torch.sigmoid(logits)
                     
                     # Compute classification loss 
                     cls_loss = criterion_class(logits, labels)
           
-            
+                    print("qui")
                     
                     # If not first iteration
                     if self.n_known > 0:
@@ -239,7 +239,7 @@ class LwF(nn.Module):
             
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
-                        #logits = torch.sigmoid(logits) #BCE
+                        logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
             
                         # Compute distillation loss
