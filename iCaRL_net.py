@@ -145,8 +145,16 @@ class iCaRL(nn.Module):
     #print('caricato immagini per costruzione')
     #print(features)
     #features = features / np.linalg.norm(features)
-    class_mean = np.mean(np.array(features))
-    print('Costruzione exemp---class_mean:{}'.f(class_mean))
+    #class_mean = np.mean(np.array(features))
+    class_mean = None
+    for feature in features:
+        if class_mean is None:
+            class_mean = feature
+        else:
+            class_mean += feature
+    class_means = class_mean / len(features)
+
+    print('Costruzione exemp---class_mean:{}'.format(class_mean))
     #class_mean = class_mean / np.linalg.norm(class_mean)
 
 
@@ -164,9 +172,18 @@ class iCaRL(nn.Module):
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
-        #print('Indice scelto:{}'.format(i))
+        print('Indice scelto:{}'.format(i))
+
         images = np.concatenate((images[:i], images[i+1:]))
-        features = np.concatenate((features[:i], features[i+1:]))
+
+        if i == 0:
+            features = features[i+1:]
+        else:
+            features = np.concatenate((features[:i], features[i+1:]))
+        #images = np.concatenate((images[:i], images[i+1:]))
+        #features = np.concatenate((features[:i], features[i+1:]))
+        #print('F1',features[i-2:i])
+        #print('F2',features[i+1: i+3])
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
@@ -263,7 +280,7 @@ class iCaRL(nn.Module):
             a = 0
 
             for feature in features:
-              feature = feature / np.linalg.norm(feature)
+              #feature = feature / np.linalg.norm(feature)
               #computing L2 distance
               #distances = torch.pow(exemplar_means - feature, 2).sum(-1)
               distances = []
