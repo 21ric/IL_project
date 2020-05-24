@@ -176,6 +176,9 @@ class iCaRL(nn.Module):
 
         #compute the mean for each examplars
         cond = True
+
+        class_mean = None
+
         exemplar_means=[]
         for exemplars in self.exemplars:
 
@@ -194,7 +197,13 @@ class iCaRL(nn.Module):
 
 
 
-            class_means = np.mean(features, axis=1)
+            for feature in features:
+                if class_mean is None:
+                    class_means = feature
+                else:
+                    class_mean += feature
+            class_mean = class_mean / len(exemplars)
+            #class_means = np.mean(features, axis=1)
 
             if cond:
                 print('FEATURE')
