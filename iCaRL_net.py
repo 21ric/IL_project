@@ -144,8 +144,10 @@ class iCaRL(nn.Module):
 
     #print('caricato immagini per costruzione')
     #print(features)
-
+    features = features / np.linalg.norm(features)
     class_mean = np.mean(np.array(features))
+    class_mean = class_mean / np.linalg.norm(class_mean)
+
 
     exemplar_set = []
     exemplar_features = []
@@ -155,6 +157,7 @@ class iCaRL(nn.Module):
         phi = features
         mu = class_mean
         mu_p = 1.0/(k+1) * (phi + S)
+        mu_p = mu_p / np.linalg.norm(mu_p)
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
 
@@ -167,6 +170,7 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
+"""
   #da cambiare completamente
   def classify(self, dataloader, transform):
 
@@ -189,7 +193,7 @@ class iCaRL(nn.Module):
 
 
 
-        """
+
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -199,7 +203,7 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
-        """
+
 
         ypred = []
         ytrue = []
@@ -229,8 +233,8 @@ class iCaRL(nn.Module):
             print('Running corrects')
             print(running_corrects)
 
-            ypred.append(preds)
-            ytrue.append(targets)
+            ypred.extends(preds)
+            ytrue.extends(targets)
 
 
         print(ypred)
@@ -239,3 +243,48 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return np.array(ypred), np.array(ytrue)
+"""
+  def classify(self, x, transform):
+        """Classify images by neares-means-of-exemplars
+        Args:
+            x: input image batch
+        Returns:
+            preds: Tensor of size (batch_size,)
+        """
+        batch_size = x.size(0)
+
+        if self.compute_means:
+            print "Computing mean of exemplars...",
+            exemplar_means = []
+            for P_y in self.exemplar_sets:
+                features = []
+                # Extract feature for each exemplar in P_y
+                for ex in P_y:
+                    ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
+                    feature = self.feature_extractor(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / feature.data.norm() # Normalize
+                    features.append(feature)
+                features = torch.stack(features)
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
+                exemplar_means.append(mu_y)
+            self.exemplar_means = exemplar_means
+            self.compute_means = False
+            print "Done"
+
+        exemplar_means = self.exemplar_means
+        means = torch.stack(exemplar_means) # (n_classes, feature_size)
+        means = torch.stack([means] * batch_size) # (batch_size, n_classes, feature_size)
+        means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
+
+        feature = self.feature_extractor(x) # (batch_size, feature_size)
+        for i in xrange(feature.size(0)): # Normalize
+            feature.data[i] = feature.data[i] / feature.data[i].norm()
+        feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
+        feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
+
+        dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+        _, preds = dists.min(1)
+
+        return preds
