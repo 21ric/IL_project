@@ -93,6 +93,9 @@ class iCaRL(nn.Module):
         if i%5 == 0:
             print('-'*30)
             print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
+            for param_group in optimizer.param_groups:
+                print('Learning rate:{}'.format(param_group['lr']))
+                
         for images, labels, indexes in dataloader:
             images = images.cuda()
             labels = labels.cuda()
@@ -110,7 +113,6 @@ class iCaRL(nn.Module):
             if self.num_known > 0:
                 q_i = q[indexes]
                 dist_loss = sum(self.dist_loss(out[:, y], q_i[:, y]) for y in range(self.num_known))
-                print(dist_loss.item())
                 loss += dist_loss
 
             loss.backward()
