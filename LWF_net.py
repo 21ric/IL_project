@@ -73,6 +73,7 @@ class LwF(nn.Module):
 
         self.class_loss = nn.CrossEntropyLoss() #classification loss
         self.dist_loss = nn.BCELoss()
+
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
@@ -94,6 +95,7 @@ class LwF(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
         return(x)
+
 
     def increment_classes(self, new_classes):
         """Add n classes in the final fc layer"""
@@ -131,6 +133,7 @@ class LwF(nn.Module):
         return preds	
 	
     def update(self, dataset, class_map):
+
         self.cuda()
 
         self.compute_means = True
@@ -149,8 +152,9 @@ class LwF(nn.Module):
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
+
             for images, labels, indices in dataloader:
-                images = Variable(images).cuda()
+                images = Variable(torch.FloatTensor(images)).cuda()
                 indexes = indices.cuda()
                 g = torch.sigmoid(self.forward(images))
                 dist_target[indices] = g.data
