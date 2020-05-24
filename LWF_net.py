@@ -31,7 +31,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 10
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -210,9 +210,10 @@ class LwF(nn.Module):
                     if self.n_known > 0:
                         # Save outputs of the previous model on the current batch
                         #dist_target_i = dist_target[indices] #BCE
-                        dist_target = prev_model.forward(images)  #MCCE
+                        dist_target_raw = prev_model.forward(images)  #MCCE
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
+                        _, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
