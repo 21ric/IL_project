@@ -288,7 +288,7 @@ class iCaRL(nn.Module):
                   if a > 0:
                       print('sottrazione')
                       print(mean - feature)
-                  distances.append(np.sqrt(np.sum((mean - feature) ** 2), axis = 1))
+                  distances.append(np.sqrt(np.sum((mean - feature) ** 2, axis=1)))
               if a > 0:
                   print('DISTANCES')
                   print(distances)
