@@ -170,7 +170,7 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
-  """
+
   #da cambiare completamente
   def classify(self, dataloader, transform):
 
@@ -188,8 +188,12 @@ class iCaRL(nn.Module):
                 ex = ex.unsqueeze(0)
                 ex = ex.to(DEVICE)
                 feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
+                feature = feature / np.linalg.norm(feature)
                 features.append(feature)
-            exemplar_means.append(np.mean(features))
+
+            class_means = np.mean(features)
+            class_means = class_means/ np.linalg.norm(class_means)
+            exemplar_means.append(class_means)
 
 
 
@@ -216,6 +220,7 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
+            features = features / np.linalg.norm(features)
 
             pred_labels = []
 
@@ -225,6 +230,8 @@ class iCaRL(nn.Module):
               distances = []
               for mean in exemplar_means:
                   distances.append(np.sqrt(np.sum((mean - feature) ** 2)))
+
+              distances = distances / np.linalg(distances)
               pred_labels.append(np.argmin(distances))
 
             preds = np.array(pred_labels)
@@ -243,15 +250,11 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return np.array(ypred), np.array(ytrue)
+
   """
-  def classify(self, x, transform):
-        """Classify images by neares-means-of-exemplars
-        Args:
-            x: input image batch
-        Returns:
-            preds: Tensor of size (batch_size,)
-        """
-        batch_size = x.size(0)
+  def classify(self, x, dataloader):
+
+
 
         if self.compute_means:
             print("Computing mean of exemplars...")
@@ -275,7 +278,7 @@ class iCaRL(nn.Module):
 
         exemplar_means = self.exemplar_means
         means = torch.stack(exemplar_means) # (n_classes, feature_size)
-        means = torch.stack([means] * batch_size) # (batch_size, n_classes, feature_size)
+        means = torch.stack([means] * BATCH_SIZE) # (batch_size, n_classes, feature_size)
         means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
 
         feature = self.feature_extractor(x) # (batch_size, feature_size)
@@ -287,4 +290,6 @@ class iCaRL(nn.Module):
         dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
         _, preds = dists.min(1)
 
+
         return preds
+  """
