@@ -211,7 +211,7 @@ class LwF(nn.Module):
                         # Save outputs of the previous model on the current batch
                         #dist_target_i = dist_target[indices] 
                         dist_target = prev_model.forward(images)  #MCCE
-                        dist_target = Variable(torch.LongTensor(dist_target))
+                        dist_target = Variable(torch.LongTensor([label for label in dist_target.numpy()])).cuda()
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
