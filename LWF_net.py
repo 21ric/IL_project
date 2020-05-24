@@ -71,7 +71,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
-        self.class_loss = nn.BCELoss(reduction='mean') #classification loss
+        self.class_loss = nn.BCELoss() #classification loss
         self.dist_loss = nn.BCELoss(reduction='mean')    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
@@ -216,7 +216,7 @@ class LwF(nn.Module):
                     
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    #logits = torch.sigmoid(logits)
+                    logits = torch.sigmoid(logits)
                     
                     # Compute classification loss 
                     cls_loss = criterion_class(logits, labels)
