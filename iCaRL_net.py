@@ -30,7 +30,7 @@ class iCaRL(nn.Module):
     self.feature_extractor.fc = nn.Linear(64, num_classes)
 
     self.loss = nn.CrossEntropyLoss()
-    self.dist_loss = nn.BCEWithLogitsLoss()
+    self.dist_loss = nn.BCELoss()
 
     self.optimizer   = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
     self.num_classes = num_classes
