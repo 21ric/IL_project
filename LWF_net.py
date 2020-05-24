@@ -204,6 +204,7 @@ class LwF(nn.Module):
                     if self.n_known > 0:
                         # Compute outputs on the previous model
                         dist_target = prev_model.forward(F.sigmoid(images))
+                        dist_target = dist_target[indices]
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs 
