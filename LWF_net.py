@@ -151,7 +151,7 @@ class LwF(nn.Module):
             for images, labels, indices in dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
-                g = F.sigmoid(self.forward(images))
+                g = torch.sigmoid(self.forward(images))
                 dist_target[indices] = g.data
             dist_target = Variable(dist_target).cuda()
 
@@ -213,7 +213,7 @@ class LwF(nn.Module):
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
-                        logits = F.sigmoid(logits)
+                        logits = torch.sigmoid(logits)
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 			
                         # Compute distillation loss
