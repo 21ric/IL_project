@@ -213,7 +213,7 @@ class LwF(nn.Module):
                         dist_target_raw = prev_model.forward(images)  #MCCE
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
-                         _, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
+                        _, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
 			
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
