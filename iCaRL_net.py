@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
     self.exemplars.append(exemplar_set)
 
 
-  def _dist(a, b):
+  def dist(a, b):
         """Computes L2 distance between two tensors.
         :param a: A tensor.
         :param b: A tensor.
@@ -201,7 +201,7 @@ class iCaRL(nn.Module):
         """
         return torch.pow(a - b, 2).sum(-1)
 
-  def _get_closest(centers, features):
+  def get_closest(centers, features):
         """Returns the center index being the closest to each feature.
         :param centers: Centers to compare, in this case the class means.
         :param features: A tensor of features extracted by the convnet.
@@ -211,7 +211,7 @@ class iCaRL(nn.Module):
 
         features = features
         for feature in features:
-            distances = _dist(centers, feature)
+            distances = dist(centers, feature)
             pred_labels.append(distances.argmin().item())
 
         return np.array(pred_labels)
@@ -257,7 +257,7 @@ class iCaRL(nn.Module):
             inputs = inputs.to(DEVICE)
 
             features = self.feature_extractor.extract_features(inputs).detach()
-            preds = _get_closest(exemplar_means,features)
+            preds = get_closest(exemplar_means,features)
 
             ypred.extend(preds)
             ytrue.extend(targets)
