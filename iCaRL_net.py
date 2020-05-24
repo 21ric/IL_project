@@ -191,126 +191,6 @@ class iCaRL(nn.Module):
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
 
-
-  #da cambiare completamente
-  def classify(self, dataloader, transform):
-
-        #compute the mean for each examplars
-        cond = False
-
-        class_means = None
-
-        exemplar_means=[]
-        for exemplars in self.exemplars:
-
-            feature_extractor = self.feature_extractor.to(DEVICE)
-            features = []
-
-
-            for ex in exemplars:
-                ex = Image.fromarray(ex)
-                ex = transform(ex)
-                ex = ex.unsqueeze(0)
-                ex = ex.to(DEVICE)
-                feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
-                #feature = feature / np.linalg.norm(feature)
-                features.append(feature)
-
-
-
-            for feature in features:
-                if class_means is None:
-                    class_means = feature
-                else:
-                    class_means += feature
-            class_means = class_means / len(exemplars)
-            #class_means = np.mean(features, axis=1)
-
-            exemplar_means.append(class_means)
-
-        #print('Numero di classi in classify:{}'.format(len(class_means)))
-        #print('Medie per classi')
-        #print(exemplar_means)
-
-
-
-        #if exemplar_means is None:
-         #   raise ValueError(
-          #      "Cannot classify without built examplar means,"
-           # )
-
-        #if exemplar_means.shape[0] != self.num_classes:
-         #   raise ValueError(
-          #      "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
-           # )
- 
-        
-
-
-        ypred = []
-        ytrue = []
-
-
-        running_corrects = 0
-        for inputs, targets, _ in dataloader:
-            imputs = inputs
-
-            inputs = inputs.to(DEVICE)
-            #compute the feature map of the input
-            features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
-
-            dist =[]
-            for mean in exemplar_means:
-                dist.append(np.sqrt(np.sum((mean - features) ** 2, axis=1)))#(batch_size, n_classes)
-            preds = np.argmin(np.array(dist), axis=1)
-            print('len preds',len(preds))
-            #_, preds = dists.min(1)
-
-            ypred.extend(preds)
-            ytrue.extend(targets)
-
-            running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
-            print("qua")
-
-            pred_labels = []
-            a = 0
-
-            for feature in features:
-              #feature = feature / np.linalg.norm(feature)
-              #computing L2 distance
-              distances = torch.pow(exemplar_means - feature, 2).sum(-1)
-
-
-
-              for mean in exemplar_means:
-                  if a > 0:
-                      print('sottrazione')
-                      print(mean - feature)
-                  distances.append(np.sqrt(np.sum((mean - features) ** 2, axis=1)))
-              if a > 0:
-                  print('DISTANCES')
-                  print(distances)
-                  a = a-1
-              pred_labels.append(np.argmin(distances))
-
-            preds = np.array(pred_labels)
-
-            running_corrects += torch.sum(torch.from_numpy(preds) == targets.data).data.item()
-            print('Running corrects')
-            print(running_corrects)
-
-            ypred.extend(preds)
-            ytrue.extend(targets)
-
-
-        print(ypred)
-
-        accuracy = running_corrects / float(len(dataloader.dataset))
-        print(f"Test accuracy: {accuracy}")
-
-        return ypred, ytrue
-
-  """
   def classify(self, dataloader):
 
         compute_means = True
@@ -319,7 +199,7 @@ class iCaRL(nn.Module):
             exemplar_means = []
             for P_y in self.exemplars:
                 features = []
-                # Extract feature for each exemplar in P_y
+                # Extract feature for each exemplar set in P_y
                 for ex in P_y:
                     ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
                     feature = self.feature_extractor.extract_features(ex.unsqueeze(0))
@@ -359,4 +239,4 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
         print(preds)
         return preds
-    """
+  
