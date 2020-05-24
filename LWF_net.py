@@ -216,7 +216,7 @@ class LwF(nn.Module):
                     
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    logits = torch.sigmoid(logits)
+                    #logits = torch.sigmoid(logits)
                     
                     # Compute classification loss 
                     cls_loss = criterion_class(logits, labels)
