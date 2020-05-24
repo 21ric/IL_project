@@ -169,6 +169,7 @@ class iCaRL(nn.Module):
         #mu_p = mu_p / np.linalg.norm(mu_p)
         #mu_p = mu_p / np.linalg.norm(mu_p)
         i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis=1)))
+        print("argmin is :",i)
 
         exemplar_set.append(images[i])
         exemplar_features.append(features[i])
@@ -234,18 +235,16 @@ class iCaRL(nn.Module):
 
 
 
-        if exemplar_means is None:
-            raise ValueError(
-                "Cannot classify without built examplar means,"
-            )
+        #if exemplar_means is None:
+         #   raise ValueError(
+          #      "Cannot classify without built examplar means,"
+           # )
 
-        if exemplar_means.shape[0] != self.num_classes:
-            raise ValueError(
-                "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
-            )
+        #if exemplar_means.shape[0] != self.num_classes:
+         #   raise ValueError(
+          #      "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
+           # )
  
-        else:
-           print(f"number of examplar means {exemplar_means.shape[0]} is costistent")
         
 
 
