@@ -256,8 +256,12 @@ class iCaRL(nn.Module):
             #compute the feature map of the input
             features = self.feature_extractor.extract_features(inputs).data.cpu().numpy().squeeze()
 
-            dists = (features - exemplar_means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-            _, preds = dists.min(1)
+            dist =[]
+            for mean in exemplar_mean:
+                dists.append(features - exemplar_means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
+            preds = np.argmin(np.array(dist), axis=1)
+            print('len preds',len(preds))
+            #_, preds = dists.min(1)
 
             ypred.extend(preds)
             ytrue.extend(targets)
