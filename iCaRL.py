@@ -67,19 +67,66 @@ def main():
 
         net.n_known = net.n_classes
 
-        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+        if i == 0:
 
-        running_corrects = 0
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
-        for imgs, labels, _ in  test_dataloader:
-            imgs = imgs
-            labels = labels.to(DEVICE)
-            preds = net.classify(imgs)
-            running_corrects += torch.sum(preds == labels.data).data.item()
-        accuracy = running_corrects / float(len(test_dataloader.dataset))
-        print('Test Accuracy: {}'.format(accuracy))
+            running_corrects = 0
 
-        if i == 3:
+            for imgs, labels, _ in  test_dataloader:
+                imgs = imgs
+                labels = labels.to(DEVICE)
+                preds = net.classify(imgs)
+                running_corrects += torch.sum(preds == labels.data).data.item()
+            accuracy = running_corrects / float(len(test_dataloader.dataset))
+            print('Test Accuracy: {}'.format(accuracy))
+        else:
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+
+            previous_classes = np.array([])
+            for j in range(i):
+              previous_classes = np.concatenate((previous_classes, classes_groups[j]))
+            test_prev_dataset = CIFAR100(root='data/', classes=previous_classes,  train=False, download=True, transform=test_transform)
+
+            # Creating dataset for all classes
+            all_classes = np.concatenate((previous_classes, classes_groups[i]))
+            test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
+
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+            all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+            prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+
+            running_corrects = 0
+
+            for imgs, labels, _ in  test_dataloader:
+                imgs = imgs
+                labels = labels.to(DEVICE)
+                preds = net.classify(imgs)
+                running_corrects += torch.sum(preds == labels.data).data.item()
+            accuracy = running_corrects / float(len(test_dataloader.dataset))
+            print('Test Accuracy new classes: {}'.format(accuracy))
+
+            running_corrects = 0
+
+            for imgs, labels, _ in  prev_dataloader:
+                imgs = imgs
+                labels = labels.to(DEVICE)
+                preds = net.classify(imgs)
+                running_corrects += torch.sum(preds == labels.data).data.item()
+            accuracy = running_corrects / float(len(test_dataloader.dataset))
+            print('Test Accuracy old classes: {}'.format(accuracy))
+
+            running_corrects = 0
+
+            for imgs, labels, _ in  all_dataloader:
+                imgs = imgs
+                labels = labels.to(DEVICE)
+                preds = net.classify(imgs)
+                running_corrects += torch.sum(preds == labels.data).data.item()
+            accuracy = running_corrects / float(len(test_dataloader.dataset))
+            print('Test Accuracy all classes: {}'.format(accuracy))
+
+        if i == 1:
             return
 
 if __name__ == '__main__':
