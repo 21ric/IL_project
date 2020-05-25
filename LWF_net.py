@@ -263,6 +263,7 @@ class LwF(nn.Module):
                         images = Variable(images)
                         images = images.cuda()
                         indices = indices.cuda()
+                        labels = labels.cuda()
 
                         outputs = self(images)
 
@@ -272,7 +273,8 @@ class LwF(nn.Module):
                         preds = self.classify(images)
                         preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                         total += labels.size(0)
-                        corrects += (preds == labels.numpy()).sum()
+                        
+                        corrects += (preds == labels.cpu().numpy()).sum()
                          
                 val_acc = corrects / total
 
