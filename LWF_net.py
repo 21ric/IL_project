@@ -269,8 +269,8 @@ class LwF(nn.Module):
 
                         outputs = self(images)
 
-                        loss = nn.CrossEntropyLoss()(outputs, labels)
-                        val_loss += loss.item() * images.size(0)
+                        v_loss = nn.CrossEntropyLoss()(outputs, labels)
+                        val_loss += v_loss.item() * images.size(0)
         
                         preds = self.classify(images)
                         preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
