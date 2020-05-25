@@ -24,7 +24,7 @@ NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
 
-def iCaRL(nn.Module):
+class iCaRL(nn.Module):
     def __init__(self, n_classes):
         super(iCaRL, self).__init__()
         self.featureture_extractor = resnet32()
