@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
 def to_onehot(targets, n_classes):
@@ -129,7 +129,8 @@ class iCaRL(nn.Module):
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
                     print('here?')
-                    dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
+                    #dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
+                    dist_loss = self.dist_loss(out[:,self.n_known], q_i)
 
                     loss += dist_loss
 
