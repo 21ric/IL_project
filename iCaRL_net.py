@@ -24,11 +24,12 @@ NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
 def to_onehot(targets, batch_size, num_classes):
-    one_hots = np.array()
+    one_hots = np.array([])
     for t in targets:
         temp = np.zeros(num_classes)
         temp[t] = 1
         onehots.append(temp)
+    print(one_hots)
     return one_hots
 
 
