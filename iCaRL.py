@@ -79,7 +79,7 @@ def main():
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
 
-        if i == 1:
+        if i == 3:
             return
 
 if __name__ == '__main__':
