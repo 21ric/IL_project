@@ -111,7 +111,7 @@ def main():
  
         results = net.update(train_dataset,val_dataset, class_map, map_reverse)
      
-        # takes the dictionari {num_epoch : [val_acc, avg_val_loss] }
+        # takes the dictionari {num_epoch : [val_acc, avg_val_loss]}
         scores = results[0]
         sorted_scores = sorted(scores.items(), key=lambda x: x[1][1]) # sorted according to the lower val loss
 

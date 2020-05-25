@@ -305,7 +305,7 @@ class LwF(nn.Module):
                 pbar.update(1)
  
             #end epochs
-            net = self.load_state_dict(best_net)  
-            return [scores,net]  
+            self.load_state_dict(best_net)  
+            return [scores,self]  
                 
 
