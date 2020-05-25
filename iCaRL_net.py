@@ -51,8 +51,8 @@ class iCaRL(nn.Module):
         bias = self.features_extractor.fc.bias.data
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.fc.weight.data[:out_features] = weight
-        self.fc.bias.data[:out_features] = bias
+        self.features_extractor.fc.weight.data[:out_features] = weight
+        self.features_extractor.fc.bias.data[:out_features] = bias
 
         self.n_classes += n
 
