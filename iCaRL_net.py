@@ -23,13 +23,13 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
-def to_onehot(targets, n_classes):
+def to_onehot(targets, n_classes, class_map):
     one_hots = []
     #print('len targets', len(targets))
     #print('targets', targets)
     for t in targets:
         temp = np.zeros(n_classes)
-        temp[t] = 1
+        temp[class_map[t]] = 1
         one_hots.append(temp)
     #print(one_hots)
     one_hots = torch.FloatTensor(one_hots)
@@ -114,9 +114,9 @@ class iCaRL(nn.Module):
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
 
-                labels = Variable(torch.LongTensor([class_map[label] for label in labels.numpy()]))
+                labels = Variable(torch.LongTensor([self.class_map[label] for label in labels.numpy()]))
 
-                labels = to_onehot(labels, self.n_classes)
+                labels = to_onehot(labels, self.n_classes, self.class_map)
                 labels = labels.to(DEVICE)
                 indexes = indexes.to(DEVICE)
 
