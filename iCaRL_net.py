@@ -100,7 +100,7 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     out = torch.sigmoid(out)
                     q_i = q[indexes]
-                    dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.num_known)
+                    dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.num_known))
 
                     loss += dist_loss
 
