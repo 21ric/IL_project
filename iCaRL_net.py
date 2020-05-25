@@ -209,7 +209,6 @@ class iCaRL(nn.Module):
         means = torch.stack([means]*batch_size)
         means = means.transpose(1,2)
 
-        x = x.to(DEVICE)
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
