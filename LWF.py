@@ -166,7 +166,7 @@ def main():
 
 
         #set the net to train for the next iteration 
-        net.train()
+        net.train(True)
 
 #for i in range(int(total_classes//CLASSES_BATCH)):
 #for i in range(1):
