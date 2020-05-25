@@ -101,7 +101,7 @@ def main():
             for imgs, labels, _ in  test_dataloader:
                 imgs = imgs
                 labels = labels.to(DEVICE)
-                preds = net.classify(imgs)
+                preds = net.classify(imgs, compute_means = True)
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(test_dataloader.dataset))
             print('Test Accuracy new classes: {}'.format(accuracy))
@@ -111,7 +111,7 @@ def main():
             for imgs, labels, _ in  prev_dataloader:
                 imgs = imgs
                 labels = labels.to(DEVICE)
-                preds = net.classify(imgs)
+                preds = net.classify(imgs, compute_means = False)
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(prev_dataloader.dataset))
             print('Test Accuracy old classes: {}'.format(accuracy))
@@ -121,7 +121,7 @@ def main():
             for imgs, labels, _ in  all_dataloader:
                 imgs = imgs
                 labels = labels.to(DEVICE)
-                preds = net.classify(imgs)
+                preds = net.classify(imgs, compute_means = False)
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))

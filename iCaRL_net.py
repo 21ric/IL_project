@@ -101,6 +101,7 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
         i = 0
+        self.train(True)
         for epoch in range(NUM_EPOCHS):
 
             if epoch in STEPDOWN_EPOCHS:
@@ -196,33 +197,36 @@ class iCaRL(nn.Module):
                 features = np.concatenate((features[:i], features[i+1:]))
 
         self.exemplar_sets.append(np.array(exemplar_set))
+        self.train(True)
 
 
-    def classify(self, x):
+    def classify(self, x, compute_means):
 
-        batch_size = x.size(0)
+        if compute_means:
+            batch_size = x.size(0)
 
-        exemplar_means = []
+            exemplar_means = []
 
-        self.to(DEVICE)
-        #print('exset', self.exemplar_sets)
-        for exemplars in self.exemplar_sets:
-            #print('in')
-            features = []
-            for ex in  exemplars:
-                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                feature = feature.squeeze()
-                feature.data = feature.data / feature.data.norm()
-                features.append(feature)
+            self.to(DEVICE)
+            self.train(False)
+            #print('exset', self.exemplar_sets)
+            for exemplars in self.exemplar_sets:
+                #print('in')
+                features = []
+                for ex in  exemplars:
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / feature.data.norm()
+                    features.append(feature)
 
-            features = torch.stack(features)
-            mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / mu_y.data.norm()
-            exemplar_means.append(mu_y)
-            #print('mu_y', mu_y)
+                features = torch.stack(features)
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / mu_y.data.norm()
+                exemplar_means.append(mu_y)
+                #print('mu_y', mu_y)
 
-        self.exemplar_means = exemplar_means
+            self.exemplar_means = exemplar_means
         #print(self.exemplar_means)
         exemplar_means = self.exemplar_means
 
@@ -232,7 +236,7 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
         x = x.to(DEVICE)
-
+        self.train(False)
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
@@ -242,5 +246,7 @@ class iCaRL(nn.Module):
 
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)
+
+        self.train(True)
 
         return preds
