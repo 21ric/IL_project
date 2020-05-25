@@ -44,7 +44,7 @@ class iCaRL(nn.Module):
         return x
 
     def add_classes(self, n):
-        in features = self.featureture_extractor.fc.in_features
+        in_features = self.featureture_extractor.fc.in_features
         out_features = self.feature_extractor.fc.out_features
         weight = self.feature_extractor.fc.weight.data
         bias = self.feature_extractor.fc.bias.data
