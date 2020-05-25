@@ -124,7 +124,7 @@ class iCaRL(nn.Module):
 
                 #print('out', out[0], 'labels', labels[0])
 
-                loss = self.clf_loss(out, labels)
+                loss = self.clf_loss(out[:, self.n_known:], labels[:, self.n_known:])
 
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
