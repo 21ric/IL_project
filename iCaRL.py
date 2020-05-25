@@ -37,16 +37,33 @@ def main():
     #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
-    range_classes = np.arange(100)
-    classes_groups = np.array_split(range_classes, 10)
+    #range_classes = np.arange(100)
+    #classes_groups = np.array_split(range_classes, 10)
+    total_classes = 100
+    perm_id = np.random.permutation(total_classes)
+    all_classes = np.arange(total_classes)
 
+    for i in range(len(all_classes)):
+      all_classes[i] = perm_id[all_classes[i]]
+
+    class_map = {}
+    #takes 10 new classes randomly
+    for i, cl in enumerate(all_classes):
+        class_map[cl] = i
+    print (f"Class map:{class_map}\n")
+
+    # Create class map reversed
+    map_reverse = {}
+    for cl, map_cl in class_map.items():
+        map_reverse[map_cl] = int(cl)
+    print (f"Map Reverse:{map_reverse}\n")
 
     net = iCaRL(0)
 
     for i in range(int(100/ClASSES_BATCH)):
 
-        train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
-        test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
+        train_dataset = CIFAR100(root='data/', classes=all_classes[i:i+CLASSES_BATCH]], train=True, download=True, transform=train_transform)
+        test_dataset = CIFAR100(root='data/', classes=all_classes[:i+CLASSES_BATCH]],  train=False, download=True, transform=test_transform)
 
         net.update_representation(dataset = train_dataset)
 
@@ -83,6 +100,7 @@ def main():
         else:
             test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
+            """
             previous_classes = np.array([])
             for j in range(i):
               previous_classes = np.concatenate((previous_classes, classes_groups[j]))
@@ -95,7 +113,7 @@ def main():
             test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
             all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
             prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
-
+            """
             running_corrects = 0
 
             for imgs, labels, _ in  test_dataloader:
@@ -104,8 +122,8 @@ def main():
                 preds = net.classify(imgs, compute_means = True)
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(test_dataloader.dataset))
-            print('Test Accuracy new classes: {}'.format(accuracy))
-
+            print('Test Accuracy: {}'.format(accuracy))
+            """
             running_corrects = 0
 
             for imgs, labels, _ in  prev_dataloader:
@@ -125,7 +143,7 @@ def main():
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
-
+            """
         if i == 1:
             return
 
