@@ -86,7 +86,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=10):
+    def __init__(self, block, layers, num_classes):
         self.inplanes = 16
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1,
@@ -157,9 +157,9 @@ def resnet20(pretrained=False, **kwargs):
     model = ResNet(BasicBlock, [n, n, n], **kwargs)
     return model
 
-def resnet32(pretrained=False, **kwargs):
+def resnet32(pretrained=False, **kwargs, num_classes):
     n = 5
-    model = ResNet(BasicBlock, [n, n, n], **kwargs)
+    model = ResNet(BasicBlock, [n, n, n], **kwargs, num_classes)
     return model
 
 def resnet56(pretrained=False, **kwargs):
