@@ -130,7 +130,7 @@ class iCaRL(nn.Module):
                     #print('g', g[:,1])
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
-                    print('here?')
+                    #print('here?')
                     #print(out[:, self.n_known])
                     #print(q_i)
                     #dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
@@ -185,8 +185,15 @@ class iCaRL(nn.Module):
 
             #print('chosen i:{}'.format(i))
 
-            images = np.concatenate((images[:i], images[i+1:]))
-            features = np.concatenate((features[:i], features[i+1:]))
+            if i == 0:
+                images = images[i+1:]
+                features = features[i+1:]
+            elif i == len(images):
+                images = images[:i-1]
+                features = features[:i-1]
+            else:
+                images = np.concatenate((images[:i], images[i+1:]))
+                features = np.concatenate((features[:i], features[i+1:]))
 
         self.exemplar_sets.append(np.array(exemplar_set))
 
