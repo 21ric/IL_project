@@ -37,8 +37,38 @@ def main():
     #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
-    range_classes = np.arange(100)
-    classes_groups = np.array_split(range_classes, 10)
+
+    total_classes = 100    
+
+    perm_id = np.random.permutation(total_classes)
+    all_classes = np.arange(total_classes)
+    
+    #mix the classes indexes
+    for i in range(len(all_classes)):
+      all_classes[i] = perm_id[all_classes[i]]
+
+    #Create groups of 10
+    classes_groups = np.array_split(all_classes, 10)
+    print(classes_groups)
+
+    #num_iters = total_classes//CLASSES_BATCH      
+    
+    # Create class map
+    class_map = {}
+    #takes 10 new classes randomly
+    for i, cl in enumerate(all_classes):
+        class_map[cl] = i
+    print (f"Class map:{class_map}\n")     
+    
+    # Create class map reversed
+    map_reverse = {}
+    for cl, map_cl in class_map.items():
+        map_reverse[map_cl] = int(cl)
+    print (f"Map Reverse:{map_reverse}\n")
+    
+
+    #range_classes = np.arange(100)
+    #classes_groups = np.array_split(range_classes, 10)
 
 
     net = iCaRL(0)
@@ -48,7 +78,7 @@ def main():
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
-        net.update_representation(dataset = train_dataset)
+        net.update_representation(dataset = train_dataset, class_map)
 
         #print('Dato train sample')
         #print(train_dataset.data[:1])
@@ -77,7 +107,9 @@ def main():
                 imgs = imgs
                 labels = labels.to(DEVICE)
                 preds = net.classify(imgs, compute_means=True)
-                running_corrects += torch.sum(preds == labels.data).data.item()
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                running_corrects += (preds == labels.numpy()).sum()
+                #running_corrects += torch.sum(preds == labels.data).data.item() 
             accuracy = running_corrects / float(len(test_dataloader.dataset))
             print('Test Accuracy: {}'.format(accuracy))
         else:
@@ -103,7 +135,9 @@ def main():
                 imgs = imgs
                 labels = labels.to(DEVICE)
                 preds = net.classify(imgs, compute_means = True)
-                running_corrects += torch.sum(preds == labels.data).data.item()
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                running_corrects += (preds == labels.numpy()).sum()
+                #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(test_dataloader.dataset))
             print('Test Accuracy: {}'.format(accuracy))
 
@@ -113,7 +147,9 @@ def main():
                 imgs = imgs
                 labels = labels.to(DEVICE)
                 preds = net.classify(imgs, compute_means = False)
-                running_corrects += torch.sum(preds == labels.data).data.item()
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                running_corrects += (preds == labels.numpy()).sum()
+                #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(prev_dataloader.dataset))
             print('Test Accuracy old classes: {}'.format(accuracy))
 
@@ -123,7 +159,9 @@ def main():
                 imgs = imgs
                 labels = labels.to(DEVICE)
                 preds = net.classify(imgs, compute_means = False)
-                running_corrects += torch.sum(preds == labels.data).data.item()
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                running_corrects += (preds == labels.numpy()).sum()
+                #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
             
