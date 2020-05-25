@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
                 ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                 feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                 feature = feature.squeeze()
-                feature.data = feature.data / feature.data.norm
+                feature.data = feature.data / feature.data.norm()
                 features.append(feature)
 
             features = torch.stack(features)
