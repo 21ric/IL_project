@@ -199,6 +199,7 @@ class LwF(nn.Module):
         criterion_dist = self.dist_loss
         
         self.to(DEVICE)
+        self.train()
         with tqdm(total=NUM_EPOCHS) as pbar:
             i = 0
             for epoch in range(NUM_EPOCHS):    
