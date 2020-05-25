@@ -279,10 +279,11 @@ class LwF(nn.Module):
         avg_val_loss = val_loss/len(val_dataloader.dataset)
 
         if (min_val_loss is None):
-              min_val_loss = avg_val_loss
-              best_net = copy.deepcopy(net.state_dict())
+           min_val_loss = avg_val_loss
+           best_net = copy.deepcopy(net.state_dict())
+
         else:
-              if avg_val_loss < min_val_loss:
+           if avg_val_loss < min_val_loss:
               min_val_loss = avg_val_loss
               best_net = copy.deepcopy(net.state_dict())
             
