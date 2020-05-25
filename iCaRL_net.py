@@ -185,7 +185,7 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
         #print('exset', self.exemplar_sets)
-        for exemplars in self.exemplars_sets:
+        for exemplars in self.exemplar_sets:
             print('in')
             features = []
             for ex in  exemplars:
