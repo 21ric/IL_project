@@ -86,6 +86,7 @@ class iCaRL(nn.Module):
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
+        self.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
             i = 0
             for imgs, labels, indexes in loader:
