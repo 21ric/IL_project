@@ -72,7 +72,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.class_loss = nn.BCEWithLogitsLoss() #classification loss
-        self.dist_loss = nn.BCELoss()    #distillation loss
+        self.dist_loss = nn.BCEWithLogitsLoss()    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
@@ -157,7 +157,8 @@ class LwF(nn.Module):
             for images, labels, indices in dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
-                g = torch.sigmoid(self.forward(images))
+                #g = torch.sigmoid(self.forward(images))
+                g = self.forward(images) 
                 dist_target[indices] = g.data
             dist_target = Variable(dist_target).cuda()
 
@@ -167,13 +168,6 @@ class LwF(nn.Module):
         if len(new_classes) > 0:
             self.increment_classes(new_classes)
             self.cuda()
-
-
-        #if len(new_classes) > 0:
-
-            # Change last FC layer
-            # adding 10 new output neurons and change self.n_classes attribute
-         #   self.increment_classes(new_classes)  
                
         # Define optimizer and classification loss
 
@@ -235,7 +229,7 @@ class LwF(nn.Module):
             
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
-                        logits = torch.sigmoid(logits) #BCE
+                        #logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
             
                         # Compute distillation loss
