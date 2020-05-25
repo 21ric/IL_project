@@ -60,15 +60,16 @@ class iCaRL(nn.Module):
     dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
 
     #Store network outputs with pre-updated parameters
-    q = torch.zeros(len(dataset), self.num_classes).cuda()
-    self.eval()
-    for images, labels, indexes in dataloader:
-        images = images.cuda()
-        indexes = indexes.cuda()
-        g =  torch.sigmoid(self(images))
-        q[indexes] = g.data
-    self.train()
-    q.cuda()
+    if self.num_classes !=0:
+        q = torch.zeros(len(dataset), self.num_classes).cuda()
+        self.eval()
+        for images, labels, indexes in dataloader:
+            images = images.cuda()
+            indexes = indexes.cuda()
+            g =  torch.sigmoid(self(images))
+            q[indexes] = g.data
+        self.train()
+        q.cuda()
 
 
     #Increment classes
