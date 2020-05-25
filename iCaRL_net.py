@@ -23,6 +23,8 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
+def to_onehot(targets, n_classes):
+    return torch.eye(n_classes)[targets]
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes):
@@ -33,8 +35,8 @@ class iCaRL(nn.Module):
         self.n_known = 0
         self.exemplar_sets = []
 
-        self.clf_loss = nn.CrossEntropyLoss()
-        self.dist_loss = nn.BCELoss()
+        self.clf_loss = nn.BCEWithLogitsLoss()
+        self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.exemplars_sets = []
@@ -92,6 +94,7 @@ class iCaRL(nn.Module):
             i = 0
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
+                labels = to_onehot(targets, self.n_classes)
                 labels = labels.to(DEVICE)
                 indexes = indexes.to(DEVICE)
 
