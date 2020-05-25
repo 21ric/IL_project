@@ -27,7 +27,7 @@ DEVICE = 'cuda'
 class iCaRL(nn.Module):
     def __init__(self, n_classes):
         super(iCaRL, self).__init__()
-        self.featureture_extractor = resnet32()
+        self.features_extractor = resnet32()
 
         self.n_classes = n_classes
         self.n_known = 0
@@ -45,12 +45,12 @@ class iCaRL(nn.Module):
         return x
 
     def add_classes(self, n):
-        in_features = self.featureture_extractor.fc.in_features
-        out_features = self.feature_extractor.fc.out_features
-        weight = self.feature_extractor.fc.weight.data
-        bias = self.feature_extractor.fc.bias.data
+        in_features = self.features_extractor.fc.in_features
+        out_features = self.features_extractor.fc.out_features
+        weight = self.features_extractor.fc.weight.data
+        bias = self.features_extractor.fc.bias.data
 
-        self.feature_extractor.fc = nn.Linear(in_features, out_features+n)
+        self.features_extractor.fc = nn.Linear(in_features, out_features+n)
         self.fc.weight.data[:out_features] = weight
         self.fc.bias.data[:out_features] = bias
 
