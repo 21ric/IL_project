@@ -31,7 +31,7 @@ def to_onehot(targets, batch_size, num_classes):
         one_hots.append(temp)
     print(one_hots)
     one_hots = torch.FloatTensor(one_hots)
-    print one_hots.size()
+    print(one_hots.size())
     return one_hots
 
 
