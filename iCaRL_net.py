@@ -111,5 +111,5 @@ class iCaRL(nn.Module):
                 optimizer.step()
 
                 if i % 10 == 0:
-                    print('Epoch {} Loss:{:.4f}'.format(i, loss.data[0]))
+                    print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 i+=1
