@@ -74,12 +74,12 @@ class iCaRL(nn.Module):
 
 
     #Increment classes
-    in_features = self.feature_extractor.fc.in_features
-    out_features = self.feature_extractor.fc.out_features
+    in_features = self.fc.in_features
+    out_features = self.fc.out_features
     weight = self.feature_extractor.fc.weight.data
 
-    self.feature_extractor.fc = nn.Linear(in_features, out_features+n, bias=False)
-    self.feature_extractor.fc.weight.data[:out_features] = weight
+    self.fc = nn.Linear(in_features, out_features+n, bias=False)
+    self.fc.weight.data[:out_features] = weight
     self.num_known = self.num_classes
     self.num_classes += n
 
