@@ -71,7 +71,7 @@ def main():
     #classes_groups = np.array_split(range_classes, 10)
 
 
-    net = iCaRL(0)
+    net = iCaRL(0, class_map)
 
     for i in range(int(100/CLASSES_BATCH)):
 
