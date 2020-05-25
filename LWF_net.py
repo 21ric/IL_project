@@ -59,17 +59,7 @@ def kaiming_normal_init(m):
 class LwF(nn.Module):
     
     def __init__(self, n_classes, classes_map):
-        super(LwF,self).__init__()
-        
-        '''
-        # Create the network
-        self.feature_extractor = resnet32(num_classes=feature_size)
-        self.bn = nn.BatchNorm1d(feature_size, momentum=0.01)
-        self.ReLU = nn.ReLU()
-        self.fc = nn.Linear(feature_size, n_classes, bias=False)
-        '''
-        
-        
+        super(LwF,self).__init__()        
         self.model = resnet32(num_classes=10)
         self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
@@ -102,12 +92,6 @@ class LwF(nn.Module):
         x = self.fc(x) 
         '''
         x = self.model(x)
-        '''
-        x = self.feature_extractor(x)
-        x = self.bn(x)
-        x = self.ReLU(x)
-        x = self.fc(x)
-        '''
         return x
 
 
