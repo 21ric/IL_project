@@ -128,3 +128,23 @@ class iCaRL(nn.Module):
             if i % 10 == 0:
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
             i+=1
+
+    def reduce_exemplars_set(self, m):
+        for y, exemplars in enumerate(self.exemplars_sets):
+            self.exemplars_sets[y] = exemplars[:m]
+
+
+    def construct_exemplars_set(self, images, m):
+
+        features = []
+        self.to(DEVICE)
+        self.train(False)
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0])
+
+        features = np.array(features)
+        class_mean = np.mean(features, axis=0)
+        print('class_mean', class_mean)

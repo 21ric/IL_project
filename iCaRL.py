@@ -52,16 +52,17 @@ def main():
         #print(train_dataset.data[:1])
         #print('tipo')
         #print(type(train_dataset.data[:1]))
-        """
+
         print('done upd')
 
         m = int(math.ceil(MEMORY_SIZE/net.num_classes))
 
         net.reduce_exemplars_set(m)
 
+
         for y in range(net.num_known, net.num_classes):
             net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, train_dataset.transform)
-        """
+        
         if i == 1:
             return
 
