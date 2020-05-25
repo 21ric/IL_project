@@ -29,7 +29,7 @@ def to_onehot(targets, n_classes, class_map):
     #print('targets', targets)
     for t in targets:
         temp = np.zeros(n_classes)
-        temp[class_map[t]] = 1
+        temp[t] = 1
         one_hots.append(temp)
     #print(one_hots)
     one_hots = torch.FloatTensor(one_hots)
