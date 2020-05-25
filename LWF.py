@@ -106,8 +106,12 @@ def main():
 
         # UPDATE STEP on train set
         print("Update step\n")
+      
+        # returns the history of val loss and accuracy and the net providing the lower val loss
+ 
         results = net.update(train_dataset,val_dataset, class_map, map_reverse)
 
+        # takes the best net
         to_test = results[1]
         # net.update(dataset = train_dataset)
 
