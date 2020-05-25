@@ -55,7 +55,7 @@ def main():
 
         print('done upd')
 
-        m = int(math.ceil(MEMORY_SIZE/net.num_classes))
+        m = int(math.ceil(MEMORY_SIZE/net.n_classes))
 
         net.reduce_exemplars_set(m)
 
