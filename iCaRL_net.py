@@ -38,7 +38,7 @@ def to_onehot(targets, n_classes):
 
 
 class iCaRL(nn.Module):
-    def __init__(self, n_classes):
+    def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=0)
 
@@ -51,6 +51,8 @@ class iCaRL(nn.Module):
 
         self.exemplar_means = []
         self.exemplars_sets = []
+
+        self.class_map = class_map
 
 
     def forward(self, x):
@@ -111,6 +113,8 @@ class iCaRL(nn.Module):
 
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
+
+                labels = Variable(torch.LongTensor([class_map[label] for label in labels.numpy()]))
 
                 labels = to_onehot(labels, self.n_classes)
                 labels = labels.to(DEVICE)

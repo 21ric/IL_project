@@ -58,7 +58,7 @@ def main():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
 
-    net = iCaRL(0)
+    net = iCaRL(0, class_map)
 
     for i in range(int(100/CLASSES_BATCH)):
 
