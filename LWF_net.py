@@ -210,6 +210,8 @@ class LwF(nn.Module):
                     # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
+                    labels_hot=torch.eye(self.n_classes)[labels]
+                    labels_hot = labels_hot.to(DEVICE)
 
                     # Zero-ing the gradient
                     optimizer.zero_grad()
@@ -219,8 +221,6 @@ class LwF(nn.Module):
                     #logits = torch.sigmoid(logits)
                     
                     # Compute classification loss + one-hot labels for BCE
-                    labels_hot=torch.eye(self.n_classes)[labels]
-                    #labels_hot.to(DEVICE)
                     cls_loss = criterion_class(logits, labels_hot)
           
                     
