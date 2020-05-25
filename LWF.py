@@ -66,7 +66,7 @@ def main():
 
 
     # Create Network
-    net = LwF(CLASSES_BATCH,class_map)
+    net = LwF(2048,CLASSES_BATCH,class_map)
  
       
     #iterating until the net knows total_classes with 10 by 10 steps 
