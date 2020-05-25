@@ -197,7 +197,7 @@ class iCaRL(nn.Module):
 
             features = torch.stack(features)
             mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / mu_y.data.norm
+            mu_y.data = mu_y.data / mu_y.data.norm()
             exemplar_means.append(mu_y)
             print('mu_y', mu_y)
 
@@ -211,7 +211,7 @@ class iCaRL(nn.Module):
 
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
-            feature.data[i] = feature.data[i]/ feature.data[i].norm
+            feature.data[i] = feature.data[i]/ feature.data[i].norm()
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
 
