@@ -62,7 +62,7 @@ class LwF(nn.Module):
         super(LwF,self).__init__()        
         self.model = resnet32(num_classes=10)
         self.model.apply(kaiming_normal_init)
-        self.model.fc = nn.Linear(64, num_classes) # Modify output layers
+        self.model.fc = nn.Linear(64, n_classes) # Modify output layers
 
         # Save FC layer in attributes
         self.fc = self.model.fc
