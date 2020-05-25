@@ -15,7 +15,7 @@ import torch
 DEVICE = 'cuda'
 BATCH_SIZE = 128
 ClASSES_BATCH = 10
-MEMORY_SIZE = 40
+MEMORY_SIZE = 2000
 ########################
 
 def main():
@@ -74,11 +74,8 @@ def main():
         for imgs, labels, _ in  test_dataloader:
             imgs = imgs
             labels = labels.to(DEVICE)
-            print('here')
             preds = net.classify(imgs)
-            print('here3')
             running_corrects += torch.sum(preds == labels.data).data.item()
-            print('here4')
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
 

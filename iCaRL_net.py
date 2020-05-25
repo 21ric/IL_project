@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 4
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 def to_onehot(targets, n_classes):
@@ -102,6 +102,12 @@ class iCaRL(nn.Module):
         self.to(DEVICE)
         i = 0
         for epoch in range(NUM_EPOCHS):
+
+            if epoch in STEPDOWN_EPOCHS:
+              for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
+
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
 
@@ -131,6 +137,8 @@ class iCaRL(nn.Module):
 
             if i % 10 == 0:
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                for param_group in optimizer.param_groups:
+                  print('Learning rate:{}'.format(param_group['lr']))
             i+=1
 
     def reduce_exemplars_set(self, m):
@@ -211,14 +219,13 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
         x = x.to(DEVICE)
-        print('here1')
+
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
 
-        print('here2')
 
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)
