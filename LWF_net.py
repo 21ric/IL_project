@@ -272,10 +272,10 @@ class LwF(nn.Module):
         
                         preds = self.classify(images)
                         preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-                        #total += labels.size(0)
-                        corrects += torch.sum(preds == labels.data).data.item()
+                        total += labels.size(0)
+                        corrects += (preds == labels.numpy()).sum()
                          
-                val_acc = corrects / float(len(val_dataloader.dataset))
+                val_acc = corrects / total
 
                 print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
 
