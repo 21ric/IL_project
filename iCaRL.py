@@ -39,35 +39,12 @@ def main():
     classes_groups = np.array_split(range_classes, 10)
 
 
-    net = iCaRL(10)
+    net = iCaRL(0)
 
     for i in range(int(100/ClASSES_BATCH)):
 
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
-
-        if i != 0:
-
-            #creating dataset for previous classes
-            previous_classes = np.array([])
-            for j in range(i):
-              previous_classes = np.concatenate((previous_classes, classes_groups[j]))
-            test_prev_dataset = CIFAR100(root='data/', classes=previous_classes,  train=False, download=True, transform=test_transform)
-
-            # Creating dataset for all classes
-            all_classes = np.concatenate((previous_classes, classes_groups[i]))
-            test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
-
-            # Prepare Dataloaders
-            train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-            test_prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-            test_all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-
-        else:
-
-            train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
         net.update_representation(dataset = train_dataset)
 
@@ -75,6 +52,7 @@ def main():
         #print(train_dataset.data[:1])
         #print('tipo')
         #print(type(train_dataset.data[:1]))
+        """
         print('done upd')
 
         m = int(math.ceil(MEMORY_SIZE/net.num_classes))
@@ -83,18 +61,7 @@ def main():
 
         for y in range(net.num_known, net.num_classes):
             net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, train_dataset.transform)
-
-
-        if i !=0:
-            print('New classes')
-            preds_new, _ = net.classify(test_dataloader)
-            print('Old classes')
-            preds_old, _ = net.classify(test_prev_dataloader)
-            print('All classes')
-            preds_all, _ = net.classify(test_all_dataloader)
-        else:
-            preds, _ = net.classify(test_dataloader)
-
+        """
         if i == 1:
             return
 
