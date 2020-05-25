@@ -30,7 +30,9 @@ def to_onehot(targets, batch_size, num_classes):
         temp[t] = 1
         one_hots.append(temp)
     print(one_hots)
-    return torch.FloatTensor(one_hots)
+    one_hots = torch.FloatTensor(one_hots)
+    print one_hots.size()
+    return one_hots
 
 
 class iCaRL(nn.Module):
