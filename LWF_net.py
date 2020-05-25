@@ -58,7 +58,7 @@ def kaiming_normal_init(m):
 
 class LwF(nn.Module):
     
-    def __init__(self, feature_size, n_classes, classes_map):
+    def __init__(self, n_classes, classes_map):
         super(LwF,self).__init__()
         
         '''
