@@ -221,8 +221,8 @@ class LwF(nn.Module):
                     # If not first iteration
                     if self.n_known > 0:
                         # Save outputs of the previous model on the current batch
-                        #dist_target_i = dist_target[indices] #BCE
-                        dist_target_batch = prev_model.forward(images)  #MCCE
+                        dist_target_i = dist_target[indices] #BCE
+                        #dist_target_batch = prev_model.forward(images)  #MCCE
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
                         #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
@@ -230,11 +230,11 @@ class LwF(nn.Module):
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
                         #logits = torch.sigmoid(logits) #BCE
-                        logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
             
                         # Compute distillation loss
-                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                        dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
+                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                        #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
