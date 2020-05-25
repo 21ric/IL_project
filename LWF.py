@@ -104,8 +104,6 @@ def main():
         
         print("\n")                                       
 
-        net = LwF(CLASSES_BATCH, class_map)  #re-initialize because the last saved is the best net
-
         # UPDATE STEP on train set
         print("Update step\n")
       
