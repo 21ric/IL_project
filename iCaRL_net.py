@@ -118,7 +118,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                print(out[0])
+                #print(out[0])
 
                 #print('out', out[0], 'labels', labels[0])
 
@@ -131,8 +131,8 @@ class iCaRL(nn.Module):
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
                     print('here?')
-                    print(out[:, self.n_known])
-                    print(q_i)
+                    #print(out[:, self.n_known])
+                    #print(q_i)
                     #dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
                     dist_loss = self.dist_loss(out, q_i)
 
