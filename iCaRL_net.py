@@ -89,7 +89,8 @@ class iCaRL(nn.Module):
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                g = F.sigmoid(self.forward(images))
+                #g = torch.sigmoid(self.forward(images))
+                g = self.forward(images)
                 q[indexes] = g.data
             q = Variable(q).cuda()
             self.train(True)
@@ -116,8 +117,8 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
-                    print('g', g[:,y])
-                    print('q_i', q_i[:,y])
+                    print('g', g[:,1])
+                    print('q_i', q_i[:,1])
                     dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.num_known))
 
                     loss += dist_loss
