@@ -9,6 +9,8 @@ import numpy as np
 
 import math
 
+import torch
+
 ####Hyper-parameters####
 DEVICE = 'cuda'
 BATCH_SIZE = 128

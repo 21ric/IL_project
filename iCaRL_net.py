@@ -202,7 +202,7 @@ class iCaRL(nn.Module):
             #print('mu_y', mu_y)
 
         self.exemplar_means = exemplar_means
-        print(self.exemplar_means)
+        #print(self.exemplar_means)
         exemplar_means = self.exemplar_means
 
         means = torch.stack(exemplar_means)
