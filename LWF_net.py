@@ -178,6 +178,7 @@ class LwF(nn.Module):
 
                 val_acc = 0.0
                 min_val_loss = None
+                val_loss = 0.0
    
                 if i%5 == 0:
                     print('-'*30)
