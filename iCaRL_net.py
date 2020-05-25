@@ -80,8 +80,6 @@ class iCaRL(nn.Module):
 
         self.add_exemplars(dataset)
 
-
-
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         if self.n_known > 0:
@@ -101,8 +99,8 @@ class iCaRL(nn.Module):
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
         self.to(DEVICE)
+        i = 0
         for epoch in range(NUM_EPOCHS):
-            i = 0
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
 
@@ -116,7 +114,7 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out, labels)
 
                 if self.n_known > 0:
-                    out = torch.sigmoid(out)
+                    #out = torch.sigmoid(out)
                     q_i = q[indexes]
                     dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.num_known))
 
