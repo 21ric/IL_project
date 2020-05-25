@@ -75,7 +75,9 @@ def main():
             imgs = imgs
             print('here')
             preds = net.classify(imgs)
+            print('here3')
             running_corrects += torch.sum(preds == labels.data).data.item()
+            print('here4')
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
 
