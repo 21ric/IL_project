@@ -284,12 +284,12 @@ class LwF(nn.Module):
 
                 if (min_val_loss is None):
                      min_val_loss = avg_val_loss
-                     best_net = copy.deepcopy(net.state_dict())
+                     best_net = copy.deepcopy(self.state_dict())
 
                 else:
                      if avg_val_loss < min_val_loss:
                           min_val_loss = avg_val_loss
-                          best_net = copy.deepcopy(net.state_dict())
+                          best_net = copy.deepcopy(self.state_dict())
             
                 scores[i+1] = [val_acc,avg_val_loss] 
                  
@@ -303,7 +303,7 @@ class LwF(nn.Module):
                 pbar.update(1)
  
             #end epochs
-            net.load_state_dict(best_net)  
-            return [scores,net]  
+            self.load_state_dict(best_net)  
+            return [scores,self]  
                 
 
