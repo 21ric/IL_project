@@ -37,6 +37,7 @@ class iCaRL(nn.Module):
         self.dist_loss = nn.BCELoss()
 
         self.exemplar_means = []
+        self.exemplars_sets = []
 
 
     def forward(self, x):
