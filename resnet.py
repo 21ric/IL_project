@@ -157,9 +157,9 @@ def resnet20(pretrained=False, **kwargs):
     model = ResNet(BasicBlock, [n, n, n], **kwargs)
     return model
 
-def resnet32(pretrained=False, **kwargs):
+def resnet32(pretrained=False, **kwargs, num_classes):
     n = 5
-    model = ResNet(BasicBlock, [n, n, n], **kwargs)
+    model = ResNet(BasicBlock, [n, n, n], **kwargs, num_classes)
     return model
 
 def resnet56(pretrained=False, **kwargs):
