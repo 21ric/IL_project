@@ -61,7 +61,7 @@ class LwF(nn.Module):
     def __init__(self, num_classes, classes_map):
         super(LwF,self).__init__()
         
-        self.model = resnet32()
+        self.model = resnet32(num_classes=10)
         self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
 
@@ -220,7 +220,7 @@ class LwF(nn.Module):
                     
                     # Compute classification loss + one-hot labels for BCE
                     labels_hot=torch.eye(self.n_classes)[labels]
-                    labels_hot.to(DEVICE)
+                    #labels_hot.to(DEVICE)
                     cls_loss = criterion_class(logits, labels_hot)
           
                     
