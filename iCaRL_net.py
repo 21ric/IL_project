@@ -41,7 +41,7 @@ class iCaRL(nn.Module):
 
 
     def forward(self, x):
-        x = self.featureture_extractor(x)
+        x = self.features_extractor(x)
         return x
 
     def add_classes(self, n):
