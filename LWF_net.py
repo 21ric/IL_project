@@ -58,19 +58,29 @@ def kaiming_normal_init(m):
 
 class LwF(nn.Module):
     
-    def __init__(self, num_classes, classes_map):
+    def __init__(self, feature_size, n_classes, classes_map):
         super(LwF,self).__init__()
         
+        # Create the network
+        self.feature_extractor = resnet32(num_classes=feature_size)
+        self.bn = nn.BatchNorm1d(feature_size, momentum=0.01)
+        self.ReLU = nn.ReLU()
+        self.fc = nn.Linear(feature_size, n_classes, bias=False)
+        
+        
+        '''
         self.model = resnet32(num_classes=10)
         self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
 
         # Save FC layer in attributes
         self.fc = self.model.fc
+        
         # Save other layers in attributes
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
-
+        '''
+        
         self.class_loss = nn.BCEWithLogitsLoss() #classification loss
         self.dist_loss = nn.BCEWithLogitsLoss()    #distillation loss
 
@@ -111,13 +121,19 @@ class LwF(nn.Module):
             new_out_features = out_features + n
             
         print('new out features: ', new_out_features)
+        '''
         # Update model, changing last FC layer
         self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
         # Update attribute self.fc
         self.fc = self.model.fc
-
+        '''
+        self.fc = nn.Linear(in_features, new_out_features, bias = False)
+        
+        '''
         # Initialize weights with kaiming normal
         kaiming_normal_init(self.fc.weight)
+        '''
+        
         # Upload old FC weights on first "out_features" nodes
         self.fc.weight.data[:out_features] = weight
         self.n_classes += n
