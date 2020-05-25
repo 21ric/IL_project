@@ -37,18 +37,18 @@ STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
 ########################
 
-
-def MultiClassCrossEntropy(logits, labels, T):
-    # Ld = -1/N * sum(N) sum(C) softmax(label) * log(softmax(logit))
-    labels = Variable(labels.data, requires_grad=False).cuda()
-    outputs = torch.log_softmax(logits/T, dim=1)   # compute the log of softmax values
-    labels = torch.softmax(labels/T, dim=1)
-    # print('outputs: ', outputs)
-    # print('labels: ', labels.shape)
-    outputs = torch.sum(outputs * labels, dim=1, keepdim=False)
-    outputs = -torch.mean(outputs, dim=0, keepdim=False)
-    # print('OUT: ', outputs)
-    return Variable(outputs.data, requires_grad=True).cuda()
+def to_onehot(targets, n_classes):
+    one_hots = []
+    #print('len targets', len(targets))
+    #print('targets', targets)
+    for t in targets:
+        temp = np.zeros(n_classes)
+        temp[t] = 1
+        one_hots.append(temp)
+    #print(one_hots)
+    one_hots = torch.FloatTensor(one_hots)
+    #print(one_hots.size())
+    return one_hots
 
 def kaiming_normal_init(m):
     if isinstance(m, nn.Conv2d):
@@ -61,14 +61,15 @@ class LwF(nn.Module):
     def __init__(self, feature_size, n_classes, classes_map):
         super(LwF,self).__init__()
         
+        '''
         # Create the network
         self.feature_extractor = resnet32(num_classes=feature_size)
         self.bn = nn.BatchNorm1d(feature_size, momentum=0.01)
         self.ReLU = nn.ReLU()
         self.fc = nn.Linear(feature_size, n_classes, bias=False)
-        
-        
         '''
+        
+        
         self.model = resnet32(num_classes=10)
         self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, num_classes) # Modify output layers
@@ -79,13 +80,10 @@ class LwF(nn.Module):
         # Save other layers in attributes
         self.feature_extractor = nn.Sequential(*list(self.model.children())[:-1])
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
-        '''
+        
         
         self.class_loss = nn.BCEWithLogitsLoss() #classification loss
         self.dist_loss = nn.BCEWithLogitsLoss()    #distillation loss
-
-        #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
-        #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
 
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
 
@@ -95,9 +93,6 @@ class LwF(nn.Module):
         self.n_known = 0
         self.classes_map = classes_map
 
-        #self.num_classes = num_classes
-        #self.num_known = 0
-        
         
         
     def forward(self, x):
@@ -106,11 +101,14 @@ class LwF(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x) 
         '''
+        x = self.model(x)
+        '''
         x = self.feature_extractor(x)
         x = self.bn(x)
         x = self.ReLU(x)
         x = self.fc(x)
-        return(x)
+        '''
+        return x
 
 
     def increment_classes(self, new_classes):
@@ -127,7 +125,7 @@ class LwF(nn.Module):
             new_out_features = out_features + n
             
         print('new out features: ', new_out_features)
-        '''
+        
         # Update model, changing last FC layer
         self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
         # Update attribute self.fc
@@ -138,7 +136,7 @@ class LwF(nn.Module):
         '''
         # Initialize weights with kaiming normal
         kaiming_normal_init(self.fc.weight)
-        '''
+        
         
         # Upload old FC weights on first "out_features" nodes
         self.fc.weight.data[:out_features] = weight
@@ -158,8 +156,6 @@ class LwF(nn.Module):
 
         self.cuda()
 
-        self.compute_means = True
-
         # Save a copy to compute distillation outputs
         prev_model = copy.deepcopy(self)
         prev_model.to(DEVICE)
@@ -168,14 +164,14 @@ class LwF(nn.Module):
         classes = list(set(dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
-
-    
+   
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
     
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
-
+            self.to(DEVICE)
+            self.train(False)
             for images, labels, indices in dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
@@ -192,14 +188,13 @@ class LwF(nn.Module):
             self.cuda()
                
         # Define optimizer and classification loss
-
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
         criterion_class = self.class_loss
         criterion_dist = self.dist_loss
         
         self.to(DEVICE)
-        self.train()
+        self.train(True)
         with tqdm(total=NUM_EPOCHS) as pbar:
             i = 0
             for epoch in range(NUM_EPOCHS):    
@@ -227,7 +222,8 @@ class LwF(nn.Module):
                     # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
-                    labels_hot=torch.eye(self.n_classes)[labels]
+                    #labels_hot=torch.eye(self.n_classes)[labels]
+                    labels_hot = to_onehot(labels, self.n_classes)
                     labels_hot = labels_hot.to(DEVICE)
 
                     # Zero-ing the gradient
@@ -237,8 +233,8 @@ class LwF(nn.Module):
                     logits = self.forward(images) 
                     #logits = torch.sigmoid(logits)
                     
-                    # Compute classification loss + one-hot labels for BCE
-                    cls_loss = criterion_class(logits, labels_hot)
+                    # Compute classification loss 
+                    cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
           
                     
                     # If not first iteration
@@ -256,7 +252,8 @@ class LwF(nn.Module):
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
             
                         # Compute distillation loss
-                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                        dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i)
                         #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
                       
                         # Compute total loss
