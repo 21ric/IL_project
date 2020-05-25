@@ -104,7 +104,7 @@ def main():
 
         # UPDATE STEP on train set
         print("Update step\n")
-        results = net.update(train_dataset,val_dataset, class_map)
+        results = net.update(train_dataset,val_dataset, class_map, map_reverse)
 
         to_test = results[1]
         # net.update(dataset = train_dataset)
