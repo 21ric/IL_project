@@ -112,7 +112,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                print('out', out[0], 'labels', labels[0])
+                #print('out', out[0], 'labels', labels[0])
 
                 loss = self.clf_loss(out, labels)
 
@@ -169,7 +169,7 @@ class iCaRL(nn.Module):
             exemplar_set.append(images[i])
             exemplar_features.append(features[i])
 
-            print('chosen i:{}'.format(i))
+            #print('chosen i:{}'.format(i))
 
             images = np.concatenate((images[:i], images[i+1:]))
             features = np.concatenate((features[:i], features[i+1:]))
@@ -199,7 +199,7 @@ class iCaRL(nn.Module):
             exemplar_means.append(mu_y)
 
         self.exemplar_means = exemplar_means
-
+        print(self.exemplar_means)
         exemplar_means = self.exemplar_means
 
         means = torch.stack(exemplar_means)
