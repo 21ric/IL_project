@@ -119,9 +119,10 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
-                    print('g', g[:,1])
-                    print('q_i', q_i[:,1])
-                    dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.num_known))
+                    #print('g', g[:,1])
+                    #print('q_i', q_i[:,1])
+                    #controllare dist loss
+                    dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
 
                     loss += dist_loss
 
@@ -174,3 +175,44 @@ class iCaRL(nn.Module):
             features = np.concatenate((features[:i], features[i+1:]))
 
         self.exemplar_sets.append(np.array(exemplar_set))
+
+
+    def classify(self, x):
+
+        batch_size = x.size(0)
+
+        exemplar_means = []
+
+        self.to(DEVICE)
+        for exemplars in self.exemplars_sets:
+            features = []
+            for ex in  exemplars:
+                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                feature = feature.squeeze()
+                feature.data = feature.data / feature.data.norm
+                features.append(feature)
+
+            features = torch.stack(features)
+            mu_y = features.mean(0).squeeze()
+            mu_y.data = mu_y.data / mu_y.data.norm
+            exemplar_means.append(mu_y)
+
+        self.exemplar_means = exemplar_means
+
+        exemplar_means = self.exemplar_means
+
+        means = torch.stack(exemplar_means)
+        means = torch.stack([means]*batch_size)
+        means = means.transpose(1,2)
+
+        feature = self.features_extractor.extract_features(x)
+        for i in range(feature.size(0)):
+            feature.data[i] = feature.data[i]/ feature.data[i].norm
+        feature = feature.unsqueeze(2)
+        feature = feature.expand_as(means)
+
+        dists = (feature - means).pow(2).sum(1).squeeze()
+        _, pred = dists.min(1)
+
+        return preds
