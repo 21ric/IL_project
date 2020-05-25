@@ -46,7 +46,7 @@ def main():
     for i in range(int(100/CLASSES_BATCH)):
 
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
-        test_dataset = CIFAR100(root='data/', classes=classes_gropus[i],  train=False, download=True, transform=test_transform)
+        test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
         net.update_representation(dataset = train_dataset)
 
@@ -83,7 +83,7 @@ def main():
         else:
             test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
-            """
+
             previous_classes = np.array([])
             for j in range(i):
               previous_classes = np.concatenate((previous_classes, classes_groups[j]))
@@ -96,7 +96,7 @@ def main():
             test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
             all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
             prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
-            """
+
             running_corrects = 0
 
             for imgs, labels, _ in  test_dataloader:
@@ -106,7 +106,7 @@ def main():
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(test_dataloader.dataset))
             print('Test Accuracy: {}'.format(accuracy))
-            """
+
             running_corrects = 0
 
             for imgs, labels, _ in  prev_dataloader:
@@ -126,7 +126,7 @@ def main():
                 running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
-            """
+            
         if i == 1:
             return
 
