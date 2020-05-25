@@ -89,13 +89,15 @@ def main():
                                
                                                              #train data_loader loads images in classes [0:10] then in [10:20] etc..          
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
-        #train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
+        
 
         train_indexes, val_indexes = train_test_split(range(len(train_dataset)), test_size=0.2, stratify=train_dataset.targets)
         
         val_dataset = Subset(copy.copy(train_dataset), val_indexes)   
         train_dataset = Subset(copy.copy(train_dataset), train_indexes)
-  
+   
+        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
+
                                                      #test data_loader loades images in classes [0:10] then [0:20] etc..
         test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+CLASSES_BATCH],download=True, transform=test_transform)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
