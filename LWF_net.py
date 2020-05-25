@@ -258,40 +258,40 @@ class LwF(nn.Module):
 
                 for  images, labels, indices in val_dataloader:
                     
-                    	images = Variable(images)
-                    	images = images.cuda()
-                    	indices = indices.cuda()
+                        images = Variable(images)
+                        images = images.cuda()
+                        indices = indices.cuda()
 
                         outputs = net(images)
 
                         loss = nn.CrossEntropyLoss()(outputs, labels)
                         val_loss += loss.item() * images.size(0)
-		
-		        preds = net.classify(images)
-		        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-		        total += labels.size(0)
-		        corrects += (preds == labels.numpy()).sum()
+        
+                        preds = net.classify(images)
+                        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                        total += labels.size(0)
+                        corrects += (preds == labels.numpy()).sum()
                          
                 val_acc = corrects / total
 
-		print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+        print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
 
-		avg_val_loss = val_loss/len(val_dataloader.dataset)
+        avg_val_loss = val_loss/len(val_dataloader.dataset)
 
-		if (min_val_loss is None):
-		      min_val_loss = avg_val_loss
-		      best_net = copy.deepcopy(net.state_dict())
-		else:
-		      if avg_val_loss < min_val_loss:
-			  min_val_loss = avg_val_loss
-			  best_net = copy.deepcopy(net.state_dict())
-		    
-		scores[i+1] = [val_acc,avg_val_loss] 
-		         
+        if (min_val_loss is None):
+              min_val_loss = avg_val_loss
+              best_net = copy.deepcopy(net.state_dict())
+        else:
+              if avg_val_loss < min_val_loss:
+              min_val_loss = avg_val_loss
+              best_net = copy.deepcopy(net.state_dict())
+            
+        scores[i+1] = [val_acc,avg_val_loss] 
+                 
 
                 if i%5 == 0:
 
-                	print("Loss: {:.4f}\n".format(loss.item()))    
+                    print("Loss: {:.4f}\n".format(loss.item()))    
                 
                 i+=1
     
