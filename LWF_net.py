@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+from sklearn.model_selection import train_test_split
 
 from resnet import resnet32
 
