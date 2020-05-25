@@ -111,6 +111,12 @@ def main():
  
         results = net.update(train_dataset,val_dataset, class_map, map_reverse)
 
+        scores = results[0]
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1][1])
+
+        print(f"lower validation loss: {sorted_scores[0][1][1]} at epoch:{sorted_scores[0][0]}:\n")
+ 
+        print(f"lower val loss: {scores
         # takes the best net
         to_test = results[1]
         # net.update(dataset = train_dataset)
