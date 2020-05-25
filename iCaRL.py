@@ -14,7 +14,7 @@ import torch
 ####Hyper-parameters####
 DEVICE = 'cuda'
 BATCH_SIZE = 128
-ClASSES_BATCH = 10
+CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
@@ -60,7 +60,7 @@ def main():
 
     net = iCaRL(0)
 
-    for i in range(int(100/ClASSES_BATCH)):
+    for i in range(int(100/CLASSES_BATCH)):
 
         train_dataset = CIFAR100(root='data/', classes=all_classes[i:i+CLASSES_BATCH], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=all_classes[:i+CLASSES_BATCH],  train=False, download=True, transform=test_transform)
