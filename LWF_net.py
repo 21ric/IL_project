@@ -235,14 +235,9 @@ class LwF(nn.Module):
                         #logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 
-                        dist_loss = self.criterion_dist(logits[:, :self.n_known], dist_target_i)  #richi dist_loss
-
                         # Compute distillation loss
                         #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-<<<<<<< HEAD
-=======
-                        dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i)
->>>>>>> 5a3ec9f6c781cf0ee0e81b6ee5e62b1bfbe42348
+                        dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i) #richi dist_loss
                         #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
                       
                         # Compute total loss
