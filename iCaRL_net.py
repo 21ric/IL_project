@@ -28,8 +28,8 @@ DEVICE = 'cuda'
 class iCaRL(nn.Module):
   def __init__(self, num_classes):
     super(iCaRL,self).__init__()
-    self.feature_extractor = resnet32()
-    self.feature_extractor.fc = nn.Linear(64, num_classes)
+    self.feature_extractor = resnet32(iCaRL=True)
+    self.fc = nn.Linear(self.feature_extractor.out_dim, num_classes)
 
     self.loss = nn.CrossEntropyLoss()
     self.dist_loss = nn.BCELoss()
@@ -38,11 +38,12 @@ class iCaRL(nn.Module):
     self.num_classes = num_classes
     self.num_known   = 0
     self.exemplars   = []
-
+    self.means = None
 
 
   def forward(self, x):
     x = self.feature_extractor(x)
+    x = self.fc(x)
     return(x)
 
   def update_representation(self, dataset):
@@ -62,11 +63,13 @@ class iCaRL(nn.Module):
 
     #Store network outputs with pre-updated parameters
     q = torch.zeros(len(dataset), self.num_classes).cuda()
+    self.eval()
     for images, labels, indexes in dataloader:
         images = images.cuda()
         indexes = indexes.cuda()
         g =  torch.sigmoid(self(images))
         q[indexes] = g.data
+    self.train()
     q.cuda()
 
 
@@ -134,6 +137,7 @@ class iCaRL(nn.Module):
 
     feature_extractor = self.feature_extractor.to(DEVICE)
     features = []
+    self.eval()
     for img in images:
         img = Image.fromarray(img)
         img = transform(img)
@@ -190,6 +194,7 @@ class iCaRL(nn.Module):
 
     #print(exemplar_set[:3])
     self.exemplars.append(exemplar_set)
+    self.train()
 
 
   #da cambiare completamente
@@ -234,7 +239,7 @@ class iCaRL(nn.Module):
 
 
 
-        """
+
         if exemplar_means is None:
             raise ValueError(
                 "Cannot classify without built examplar means,"
@@ -244,7 +249,7 @@ class iCaRL(nn.Module):
             raise ValueError(
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
-        """
+
 
 
         ypred = []
@@ -309,54 +314,4 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return ypred, ytrue
-
-  """
-  def classify(self, dataloader):
-
-        compute_means = True
-        if compute_means:
-            print("Computing mean of exemplars...")
-            exemplar_means = []
-            for P_y in self.exemplars:
-                features = []
-                # Extract feature for each exemplar in P_y
-                for ex in P_y:
-                    ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
-                    feature = self.feature_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / feature.data.norm() # Normalize
-                    features.append(feature)
-                features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
-                exemplar_means.append(mu_y)
-            #self.exemplar_means = exemplar_means
-            #self.compute_means = False
-            print("Done")
-
-        #exemplar_means = self.exemplar_means
-        means = torch.stack(exemplar_means) # (n_classes, feature_size)
-        means = torch.stack([means] * BATCH_SIZE) # (batch_size, n_classes, feature_size)
-        means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
-
-        preds = []
-        running_corrects = 0
-        for inputs, targets, _ in dataloader:
-            print('qui?')
-            feature = self.feature_extractor.extract_features(input) # (batch_size, feature_size)
-            #for i in xrange(feature.size(0)): # Normalize
-            #    feature.data[i] = feature.data[i] / feature.data[i].norm()
-            feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
-            feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
-
-            dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-            _, predictions = dists.min(1)
-
-            running_corrects += torch.sum(torch.from_numpy(predictions) == targets.data).data.item()
-            preds.extend(predictions)
-
-        accuracy = running_corrects/len(dataloader.dataset)
-        print(f"Test accuracy: {accuracy}")
-        print(preds)
-        return preds
-    """
+"""
