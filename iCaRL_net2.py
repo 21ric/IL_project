@@ -75,7 +75,7 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplars_sets):
             dataset.append(exemplars, [y]*len(exemplars))
 
-    def update_representation(self, dataset):
+    def update_representation(self, dataset, class_map):
         targets = list(set(dataset.targets))
         n = len(targets)
         print('{} new classes'.format(n))
@@ -113,12 +113,13 @@ class iCaRL(nn.Module):
 
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
-
-                labels = Variable(torch.LongTensor([self.class_map[label] for label in labels.numpy()]))
-
-                labels = to_onehot(labels, self.n_classes, self.class_map)
-                labels = labels.to(DEVICE)
                 indexes = indexes.to(DEVICE)
+                # We need to save labels in this way because classes are randomly shuffled at the beginning
+                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                labels = Variable(seen_labels).to(DEVICE)
+                labels_hot=torch.eye(self.n_classes)[labels]
+                labels_hot = labels_hot.to(DEVICE)
+                
 
                 optimizer.zero_grad()
                 #out = torch.sigmoid(self(imgs))
@@ -128,7 +129,7 @@ class iCaRL(nn.Module):
 
                 #print('out', out[0], 'labels', labels[0])
 
-                loss = self.clf_loss(out[:, self.n_known:], labels[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
