@@ -31,7 +31,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 70
+NUM_EPOCHS = 20
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -72,7 +72,7 @@ class LwF(nn.Module):
         self.feature_extractor = nn.DataParallel(self.feature_extractor) 
 
         self.class_loss = nn.BCEWithLogitsLoss() #classification loss
-        self.dist_loss = nn.BCELoss()    #distillation loss
+        self.dist_loss = nn.BCEWithLogitsLoss()    #distillation loss
 
         #self.dist_loss = nn.CrossEntropyLoss() #distillation loss
         #self.dist_loss = nn.BCEWithLogitsLoss() #distillation loss
@@ -157,7 +157,8 @@ class LwF(nn.Module):
             for images, labels, indices in dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
-                g = torch.sigmoid(self.forward(images))
+                #g = torch.sigmoid(self.forward(images))
+                g = self.forward(images) 
                 dist_target[indices] = g.data
             dist_target = Variable(dist_target).cuda()
 
@@ -167,13 +168,6 @@ class LwF(nn.Module):
         if len(new_classes) > 0:
             self.increment_classes(new_classes)
             self.cuda()
-
-
-        #if len(new_classes) > 0:
-
-            # Change last FC layer
-            # adding 10 new output neurons and change self.n_classes attribute
-         #   self.increment_classes(new_classes)  
                
         # Define optimizer and classification loss
 
@@ -228,19 +222,19 @@ class LwF(nn.Module):
                     if self.n_known > 0:
                         # Save outputs of the previous model on the current batch
                         dist_target_i = dist_target[indices] #BCE
-                        #dist_target_raw = prev_model.forward(images)  #MCCE
+                        #dist_target_batch = prev_model.forward(images)  #MCCE
                         #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
                         #dist_target = Variable(dist_target_raw).cuda() #MCEE
                         #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
             
                         # Save logits of the first "old" nodes of the network
                         # LwF doesn't use examplars, it uses the network outputs itselfs
-                        logits = torch.sigmoid(logits) #BCE
+                        #logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
             
                         # Compute distillation loss
                         dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                        #dist_loss = criterion_dist(logits_dist, dist_target)  #MCCE
+                        #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
                       
                         # Compute total loss
                         loss = dist_loss+cls_loss
