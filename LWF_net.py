@@ -262,6 +262,7 @@ class LwF(nn.Module):
                         images = Variable(images)
                         images = images.cuda()
                         indices = indices.cuda()
+                        labels = labels.cuda()
 
                         outputs = self(images)
 
