@@ -37,18 +37,6 @@ STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
 ########################
 
-def to_onehot(targets, n_classes):
-    one_hots = []
-    #print('len targets', len(targets))
-    #print('targets', targets)
-    for t in targets:
-        temp = np.zeros(n_classes)
-        temp[t] = 1
-        one_hots.append(temp)
-    #print(one_hots)
-    one_hots = torch.FloatTensor(one_hots)
-    #print(one_hots.size())
-    return one_hots
 
 def kaiming_normal_init(m):
     if isinstance(m, nn.Conv2d):
@@ -207,8 +195,8 @@ class LwF(nn.Module):
                     # We need to save labels in this way because classes are randomly shuffled at the beginning
                     seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
-                    #labels_hot=torch.eye(self.n_classes)[labels]
-                    labels_hot = to_onehot(labels, self.n_classes)
+                    labels_hot=torch.eye(self.n_classes)[labels]
+                    #labels_hot = to_onehot(labels, self.n_classes)
                     labels_hot = labels_hot.to(DEVICE)
 
                     # Zero-ing the gradient
@@ -216,7 +204,6 @@ class LwF(nn.Module):
                     
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    logits = torch.sigmoid(logits)
                     
                     # Compute classification loss 
                     cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
