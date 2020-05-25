@@ -29,7 +29,6 @@ class iCaRL(nn.Module):
   def __init__(self, num_classes):
     super(iCaRL,self).__init__()
     self.feature_extractor = resnet32(iCaRL=True)
-    self.fc = nn.Linear(self.feature_extractor.out_dim, num_classes)
 
     self.loss = nn.CrossEntropyLoss()
     self.dist_loss = nn.BCELoss()
@@ -43,7 +42,6 @@ class iCaRL(nn.Module):
 
   def forward(self, x):
     x = self.feature_extractor(x)
-    x = self.fc(x)
     return(x)
 
   def update_representation(self, dataset):
@@ -74,12 +72,12 @@ class iCaRL(nn.Module):
 
 
     #Increment classes
-    in_features = self.fc.in_features
-    out_features = self.fc.out_features
-    weight = self.fc.weight.data
+    in_features = self.feature_extractor.fc.in_features
+    out_features = self.feature_extractor.fc.out_features
+    weight = self.feature_extractor.fc.weight.data
 
-    self.fc = nn.Linear(in_features, out_features+n, bias=False)
-    self.fc.weight.data[:out_features] = weight
+    self.feature_extractor.fc = nn.Linear(in_features, out_features+n, bias=False)
+    self.feature_extractor.fc.weight.data[:out_features] = weight
     self.num_known = self.num_classes
     self.num_classes += n
 
