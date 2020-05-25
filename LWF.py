@@ -1,7 +1,7 @@
 from LWF_net import LwF
 
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import Subset, DataLoader
 from torch.autograd import Variable
 from sklearn.model_selection import train_test_split
 
