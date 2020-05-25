@@ -73,6 +73,7 @@ def main():
 
         for imgs, labels, _ in  test_dataloader:
             imgs = imgs
+            labels = labels.to(DEVICE)
             print('here')
             preds = net.classify(imgs)
             print('here3')
