@@ -26,6 +26,7 @@ DEVICE = 'cuda'
 def to_onehot(targets, batch_size, num_classes):
     one_hots = []
     print('len targets', len(targets))
+    print('targets', targets)
     for t in targets:
         temp = np.zeros(num_classes)
         temp[t] = 1
