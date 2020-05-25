@@ -274,20 +274,20 @@ class LwF(nn.Module):
                          
                 val_acc = corrects / total
 
-        print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+                print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
 
-        avg_val_loss = val_loss/len(val_dataloader.dataset)
+        	avg_val_loss = val_loss/len(val_dataloader.dataset)
 
-        if (min_val_loss is None):
-           min_val_loss = avg_val_loss
-           best_net = copy.deepcopy(net.state_dict())
+        	if (min_val_loss is None):
+           		min_val_loss = avg_val_loss
+           		best_net = copy.deepcopy(net.state_dict())
 
-        else:
-           if avg_val_loss < min_val_loss:
-              min_val_loss = avg_val_loss
-              best_net = copy.deepcopy(net.state_dict())
+        	else:
+           		if avg_val_loss < min_val_loss:
+              			min_val_loss = avg_val_loss
+              			best_net = copy.deepcopy(net.state_dict())
             
-        scores[i+1] = [val_acc,avg_val_loss] 
+        	scores[i+1] = [val_acc,avg_val_loss] 
                  
 
                 if i%5 == 0:
