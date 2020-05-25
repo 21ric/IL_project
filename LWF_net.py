@@ -31,7 +31,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 20
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -157,8 +157,8 @@ class LwF(nn.Module):
             for images, labels, indices in dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
-                #g = torch.sigmoid(self.forward(images))
-                g = self.forward(images) 
+                g = torch.sigmoid(self.forward(images))
+                #g = self.forward(images) 
                 dist_target[indices] = g.data
             dist_target = Variable(dist_target).cuda()
 
