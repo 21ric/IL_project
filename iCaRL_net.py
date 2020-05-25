@@ -20,7 +20,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 4
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 def to_onehot(targets, n_classes):
