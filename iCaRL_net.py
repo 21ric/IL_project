@@ -118,6 +118,8 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
+                print(out[0])
+
                 #print('out', out[0], 'labels', labels[0])
 
                 loss = self.clf_loss(out, labels)
