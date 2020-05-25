@@ -211,11 +211,14 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
         x = x.to(DEVICE)
+        print('here1')
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
+
+        print('here2')
 
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)

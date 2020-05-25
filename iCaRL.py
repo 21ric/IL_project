@@ -70,9 +70,10 @@ def main():
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
         running_corrects = 0
-        
+
         for imgs, labels, _ in  test_dataloader:
             imgs = imgs
+            print('here')
             preds = net.classify(imgs)
             running_corrects += torch.sum(preds == labels.data).data.item()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
