@@ -197,9 +197,9 @@ class iCaRL(nn.Module):
     self.train()
 
 
- 
+
   #da cambiare completamente
-  
+
   def classify(self, dataloader, transform):
 
         #compute the mean for each examplars
@@ -241,7 +241,7 @@ class iCaRL(nn.Module):
 
 
 
-<<<<<<< HEAD
+        """
 
         if exemplar_means is None:
             raise ValueError(
@@ -253,7 +253,7 @@ class iCaRL(nn.Module):
                 "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
             )
 
-=======
+        """
         #if exemplar_means is None:
          #   raise ValueError(
           #      "Cannot classify without built examplar means,"
@@ -263,9 +263,6 @@ class iCaRL(nn.Module):
          #   raise ValueError(
           #      "The number of examplar means ({}) is inconsistent".format(exemplar_means.shape[0])
            # )
- 
-        
->>>>>>> bb31ebd5ac529f70a370715a8105b3297226f1d6
 
 
         ypred = []
@@ -330,143 +327,3 @@ class iCaRL(nn.Module):
         print(f"Test accuracy: {accuracy}")
 
         return ypred, ytrue
-<<<<<<< HEAD
-"""
-=======
-
-
-
-
-
-
-'''
-  def _dist(a, b):
-        """Computes L2 distance between two tensors.
-        :param a: A tensor.
-        :param b: A tensor.
-        :return: A tensor of distance being of the shape of the "biggest" input
-                 tensor.
-        """
-        return torch.pow(a - b, 2).sum(-1)
-
-  def get_closest(centers, features):
-        """Returns the center index being the closest to each feature.
-        :param centers: Centers to compare, in this case the class means.
-        :param features: A tensor of features extracted by the convnet.
-        :return: A numpy array of the closest centers indexes.
-        """
-        pred_labels = []
-
-        features = features
-        for feature in features:
-            distances = _dist(centers, feature)
-            pred_labels.append(distances.argmin().item())
-
-        return np.array(pred_labels)
-
-
-  def classify(self, dataloader):
-
-
-        class_means = None
-
-        exemplar_means=[]
-        for exemplars in self.exemplars:
-
-            feature_extractor = self.feature_extractor.to(DEVICE)
-            features = []
-
-
-            for ex in exemplars:
-                ex = Image.fromarray(ex)
-                ex = transform(ex)
-                ex = ex.unsqueeze(0)
-                ex = ex.to(DEVICE)
-                feature = feature_extractor.extract_features(ex).data.cpu().numpy().squeeze()
-                #feature = feature / np.linalg.norm(feature)
-                features.append(feature)
-
-
-
-            for feature in features:
-                if class_means is None:
-                    class_means = feature
-                else:
-                    class_means += feature
-            class_means = class_means / len(exemplars)
-            #class_means = np.mean(features, axis=1)
-
-            exemplar_means.append(class_means)
-     
-        ypred = []
-        ytrue = []
-
-        for inputs, targets, _ in dataloader:
-            inputs = inputs.to(DEVICE)
-
-            features = self.feature_extractor.extract_features(inputs).detach()
-            preds = _get_closest(exemplar_means,features)
-
-            ypred.extend(preds)
-            ytrue.extend(targets)
-
-        return np.array(ypred), np.array(ytrue)
-
-
-
-
-
-
-
-  def classify(self, dataloader):
-
-        compute_means = True
-        if compute_means:
-            print("Computing mean of exemplars...")
-            exemplar_means = []
-            for P_y in self.exemplars:
-                features = []
-                # Extract feature for each exemplar set in P_y
-                for ex in P_y:
-                    ex = Variable(transform(Image.fromarray(ex)), volatile=True).cuda()
-                    feature = self.feature_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / feature.data.norm() # Normalize
-                    features.append(feature)
-                features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / mu_y.data.norm() # Normalize
-                exemplar_means.append(mu_y)
-            #self.exemplar_means = exemplar_means
-            #self.compute_means = False
-            print("Done")
-
-        #exemplar_means = self.exemplar_means
-        means = torch.stack(exemplar_means) # (n_classes, feature_size)
-        means = torch.stack([means] * BATCH_SIZE) # (batch_size, n_classes, feature_size)
-        means = means.transpose(1, 2) # (batch_size, feature_size, n_classes)
-
-        preds = []
-        running_corrects = 0
-        for inputs, targets, _ in dataloader:
-            print('qui?')
-            inputs = inputs.to(DEVICE)
-            targets = targets.to(DEVICE)
-            feature = self.feature_extractor.extract_features(inputs) # (batch_size, feature_size)
-            #for i in xrange(feature.size(0)): # Normalize
-            #    feature.data[i] = feature.data[i] / feature.data[i].norm()
-            feature = feature.unsqueeze(2) # (batch_size, feature_size, 1)
-            feature = feature.expand_as(means) # (batch_size, feature_size, n_classes)
-
-            dists = (feature - means).pow(2).sum(1).squeeze() #(batch_size, n_classes)
-            _, predictions = dists.min(1)
-
-            running_corrects += torch.sum(predictions == targets.data).data.item()  #torch.from_numpy(
-            preds.extend(predictions)
-
-        accuracy = running_corrects/len(dataloader.dataset)
-        print(f"Test accuracy: {accuracy}")
-        print(preds)
-        return preds
-'''
->>>>>>> bb31ebd5ac529f70a370715a8105b3297226f1d6
