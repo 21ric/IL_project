@@ -69,7 +69,7 @@ class iCaRL(nn.Module):
 
         self.to(DEVICE)
 
-        loader = Dataloader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         if self.n_known > 0:
             self.train(False)
