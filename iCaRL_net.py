@@ -217,6 +217,6 @@ class iCaRL(nn.Module):
         feature = feature.expand_as(means)
 
         dists = (feature - means).pow(2).sum(1).squeeze()
-        _, pred = dists.min(1)
+        _, preds = dists.min(1)
 
         return preds
