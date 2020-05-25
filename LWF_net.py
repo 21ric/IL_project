@@ -125,7 +125,7 @@ class LwF(nn.Module):
         _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
         return preds    
     
-    def update(self, dataset, class_map):
+    def update(self, dataset, val_dataset, class_map):
 
         self.cuda()
 
@@ -137,9 +137,9 @@ class LwF(nn.Module):
         classes = list(set(dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
-   
-        dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
-    
+     
+        dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)   #we already pass the loader
+        
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
             dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -170,7 +170,14 @@ class LwF(nn.Module):
         self.train(True)
         with tqdm(total=NUM_EPOCHS) as pbar:
             i = 0
-            for epoch in range(NUM_EPOCHS):    
+
+            scores = {}
+
+            for epoch in range(NUM_EPOCHS): 
+
+                val_acc = 0.0
+                min_val_loss = None
+   
                 if i%5 == 0:
                     print('-'*30)
                     print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
@@ -181,6 +188,7 @@ class LwF(nn.Module):
                 if epoch in STEPDOWN_EPOCHS:
                     for param_group in optimizer.param_groups:
                         param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
 
                 # train phase, the model weights are update such that it is good with the new task
                 # and also with the old one
@@ -239,7 +247,48 @@ class LwF(nn.Module):
 
                     loss.backward()
                     optimizer.step()
+
+                # VALIDATION 
+
+                net.eval()
+                val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
                 
+                total = 0.0
+                corrects = 0.0
+
+                for  images, labels, indices in val_dataloader:
+                    
+                    	images = Variable(images)
+                    	images = images.cuda()
+                    	indices = indices.cuda()
+
+                        outputs = net(images)
+
+                        loss = nn.CrossEntropyLoss()(outputs, labels)
+                        val_loss += loss.item() * images.size(0)
+		
+		        preds = net.classify(images)
+		        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+		        total += labels.size(0)
+		        corrects += (preds == labels.numpy()).sum()
+                         
+                val_acc = corrects / total
+
+		print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+
+		avg_val_loss = val_loss/len(val_dataloader.dataset)
+
+		if (min_val_loss is None):
+		      min_val_loss = avg_val_loss
+		      best_net = copy.deepcopy(net.state_dict())
+		else:
+		      if avg_val_loss < min_val_loss:
+			  min_val_loss = avg_val_loss
+			  best_net = copy.deepcopy(net.state_dict())
+		    
+		scores[i+1] = [val_acc,avg_val_loss] 
+		         
+
                 if i%5 == 0:
 
                 	print("Loss: {:.4f}\n".format(loss.item()))    
@@ -247,5 +296,9 @@ class LwF(nn.Module):
                 i+=1
     
                 pbar.update(1)
+ 
+            #end epochs
+            net.load_state_dict(best_net)  
+            return [scores,net]  
                 
 
