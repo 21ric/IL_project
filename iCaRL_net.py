@@ -46,8 +46,8 @@ class iCaRL(nn.Module):
         self.n_known = 0
         self.exemplar_sets = []
 
-        self.clf_loss = nn.BCEWithLogitsLoss()
-        self.dist_loss = nn.BCEWithLogitsLoss()
+        self.clf_loss = nn.BCELoss()
+        self.dist_loss = nn.BCELoss()
 
         self.exemplar_means = []
         self.exemplars_sets = []
@@ -89,8 +89,8 @@ class iCaRL(nn.Module):
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                #g = torch.sigmoid(self.forward(images))
-                g = self.forward(images)
+                g = torch.sigmoid(self.forward(images))
+                #g = self.forward(images)
                 q[indexes] = g.data
             q = Variable(q).cuda()
             self.train(True)
@@ -116,7 +116,7 @@ class iCaRL(nn.Module):
                 indexes = indexes.to(DEVICE)
 
                 optimizer.zero_grad()
-                out = self(imgs)
+                out = torch.sigmoid(self(imgs))
 
                 #print(out[0])
 
