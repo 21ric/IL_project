@@ -235,7 +235,7 @@ class LwF(nn.Module):
                     
                     # Compute outputs on the new model 
                     logits = self.forward(images) 
-                    #logits = torch.sigmoid(logits)
+                    logits = torch.sigmoid(logits)
                     
                     # Compute classification loss + one-hot labels for BCE
                     cls_loss = criterion_class(logits, labels_hot)
@@ -254,9 +254,11 @@ class LwF(nn.Module):
                         # LwF doesn't use examplars, it uses the network outputs itselfs
                         #logits = torch.sigmoid(logits) #BCE
                         #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
-            
+
+                        dist_loss = self.criterion_dist(logits[:, :self.n_known], dist_target_i)  #richi dist_loss
+
                         # Compute distillation loss
-                        dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
                         #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
                       
                         # Compute total loss
