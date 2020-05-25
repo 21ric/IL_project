@@ -26,7 +26,7 @@ DEVICE = 'cuda'
 def to_onehot(targets, batch_size, num_classes):
     targets_onehot = torch.FloatTensor(batch_size, num_classes)
     targets_onehot.zero_()
-    targets_onehot.scatter_(1, y, 1)
+    targets_onehot.scatter_(1, targets, 1)
     return targets_onehot
 
 class iCaRL(nn.Module):
