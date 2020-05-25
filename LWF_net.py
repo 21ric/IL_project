@@ -126,7 +126,7 @@ class LwF(nn.Module):
         _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
         return preds    
     
-    def update(self, dataset, val_dataset, class_map):
+    def update(self, dataset, val_dataset, class_map,map_reverse):
 
         self.cuda()
 
