@@ -61,7 +61,7 @@ def main():
 
 
         for y in range(net.n_known, net.n_classes):
-            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, train_dataset.transform)
+            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m)
 
         if i == 1:
             return
