@@ -23,8 +23,11 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 4
 DEVICE = 'cuda'
 ########################
-def to_onehot(targets, n_classes):
-    return torch.eye(n_classes)[targets]
+def to_onehot(targets, batch_size, num_classes):
+    targets_onehot = torch.FloatTensor(batch_size, num_classes)
+    targets_onehot.zero_()
+    targets_onehot.scatter_(1, y, 1)
+    return targets_onehot
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes):
