@@ -128,6 +128,7 @@ class iCaRL(nn.Module):
                     #print('g', g[:,1])
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
+                    print('here?')
                     dist_loss = sum(self.dist_loss(g[:,y], q_i[:,y]) for y in range(self.n_known))
 
                     loss += dist_loss
@@ -194,7 +195,7 @@ class iCaRL(nn.Module):
         self.to(DEVICE)
         #print('exset', self.exemplar_sets)
         for exemplars in self.exemplar_sets:
-            print('in')
+            #print('in')
             features = []
             for ex in  exemplars:
                 ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
