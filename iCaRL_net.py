@@ -67,11 +67,12 @@ class iCaRL(nn.Module):
 
         self.add_exemplars(dataset)
 
-        self.to(DEVICE)
+
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         if self.n_known > 0:
+            self.to(DEVICE)
             self.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
