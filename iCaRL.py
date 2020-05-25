@@ -37,33 +37,16 @@ def main():
     #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
-    #range_classes = np.arange(100)
-    #classes_groups = np.array_split(range_classes, 10)
-    total_classes = 100
-    perm_id = np.random.permutation(total_classes)
-    all_classes = np.arange(total_classes)
+    range_classes = np.arange(100)
+    classes_groups = np.array_split(range_classes, 10)
 
-    for i in range(len(all_classes)):
-      all_classes[i] = perm_id[all_classes[i]]
 
-    class_map = {}
-    #takes 10 new classes randomly
-    for i, cl in enumerate(all_classes):
-        class_map[cl] = i
-    print (f"Class map:{class_map}\n")
-
-    # Create class map reversed
-    map_reverse = {}
-    for cl, map_cl in class_map.items():
-        map_reverse[map_cl] = int(cl)
-    print (f"Map Reverse:{map_reverse}\n")
-
-    net = iCaRL(0, class_map)
+    net = iCaRL(0)
 
     for i in range(int(100/CLASSES_BATCH)):
 
-        train_dataset = CIFAR100(root='data/', classes=all_classes[i:i+CLASSES_BATCH], train=True, download=True, transform=train_transform)
-        test_dataset = CIFAR100(root='data/', classes=all_classes[:i+CLASSES_BATCH],  train=False, download=True, transform=test_transform)
+        train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
+        test_dataset = CIFAR100(root='data/', classes=classes_gropus[i],  train=False, download=True, transform=test_transform)
 
         net.update_representation(dataset = train_dataset)
 

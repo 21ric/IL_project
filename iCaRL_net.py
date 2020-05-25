@@ -23,7 +23,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
-def to_onehot(targets, n_classes, class_map):
+def to_onehot(targets, n_classes):
     one_hots = []
     #print('len targets', len(targets))
     #print('targets', targets)
@@ -38,7 +38,7 @@ def to_onehot(targets, n_classes, class_map):
 
 
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map):
+    def __init__(self, n_classes):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=0)
 
@@ -51,8 +51,6 @@ class iCaRL(nn.Module):
 
         self.exemplar_means = []
         self.exemplars_sets = []
-
-        self.class_map = class_map
 
 
     def forward(self, x):
@@ -114,9 +112,7 @@ class iCaRL(nn.Module):
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
 
-                labels = Variable(torch.LongTensor([self.class_map[label] for label in labels.numpy()]))
-
-                labels = to_onehot(labels, self.n_classes, self.class_map)
+                labels = to_onehot(labels, self.n_classes)
                 labels = labels.to(DEVICE)
                 indexes = indexes.to(DEVICE)
 
