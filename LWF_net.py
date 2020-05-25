@@ -255,7 +255,7 @@ class LwF(nn.Module):
                 self.train(False)
                 val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
                 
-                
+                total = 0.0
                 corrects = 0.0
 
                 for  images, labels, indices in val_dataloader:
