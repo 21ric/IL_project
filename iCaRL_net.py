@@ -149,4 +149,22 @@ class iCaRL(nn.Module):
         #features = np.array(features)
         #print('num_features',len(features))
         class_mean = np.mean(features, axis=0)
-        print('class_mean', class_mean)
+        #print('class_mean', class_mean)
+        class_mean = class_mean / np.linalg.norm(class_mean)
+
+        exemplar_set = []
+        exemplar_features = []
+        for k in range(m):
+            S = np.sum(exemplar_features, axis=0)
+            phi = features
+            mu = class_mean
+            mu_p = 1.0 / (k+1)*(phi+S)
+            mu_p = mu_p / np.linalg.norm(mu_p)
+            i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+
+            exemplars_set.append(images[i])
+            exemplar_features.append(features[i])
+
+            print('chosen i:{}'.format(i))
+
+        self.exemplar_sets.append(np.array(exemplar_set))
