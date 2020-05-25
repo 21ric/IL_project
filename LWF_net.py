@@ -194,6 +194,8 @@ class LwF(nn.Module):
 
                 # train phase, the model weights are update such that it is good with the new task
                 # and also with the old one
+                self.train(True)
+
                 for  images, labels, indices in dataloader:
                     
                     seen_labels = []
