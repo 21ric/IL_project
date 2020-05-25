@@ -46,8 +46,8 @@ class iCaRL(nn.Module):
         self.n_known = 0
         self.exemplar_sets = []
 
-        self.clf_loss = nn.BCELoss()
-        self.dist_loss = nn.BCELoss()
+        self.clf_loss = nn.BCEWithLogitsLoss()
+        self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.exemplars_sets = []
@@ -117,7 +117,8 @@ class iCaRL(nn.Module):
                 indexes = indexes.to(DEVICE)
 
                 optimizer.zero_grad()
-                out = torch.sigmoid(self(imgs))
+                #out = torch.sigmoid(self(imgs))
+                out = self(imgs)
 
                 #print(out[0])
 
@@ -202,8 +203,9 @@ class iCaRL(nn.Module):
 
     def classify(self, x, compute_means):
 
+        batch_size = x.size(0)
+
         if compute_means:
-            batch_size = x.size(0)
 
             exemplar_means = []
 
