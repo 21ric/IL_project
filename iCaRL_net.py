@@ -97,7 +97,7 @@ class iCaRL(nn.Module):
             i = 0
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
-                labels = to_onehot(targets, self.n_classes)
+                labels = to_onehot(targets, BATCH_SIZE, self.n_classes)
                 labels = labels.to(DEVICE)
                 indexes = indexes.to(DEVICE)
 
