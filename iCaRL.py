@@ -62,8 +62,8 @@ def main():
 
     for i in range(int(100/ClASSES_BATCH)):
 
-        train_dataset = CIFAR100(root='data/', classes=all_classes[i:i+CLASSES_BATCH]], train=True, download=True, transform=train_transform)
-        test_dataset = CIFAR100(root='data/', classes=all_classes[:i+CLASSES_BATCH]],  train=False, download=True, transform=test_transform)
+        train_dataset = CIFAR100(root='data/', classes=all_classes[i:i+CLASSES_BATCH], train=True, download=True, transform=train_transform)
+        test_dataset = CIFAR100(root='data/', classes=all_classes[:i+CLASSES_BATCH],  train=False, download=True, transform=test_transform)
 
         net.update_representation(dataset = train_dataset)
 
