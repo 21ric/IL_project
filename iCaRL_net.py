@@ -28,7 +28,7 @@ def to_onehot(targets, batch_size, num_classes):
     for t in targets:
         temp = np.zeros(num_classes)
         temp[t] = 1
-        onehots.append(temp)
+        one_hots.append(temp)
     print(one_hots)
     return one_hots
 
