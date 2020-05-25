@@ -184,8 +184,9 @@ class iCaRL(nn.Module):
         exemplar_means = []
 
         self.to(DEVICE)
-        print('exset', self.exemplar_sets)
+        #print('exset', self.exemplar_sets)
         for exemplars in self.exemplars_sets:
+            print('in')
             features = []
             for ex in  exemplars:
                 ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
@@ -198,7 +199,7 @@ class iCaRL(nn.Module):
             mu_y = features.mean(0).squeeze()
             mu_y.data = mu_y.data / mu_y.data.norm
             exemplar_means.append(mu_y)
-            print(mu_y)
+            print('mu_y', mu_y)
 
         self.exemplar_means = exemplar_means
         print(self.exemplar_means)
