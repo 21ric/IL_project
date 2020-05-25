@@ -4,6 +4,7 @@ from torchvision import transforms
 from torch.utils.data import Subset, DataLoader
 from torch.autograd import Variable
 from sklearn.model_selection import train_test_split
+import copy
 
 from dataset import CIFAR100
 
