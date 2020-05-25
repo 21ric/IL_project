@@ -97,7 +97,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                loss = self.clf_loss(g, labels)
+                loss = self.clf_loss(out, labels)
 
                 if self.n_known > 0:
                     out = torch.sigmoid(out)
