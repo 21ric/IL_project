@@ -251,7 +251,7 @@ class LwF(nn.Module):
 
                 # VALIDATION 
 
-                net.eval()
+                self.train(False)
                 val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
                 
                 total = 0.0
@@ -263,7 +263,7 @@ class LwF(nn.Module):
                         images = images.cuda()
                         indices = indices.cuda()
 
-                        outputs = net(images)
+                        outputs = self(images)
 
                         loss = nn.CrossEntropyLoss()(outputs, labels)
                         val_loss += loss.item() * images.size(0)
