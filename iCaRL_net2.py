@@ -208,13 +208,16 @@ class iCaRL(nn.Module):
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature.squeeze(0) # new
             feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
+            #features.append(feature[0]) #old
+            features.append(feature) #new
 
         #print('features shape', features[0])
         #features = np.array(features)
         #print('num_features',len(features))
-        class_mean = np.mean(features, axis=0)
+        class_mean = np.mean(features, axis=0) #OLD
+        #class_mean = np. #NEW
         #print('class_mean', class_mean)
         class_mean = class_mean / np.linalg.norm(class_mean)
 
