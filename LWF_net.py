@@ -118,7 +118,7 @@ class LwF(nn.Module):
         prev_model.to(DEVICE)
 
         # Save true labels (new images)
-        classes = list(set(train_dataset.targets)) #list of true labels
+        classes = list(set(train_dataset.dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
      
