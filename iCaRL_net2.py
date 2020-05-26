@@ -134,6 +134,7 @@ class iCaRL(nn.Module):
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
                     #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
+                    print('qui1')
                     target = [q_i, labels_hot]
                     loss = self.dist_loss(output, target)
                     #loss += dist_loss
