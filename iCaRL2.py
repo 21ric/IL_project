@@ -108,8 +108,7 @@ def main():
             running_corrects = 0
 
             for imgs, labels, _ in  test_dataloader:
-                imgs = imgs
-                labels = labels.to(DEVICE)
+                imgs = Variable(imgs).cuda()
                 preds = net.classify(imgs, compute_means=True)
                 preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                 running_corrects += (preds == labels.numpy()).sum()
@@ -136,8 +135,7 @@ def main():
             running_corrects = 0
 
             for imgs, labels, _ in  test_dataloader:
-                imgs = imgs
-                labels = labels.to(DEVICE)
+                imgs = Variable(imgs).cuda()
                 preds = net.classify(imgs, compute_means = True)
                 preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                 running_corrects += (preds == labels.numpy()).sum()
@@ -148,8 +146,7 @@ def main():
             running_corrects = 0
 
             for imgs, labels, _ in  prev_dataloader:
-                imgs = imgs
-                labels = labels.to(DEVICE)
+                imgs = Variable(imgs).cuda()
                 preds = net.classify(imgs, compute_means = False)
                 preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                 running_corrects += (preds == labels.numpy()).sum()
@@ -160,8 +157,7 @@ def main():
             running_corrects = 0
 
             for imgs, labels, _ in  all_dataloader:
-                imgs = imgs
-                labels = labels.to(DEVICE)
+                imgs = Variable(imgs).cuda()
                 preds = net.classify(imgs, compute_means = False)
                 preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                 running_corrects += (preds == labels.numpy()).sum()
