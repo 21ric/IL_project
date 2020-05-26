@@ -11,6 +11,8 @@ from sklearn.model_selection import train_test_split
 
 import math
 
+import utils
+
 import copy
 
 import torch
@@ -27,6 +29,7 @@ def main():
 
     #define images transformation
     #define images transformation
+    """
     train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                                         transforms.RandomHorizontalFlip(),
                                         transforms.ToTensor(),
@@ -41,8 +44,8 @@ def main():
 
     #creo i dataset per ora prendo solo le prime 10 classi per testare, ho esteso la classe cifar 100 con attributo
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
-
-
+    """
+    """
     total_classes = 100
 
     perm_id = np.random.permutation(total_classes)
@@ -68,7 +71,9 @@ def main():
     for cl, map_cl in class_map.items():
         map_reverse[map_cl] = int(cl)
     #print (f"Map Reverse:{map_reverse}\n")
+    """
 
+    classes_groups, class_map, map_reverse = utils.get_class_maps()
 
     #range_classes = np.arange(100)
     #classes_groups = np.array_split(range_classes, 10)
@@ -78,9 +83,12 @@ def main():
 
     for i in range(int(100/CLASSES_BATCH)):
 
+        net.compute_means = True
+
         print('Loading the Datasets ...')
         print('-'*30)
 
+        """
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
@@ -90,6 +98,9 @@ def main():
         train_dataset = Subset(train_dataset, train_indices)
 
         val_dataset.dataset.transform = test_transform
+        """
+
+        train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])
 
         print('-'*30)
         print('Updating representation ...')
@@ -116,6 +127,23 @@ def main():
         print('Testing ...')
         print('-'*30)
 
+        print('New classes')
+        net.classify_all(test_dataset, map_reverse)
+
+        if i > 0:
+
+            previous_classes = np.array([])
+            for j in range(i):
+                previous_classes = np.concatenate((previous_classes, classes_groups[j]))
+
+            prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
+
+            print('Old classes')
+            net.classify_all(prev_classes_dataset, map_reverse)
+            print('New classes')
+            net.classify_all(all_classes_dataset, map_reverse)
+
+        """
         if i == 0:
 
             test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
@@ -179,6 +207,7 @@ def main():
                 #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
+        """
 
             print('-'*30)
 

@@ -59,6 +59,8 @@ class iCaRL(nn.Module):
         self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
+        self.compute_means = True
+
         self.exemplars_sets = []
 
         self.class_map = class_map
@@ -245,11 +247,11 @@ class iCaRL(nn.Module):
         self.train(True)
 
 
-    def classify(self, x, compute_means):
+    def classify(self, x):
 
         batch_size = x.size(0)
 
-        if compute_means:
+        if self.compute_means:
 
             exemplar_means = []
 
@@ -273,6 +275,7 @@ class iCaRL(nn.Module):
                 #print('mu_y', mu_y)
 
             self.exemplar_means = exemplar_means
+            self.compute_means = False
         #print(self.exemplar_means)
         exemplar_means = self.exemplar_means
 
@@ -296,3 +299,19 @@ class iCaRL(nn.Module):
         self.train(True)
 
         return preds
+
+
+        def classify_all(self, test_dataset, map_reverse):
+
+            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+
+            running_corrects = 0
+
+            for imgs, labels, _ in  test_dataloader:
+                imgs = Variable(imgs).cuda()
+                preds = self.classify(imgs)
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                running_corrects += (preds == labels.numpy()).sum()
+                #running_corrects += torch.sum(preds == labels.data).data.item()
+            accuracy = running_corrects / float(len(test_dataloader.dataset))
+            print('Test Accuracy: {}'.format(accuracy))
