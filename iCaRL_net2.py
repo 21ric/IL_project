@@ -116,6 +116,7 @@ class iCaRL(nn.Module):
         i = 0
 
         best_acc = 0
+        best_epoch = 0
 
         self.to(DEVICE)
         self.train(True)
