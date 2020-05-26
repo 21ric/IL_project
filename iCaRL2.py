@@ -88,7 +88,7 @@ def main():
 
         val_dataset.dataset.transform = test_transform
 
-        net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map)
+        net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
 
         #print('Dato train sample')
         #print(train_dataset.data[:1])
