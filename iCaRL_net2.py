@@ -22,7 +22,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 1
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -164,7 +164,7 @@ class iCaRL(nn.Module):
 
                     #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
                     #target = [q_i, labels_hot]
-                    print('known classe', self.n_known, self.n_classes)
+                    #print('known classe', self.n_known, self.n_classes)
                     target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
                     #loss += dist_loss
