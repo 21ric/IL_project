@@ -10,6 +10,8 @@ from PIL import Image
 
 from resnet import resnet32
 
+import copy
+
 import math
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
@@ -23,6 +25,25 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
+
+def validate(net, val_dataloader, map_reverse):
+    running_corrects_val = 0
+    for inputs, labels, index in val_dataloader:
+        inputs = inputs.to(DEVICE)
+        labels = labels.to(DEVICE)
+
+        net.train(False)
+        # forward
+        outputs = net(inputs)
+        _, preds = torch.max(outputs, 1)
+        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+        running_corrects_val += (preds == labels.cpu().numpy()).sum()
+        #running_corrects_val += torch.sum(preds == labels.data)
+
+    valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
+
+    net.train(True)
+    return valid_acc
 
 
 class iCaRL(nn.Module):
@@ -63,7 +84,8 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplars_sets):
             dataset.append(exemplars, [y]*len(exemplars))
 
-    def update_representation(self, dataset, class_map):
+    def update_representation(self, dataset, val_dataset, class_map, map_reverse):
+        dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
         print('{} new classes'.format(n))
@@ -71,6 +93,7 @@ class iCaRL(nn.Module):
         self.add_exemplars(dataset)
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
         if self.n_known > 0:
             self.to(DEVICE)
@@ -90,8 +113,12 @@ class iCaRL(nn.Module):
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
-        self.to(DEVICE)
         i = 0
+
+        best_acc = 0
+        best_epoch = 0
+
+        self.to(DEVICE)
         self.train(True)
         for epoch in range(NUM_EPOCHS):
 
@@ -132,19 +159,30 @@ class iCaRL(nn.Module):
                     #print(q_i)
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
-                    #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
-                    target = [q_i, labels_hot]
-                    loss = self.dist_loss(output, target)
-                    #loss += dist_loss
+                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
+                    #target = [q_i, labels_hot]
+                    #loss = self.dist_loss(out, target)
+                    loss += dist_loss
 
                 loss.backward()
                 optimizer.step()
+
+            accuracy = validate(self, val_loader, map_reverse)
+
+            if accuracy > best_acc:
+                best_acc = accuracy
+                best_epoch = epoch
+                best_net = copy.deepcopy(self.state_dict())
 
             if i % 10 == 0:
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
+                print('Best accuracy:{:.4f} obtained at epoch {}'.format(best_acc, best_epoch))
             i+=1
+
+        self.load_state_dict(best_net)
+        return
 
     def reduce_exemplars_set(self, m):
         for y, exemplars in enumerate(self.exemplars_sets):
@@ -187,9 +225,11 @@ class iCaRL(nn.Module):
             if i == 0:
                 images = images[1:]
                 features = features[1:]
+
             elif i == len(features):
                 images = images[:-1]
                 features = features[:-1]
+
             else:
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))

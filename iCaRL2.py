@@ -1,13 +1,17 @@
 from iCaRL_net2 import iCaRL
 
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 from dataset import CIFAR100
 
 import numpy as np
 
+from sklearn.model_selection import train_test_split
+
 import math
+
+import copy
 
 import torch
 from torch.autograd import Variable
@@ -77,7 +81,14 @@ def main():
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
-        net.update_representation(dataset = train_dataset, class_map=class_map)
+        train_indices, val_indices = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
+
+        val_dataset = Subset(copy.deepcopy(train_dataset), val_indices)
+        train_dataset = Subset(train_dataset, train_indices)
+
+        val_dataset.dataset.transform = test_transform
+
+        net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
 
         #print('Dato train sample')
         #print(train_dataset.data[:1])
@@ -91,7 +102,7 @@ def main():
         net.reduce_exemplars_set(m)
 
         for y in classes_groups[i]:
-            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m)
+            net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
 
         net.n_known = net.n_classes
 

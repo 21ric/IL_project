@@ -118,7 +118,7 @@ class LwF(nn.Module):
         prev_model.to(DEVICE)
 
         # Save true labels (new images)
-        classes = list(set(train_dataset.targets)) #list of true labels
+        classes = list(set(train_dataset.dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
      
@@ -155,7 +155,7 @@ class LwF(nn.Module):
 
         scores = {}
         best_acc = 0 # This is the validation accuracy for model selection
-
+        self.train(True)
         for epoch in range(NUM_EPOCHS):              
             if epoch%5 == 0:
                 print('-'*30)
@@ -193,9 +193,13 @@ class LwF(nn.Module):
 
                 # Compute classification loss 
                 cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
-
-                # If not first iteration
-                if self.n_known > 0:
+                
+                '''
+                if self.n_known <= 0: # First iteration
+                    loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                '''
+                
+                if self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
                     dist_target_i = dist_target[indices] #BCE
                     #dist_target_batch = prev_model.forward(images)  #MCCE
@@ -206,50 +210,46 @@ class LwF(nn.Module):
                     # Save logits of the first "old" nodes of the network
                     # LwF doesn't use examplars, it uses the network outputs itselfs
                     #logits = torch.sigmoid(logits) #BCE
-                    #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                    logits_dist = logits[:,:self.n_known]  #MCCE
 
                     # Compute distillation loss
+                    #target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i) #richi dist_loss
+                    dist_loss = criterion_dist(logits_dist, dist_target_i) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
                     loss = dist_loss+cls_loss
-                    #print(dist_loss.item())           
-
-                # If first iteration
+                    print(dist_loss.item())    
+                
                 else:
                     loss = cls_loss
-
+                    
                 loss.backward()
                 optimizer.step()
 
             # VALIDATION               
-            total = 0.0
             running_corrects = 0.0
 
-            for  images, labels, indices in val_dataloader:
+            for  images, labels, indices in val_dataloader: 
+                images = Variable(images)
+                images = images.to(DEVICE)
+                indices = indices.to(DEVICE)
+                labels = labels.to(DEVICE)
 
-                    images = Variable(images)
-                    images = images.to(DEVICE)
-                    indices = indices.to(DEVICE)
-                    labels = labels.to(DEVICE)
+                # Set the network to evaluation mode
+                self.train(False)
 
-                    # Set the network to evaluation mode
-                    self.train(False)
-
-                    # Forward + classify
-                    preds = self.classify(images)
-                    preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-                    total += labels.size(0)          
-                    running_corrects += (preds == labels.cpu().numpy()).sum()
-
-            print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+                # Forward + classify
+                preds = self.classify(images)
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]        
+                running_corrects += (preds == labels.cpu().numpy()).sum()
+                
             val_acc = running_corrects / float(len(val_dataloader.dataset))
 
             if (val_acc > best_acc):
                 best_acc = val_acc
-                best_net = copy.deepcopy(net.state_dict())
+                best_net = copy.deepcopy(self.state_dict())
 
             scores[epoch+1] = val_acc 
 
