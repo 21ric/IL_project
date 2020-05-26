@@ -177,7 +177,7 @@ class LwF(nn.Module):
         best_acc = 0 # This is the validation accuracy for model selection
         self.train(True)
         
-        for epoch in range(70): 
+        for epoch in range(30): 
              
             if epoch%5 == 0:
                 print('-'*30)
