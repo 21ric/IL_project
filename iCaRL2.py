@@ -61,13 +61,13 @@ def main():
     #takes 10 new classes randomly
     for i, cl in enumerate(all_classes):
         class_map[cl] = i
-    print (f"Class map:{class_map}\n")
+    #print (f"Class map:{class_map}\n")
 
     # Create class map reversed
     map_reverse = {}
     for cl, map_cl in class_map.items():
         map_reverse[map_cl] = int(cl)
-    print (f"Map Reverse:{map_reverse}\n")
+    #print (f"Map Reverse:{map_reverse}\n")
 
 
     #range_classes = np.arange(100)
@@ -77,6 +77,9 @@ def main():
     net = iCaRL(0, class_map)
 
     for i in range(int(100/CLASSES_BATCH)):
+
+        print('Loading the Datasets ...')
+        print('-'*30)
 
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
@@ -88,23 +91,33 @@ def main():
 
         val_dataset.dataset.transform = test_transform
 
+        print('Updating representation ...')
+        print('-'*30)
+
         net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
+
 
         #print('Dato train sample')
         #print(train_dataset.data[:1])
         #print('tipo')
         #print(type(train_dataset.data[:1]))
-
-        print('done upd')
+        print('Reducing exemplar sets ...')
+        print('-'*30)
 
         m = int(math.ceil(MEMORY_SIZE/net.n_classes))
 
         net.reduce_exemplars_set(m)
 
+        print('Constructing exemplar sets ...')
+        print('-'*30)
+
         for y in classes_groups[i]:
             net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
 
         net.n_known = net.n_classes
+
+        print('Testing ...')
+        print('-'*30)
 
         if i == 0:
 
@@ -169,6 +182,8 @@ def main():
                 #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
+            
+            print('-'*30)
 
         if i == 1:
             return
