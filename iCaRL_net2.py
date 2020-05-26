@@ -225,9 +225,11 @@ class iCaRL(nn.Module):
             if i == 0:
                 images = images[1:]
                 features = features[1:]
+
             elif i == len(features):
                 images = images[:-1]
                 features = features[:-1]
+                
             else:
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
