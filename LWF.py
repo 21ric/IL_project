@@ -63,7 +63,8 @@ def main():
 
     # Create Network
     net = LwF(CLASSES_BATCH, class_map)
- 
+    
+    test_accs = []
       
     #iterating until the net knows total_classes with 10 by 10 steps 
     for s in range(0, total_classes, CLASSES_BATCH):   
@@ -140,12 +141,16 @@ def main():
             total += labels.size(0)
             correct += (preds == labels.numpy()).sum()
 
+        test_accs.append(100.0 * correct / total)
         # Test Accuracy
         print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
 
         #set the net to train for the next iteration 
         net.train(True)
+
+    for i in range(len(test_accs)):
+	print(f"Test accuracy at iteration {i+1}: {test_accs[i]}")    
 
 
 if __name__ == '__main__':
