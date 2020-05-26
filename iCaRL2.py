@@ -73,7 +73,7 @@ def main():
         print('-'*30)
 
         print('New classes')
-        net.classify_all(test_dataset, map_reverse)
+        #net.classify_all(test_dataset, map_reverse)
 
         if i > 0:
 
