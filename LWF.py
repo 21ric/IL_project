@@ -43,17 +43,11 @@ def main():
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
     
-    #mix the classes indexes
+    # Mix the classes indexes
     for i in range(len(all_classes)):
       all_classes[i] = perm_id[all_classes[i]]
 
-    #Create groups of 10
-    #classes_groups = np.array_split(all_classes, 10)
-    #print(classes_groups)
-
-    #num_iters = total_classes//CLASSES_BATCH      
     # Create class map
-
     class_map = {}
     #takes 10 new classes randomly
     for i, cl in enumerate(all_classes):
@@ -68,50 +62,38 @@ def main():
 
 
     # Create Network
-    #net = LwF(2048,CLASSES_BATCH,class_map)
     net = LwF(CLASSES_BATCH, class_map)
  
       
     #iterating until the net knows total_classes with 10 by 10 steps 
-
-    for s in range(0, total_classes, CLASSES_BATCH):  #c'era (0, num_iter,CLASSES_BATCH), modificato perchè altrimenti avevamo num_iter=10
-                                                      #CLASSES_BATCH= 10 quindi s andava da 0 a 10 e si fermava
-                                                      #ora s parte da zero, salta di 10 in 10, fino ad arrivare a 100.. in totale fa 10 iter
-   
-       
+    for s in range(0, total_classes, CLASSES_BATCH):   
         print(f"ITERATION: {(s//CLASSES_BATCH)+1} / {total_classes//CLASSES_BATCH}\n")
-      
         print("\n")
-                
-        # Load Datasets  
-
         
-                               
-                                                             #train data_loader loads images in classes [0:10] then in [10:20] etc..          
+        # Creating dataset for current iteration        
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
-        
-
-        train_indexes, val_indexes = train_test_split(range(len(train_dataset)), test_size=0.2, stratify=train_dataset.targets)
-        
-        val_dataset = Subset(copy.copy(train_dataset), val_indexes)   
-        train_dataset = Subset(copy.copy(train_dataset), train_indexes)
-   
-        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=True, num_workers=4)
-
-                                                     #test data_loader loades images in classes [0:10] then [0:20] etc..
         test_dataset = CIFAR100(root='data',train=False,classes=all_classes[:s+CLASSES_BATCH],download=True, transform=test_transform)
-        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4)
+        
+        # Create indices for train and validation
+        train_indexes, val_indexes = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
+        
+        val_dataset = Subset(train_dataset, val_indexes)   
+        train_dataset = Subset(train_dataset, train_indexes)
+   
+        # Prepare dataloaders
+        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
+        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=False)
         
         print("\n")                                       
 
-        # UPDATE STEP on train set
+        # UPDATE STEP on training set
         print("Update step\n")
       
         # returns the history of val loss and accuracy and the net providing the lower val loss
- 
-        results = net.update(train_dataset,val_dataset, class_map, map_reverse)
-     
-        # takes the dictionari {num_epoch : [val_acc, avg_val_loss]}
+        results = net.update(train_dataset, val_dataset, class_map, map_reverse)
+        
+        """
+        # takes the dictionary {num_epoch : [val_acc, avg_val_loss]}
         scores = results[0]
         sorted_scores = sorted(scores.items(), key=lambda x: x[1][1]) # sorted according to the lower val loss
 
@@ -119,17 +101,16 @@ def main():
  
         # takes the best net
         to_test = results[1]
-        # net.update(dataset = train_dataset)
-
-        print("\nevalutation step on training and test set\n")
-        # EVALUATION STEP    
+        """
+        # EVALUATION STEP
+        print("\nevalutation step on training and test set\n")  
         net.eval()
-
         net.n_known = net.n_classes
         
         print ("the model knows %d classes:\n " % net.n_known)
+        print(f"Ready to evaluate train set, len= {len(train_dataset)}")
   
-        #Evaluating on train set
+        #Evaluating on training set
         total = 0.0
         correct = 0.0
 
@@ -142,12 +123,10 @@ def main():
             correct += (preds == labels.numpy()).sum()
 
         # Train Accuracy
-        #print ('%.2f ,' % (100.0 * correct / total), file=file, end="")
         print ('Train Accuracy : %.2f\n' % (100.0 * correct / total))
 
 
         #EValuating on test set
-
         print(f"Ready to evaluate test set, len= {len(test_dataset)}")
        
         total = 0.0
@@ -161,20 +140,11 @@ def main():
             correct += (preds == labels.numpy()).sum()
 
         # Test Accuracy
-        #print ('%.2f' % (100.0 * correct / total), file=file)
         print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
 
         #set the net to train for the next iteration 
         net.train(True)
-
-#for i in range(int(total_classes//CLASSES_BATCH)):
-#for i in range(1):
-
-        #train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
-        #test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
-        #train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
-        #test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)'''
 
 
 if __name__ == '__main__':
