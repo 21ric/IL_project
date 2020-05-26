@@ -244,12 +244,12 @@ class LwF(nn.Module):
                     total += labels.size(0)          
                     running_corrects += (preds == labels.cpu().numpy()).sum()
 
-            print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+            print ('Validation Accuracy : %.2f\n' % (100.0 * running_corrects / total))
             val_acc = running_corrects / float(len(val_dataloader.dataset))
 
             if (val_acc > best_acc):
                 best_acc = val_acc
-                best_net = copy.deepcopy(net.state_dict())
+                best_net = copy.deepcopy(self.state_dict())
 
             scores[epoch+1] = val_acc 
 
