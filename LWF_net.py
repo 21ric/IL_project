@@ -14,19 +14,6 @@ from resnet import resnet32
 import math
 import copy
 
-'''
-import torch
-torch.backends.cudnn.benchmark=True
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torch.autograd import Variable
-import numpy as np
-from PIL import Image
-from tqdm import tqdm
-import time
-import copy
-'''
 
 ####Hyper-parameters####
 LR = 2
@@ -104,10 +91,6 @@ class LwF(nn.Module):
         self.model.fc = nn.Linear(in_features, new_out_features, bias=False)
         # Update attribute self.fc
         self.fc = self.model.fc
-        '''
-        self.fc = nn.Linear(in_features, new_out_features, bias = False)
-        
-        '''
         # Initialize weights with kaiming normal
         kaiming_normal_init(self.fc.weight)
         
@@ -126,7 +109,7 @@ class LwF(nn.Module):
         _, preds = torch.max(torch.softmax(self.forward(images), dim=1), dim=1, keepdim=False)
         return preds    
     
-    def update(self, dataset, val_dataset, class_map,map_reverse):
+    def update(self, train_dataset, val_dataset, class_map, map_reverse):
 
         self.cuda()
 
@@ -135,18 +118,19 @@ class LwF(nn.Module):
         prev_model.to(DEVICE)
 
         # Save true labels (new images)
-        classes = list(set(dataset.dataset.targets)) #list of true labels
+        classes = list(set(train_dataset.targets)) #list of true labels
         print("Classes: ", classes)
         print('Known: ', self.n_known)
      
-        dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)   #we already pass the loader
+        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
+        val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=False)
         
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
-            dist_target = torch.zeros(len(dataset), self.n_classes).cuda()
+            dist_target = torch.zeros(len(train_dataset), self.n_classes).cuda()
             self.to(DEVICE)
             self.train(False)
-            for images, labels, indices in dataloader:
+            for images, labels, indices in train_dataloader:
                 images = Variable(images).cuda()
                 indexes = indices.cuda()
                 g = torch.sigmoid(self.forward(images))
@@ -168,144 +152,115 @@ class LwF(nn.Module):
         criterion_dist = self.dist_loss
         
         self.to(DEVICE)
-        self.train(True)
-        with tqdm(total=NUM_EPOCHS) as pbar:
-            i = 0
 
-            scores = {}
+        scores = {}
+        best_acc = 0 # This is the validation accuracy for model selection
 
-            for epoch in range(NUM_EPOCHS): 
+        for epoch in range(NUM_EPOCHS):              
+            if epoch%5 == 0:
+                print('-'*30)
+                print('Epoch {}/{}'.format(epoch+1, NUM_EPOCHS))
+                for param_group in optimizer.param_groups:
+                    print('Learning rate:{}'.format(param_group['lr']))
 
-                val_acc = 0.0
-                min_val_loss = None
-                val_loss = 0.0
-   
-                if i%5 == 0:
-                    print('-'*30)
-                    print('Epoch {}/{}'.format(i+1, NUM_EPOCHS))
-                    for param_group in optimizer.param_groups:
-                        print('Learning rate:{}'.format(param_group['lr']))
-        
-                # Divide learning rate by 5 after 49 63 epochs
-                if epoch in STEPDOWN_EPOCHS:
-                    for param_group in optimizer.param_groups:
-                        param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+            # Divide learning rate by 5 after 49 63 epochs
+            if epoch in STEPDOWN_EPOCHS:
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
 
-                # train phase, the model weights are update such that it is good with the new task
-                # and also with the old one
+            for  images, labels, indices in train_dataloader:
+
+                seen_labels = [] # ---------try to comment this
+
+                images = Variable(images)
+                images = images.to(DEVICE)
+                indices = indices.to(DEVICE)
+                # We need to save labels in this way because classes are randomly shuffled at the beginning
+                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                labels = Variable(seen_labels).to(DEVICE)
+                labels_hot=torch.eye(self.n_classes)[labels]
+                labels_hot = labels_hot.to(DEVICE)
+
+                # Set the network to training mode
                 self.train(True)
 
-                for  images, labels, indices in dataloader:
-                    
-                    seen_labels = []
-                    
+                # Zero-ing the gradient
+                optimizer.zero_grad()
+
+                # Compute outputs on the new model 
+                logits = self.forward(images) 
+
+                # Compute classification loss 
+                cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
+
+                # If not first iteration
+                if self.n_known > 0:
+                    # Save outputs of the previous model on the current batch
+                    dist_target_i = dist_target[indices] #BCE
+                    #dist_target_batch = prev_model.forward(images)  #MCCE
+                    #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
+                    #dist_target = Variable(dist_target_raw).cuda() #MCEE
+                    #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
+
+                    # Save logits of the first "old" nodes of the network
+                    # LwF doesn't use examplars, it uses the network outputs itselfs
+                    #logits = torch.sigmoid(logits) #BCE
+                    #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+
+                    # Compute distillation loss
+                    #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
+                    dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i) #richi dist_loss
+                    #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
+
+                    # Compute total loss
+                    loss = dist_loss+cls_loss
+                    #print(dist_loss.item())           
+
+                # If first iteration
+                else:
+                    loss = cls_loss
+
+                loss.backward()
+                optimizer.step()
+
+            # VALIDATION               
+            total = 0.0
+            running_corrects = 0.0
+
+            for  images, labels, indices in val_dataloader:
+
                     images = Variable(images)
                     images = images.to(DEVICE)
                     indices = indices.to(DEVICE)
+                    labels = labels.to(DEVICE)
 
-                    # We need to save labels in this way because classes are randomly shuffled at the beginning
-                    seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-                    labels = Variable(seen_labels).to(DEVICE)
-                    labels_hot=torch.eye(self.n_classes)[labels]
-                    #labels_hot = to_onehot(labels, self.n_classes)
-                    labels_hot = labels_hot.to(DEVICE)
+                    # Set the network to evaluation mode
+                    self.train(False)
 
-                    # Zero-ing the gradient
-                    optimizer.zero_grad()
-                    
-                    # Compute outputs on the new model 
-                    logits = self.forward(images) 
-                    
-                    # Compute classification loss 
-                    cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
-          
-                    
-                    # If not first iteration
-                    if self.n_known > 0:
-                        # Save outputs of the previous model on the current batch
-                        dist_target_i = dist_target[indices] #BCE
-                        #dist_target_batch = prev_model.forward(images)  #MCCE
-                        #dist_target_raw = torch.LongTensor([label for label in dist_target]) #MCEE
-                        #dist_target = Variable(dist_target_raw).cuda() #MCEE
-                        #_, dist_target = torch.max(torch.softmax(dist_target_raw, dim=1), dim=1, keepdim=False)
-            
-                        # Save logits of the first "old" nodes of the network
-                        # LwF doesn't use examplars, it uses the network outputs itselfs
-                        #logits = torch.sigmoid(logits) #BCE
-                        #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                    # Forward + classify
+                    preds = self.classify(images)
+                    preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+                    total += labels.size(0)          
+                    running_corrects += (preds == labels.cpu().numpy()).sum()
 
-                        # Compute distillation loss
-                        #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                        dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i) #richi dist_loss
-                        #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
-                      
-                        # Compute total loss
-                        loss = dist_loss+cls_loss
-                        #print(dist_loss.item())
-                
-    
-                    # If first iteration
-                    else:
-                        loss = cls_loss
+            print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+            val_acc = running_corrects / float(len(val_dataloader.dataset))
 
-                    loss.backward()
-                    optimizer.step()
+            if (val_acc > best_acc):
+                best_acc = val_acc
+                best_net = copy.deepcopy(net.state_dict())
 
-                # VALIDATION 
+            scores[epoch+1] = val_acc 
 
-                self.train(False)
-                val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=True)
-                
-                total = 0.0
-                corrects = 0.0
 
-                for  images, labels, indices in val_dataloader:
-                    
-                        images = Variable(images)
-                        images = images.cuda()
-                        indices = indices.cuda()
-                        labels = labels.cuda()
+            if epoch%5 == 0:
+                print("Train Loss: {:.4f}\n".format(loss.item()))
+                print('Val Acc: {:.4f}'.format(val_acc))
 
-                        outputs = self(images)
 
-                        v_loss = nn.CrossEntropyLoss()(outputs, labels)
-                        val_loss += v_loss.item() * images.size(0)
-        
-                        preds = self.classify(images)
-                        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-                        total += labels.size(0)
-                        
-                        corrects += (preds == labels.cpu().numpy()).sum()
-                         
-                val_acc = corrects / total
-
-                print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
-
-                avg_val_loss = val_loss/len(val_dataloader.dataset)
-
-                if (min_val_loss is None):
-                     min_val_loss = avg_val_loss
-                     best_net = copy.deepcopy(self.state_dict())
-
-                else:
-                     if avg_val_loss < min_val_loss:
-                          min_val_loss = avg_val_loss
-                          best_net = copy.deepcopy(self.state_dict())
-            
-                scores[i+1] = [val_acc,avg_val_loss] 
-                 
-
-                if i%5 == 0:
-
-                    print("Loss: {:.4f}\n".format(loss.item()))    
-                
-                i+=1
-    
-                pbar.update(1)
- 
-            #end epochs
-            self.load_state_dict(best_net)  
-            return [scores,self]  
+        #end epochs
+        self.load_state_dict(best_net)  
+        return [scores,self]  
                 
 
