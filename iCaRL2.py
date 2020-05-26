@@ -10,6 +10,7 @@ import numpy as np
 import math
 
 import torch
+from torch.autograd import Variable
 
 ####Hyper-parameters####
 DEVICE = 'cuda'
