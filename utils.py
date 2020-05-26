@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from torchvision import transforms
 from dataset import CIFAR100
+from torch.utils.data import Subset
 
 import numpy as np
 
