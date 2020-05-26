@@ -104,7 +104,7 @@ def main():
         
         # takes the dictionary {num_epoch : val_acc}
         scores = results[0]
-        sorted_scores = sorted(scores.items(), key=lambda x: x[1]) # sorted according to the higher val accuracy
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1],reverse = True) # sorted according to the higher val accuracy
 
         print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
@@ -128,7 +128,7 @@ def main():
             images = Variable(images).cuda()
             preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-            total += labels.size(0)
+            train_total += labels.size(0)
             train_correct += (preds == labels.numpy()).sum()
 
         # Train Accuracy
@@ -145,7 +145,7 @@ def main():
             images = Variable(images).cuda()
             preds = to_test.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-            total += labels.size(0)
+            test_total += labels.size(0)
             test_correct += (preds == labels.numpy()).sum()
 
         test_accs.append(100.0 * test_correct / test_total)
