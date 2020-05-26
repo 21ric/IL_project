@@ -123,7 +123,7 @@ class iCaRL(nn.Module):
 
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
-                    #q_i = q[indexes]
+                    q_i = q[indexes]
                     #print('g', g[:,1])
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
