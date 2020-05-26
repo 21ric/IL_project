@@ -177,7 +177,7 @@ class LwF(nn.Module):
         best_acc = 0 # This is the validation accuracy for model selection
         self.train(True)
         
-        for epoch in range(30): 
+        for epoch in range(70): 
              
             if epoch%5 == 0:
                 print('-'*30)
@@ -283,7 +283,7 @@ class LwF(nn.Module):
 
         #end epochs
         self.load_state_dict(best_net)  
-        #return [scores, self]  
-        return
+        return [scores, self]  
+        
                 
 
