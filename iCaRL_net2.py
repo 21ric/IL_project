@@ -49,9 +49,9 @@ def validate(net, val_dataloader, map_reverse):
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=n_classes)
+        self.features_extractor = resnet32(num_classes=10)
 
-        self.n_classes = 0
+        self.n_classes = n_classes
         self.n_known = 0
         self.exemplar_sets = []
 
@@ -98,7 +98,7 @@ class iCaRL(nn.Module):
         if self.n_known > 0:
             self.to(DEVICE)
             self.train(False)
-            q = torch.zeros(len(dataset), 100).cuda()
+            q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
@@ -108,7 +108,7 @@ class iCaRL(nn.Module):
             q = Variable(q).cuda()
             self.train(True)
 
-        #self.add_classes(n)
+        self.add_classes(n)
         self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
@@ -159,8 +159,10 @@ class iCaRL(nn.Module):
                     #print(q_i)
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
+
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
-                    #target = [q_i, labels_hot]
+                    target = [q_i, labels_hot]
+
                     #loss = self.dist_loss(out, target)
                     loss += dist_loss
 
