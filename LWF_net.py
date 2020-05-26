@@ -42,7 +42,7 @@ def validate(net, val_dataloader, map_reverse):
         running_corrects_val += (preds == labels.cpu().numpy()).sum()
         #running_corrects_val += torch.sum(preds == labels.data)
 
-    valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
+    valid_acc = 100 * running_corrects_val / float(len(val_dataloader.dataset))
 
     net.train(True)
     return valid_acc
