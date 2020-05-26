@@ -36,7 +36,7 @@ def validate(net, val_dataloader, map_reverse):
         # forward
         outputs = net(inputs)
         _, preds = torch.max(outputs, 1)
-        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]        
+        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
         running_corrects_val += (preds == labels.cpu().numpy()).sum()
         #running_corrects_val += torch.sum(preds == labels.data)
 
@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                print('Best accuracy:{:.4f} obtained at epoch {}'.format(accuracy, epoch))
+                print('Best accuracy:{:.4f} obtained at epoch {}'.format(best_acc, best_epoch))
             i+=1
 
         self.load_state_dict(best_net)
