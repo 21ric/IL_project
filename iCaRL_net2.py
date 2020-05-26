@@ -26,7 +26,7 @@ NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
-def validate(net, val_dataloader):
+def validate(net, val_dataloader, map_reverse):
     running_corrects_val = 0
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
@@ -36,8 +36,9 @@ def validate(net, val_dataloader):
         # forward
         outputs = net(inputs)
         _, preds = torch.max(outputs, 1)
-
-        running_corrects_val += torch.sum(preds == labels.data)
+        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]        
+        running_corrects_val += (preds == labels.cpu().numpy()).sum()
+        #running_corrects_val += torch.sum(preds == labels.data)
 
     valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
 
@@ -83,7 +84,7 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplars_sets):
             dataset.append(exemplars, [y]*len(exemplars))
 
-    def update_representation(self, dataset, val_dataset, class_map):
+    def update_representation(self, dataset, val_dataset, class_map, map_reverse):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
@@ -165,7 +166,7 @@ class iCaRL(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-            accuracy = validate(self, val_loader)
+            accuracy = validate(self, val_loader, map_reverse)
 
             if accuracy > best_acc:
                 best_acc = accuracy
