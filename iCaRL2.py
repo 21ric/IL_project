@@ -54,7 +54,7 @@ def main():
 
     #Create groups of 10
     classes_groups = np.array_split(all_classes, 10)
-    print(classes_groups)
+    #print(classes_groups)
 
     # Create class map
     class_map = {}
@@ -182,7 +182,7 @@ def main():
                 #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
-            
+
             print('-'*30)
 
         if i == 1:

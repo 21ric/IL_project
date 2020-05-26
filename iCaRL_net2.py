@@ -88,7 +88,7 @@ class iCaRL(nn.Module):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
-        print('-'*30)
+
         print('New classes:{}'.format(n))
         print('-'*30)
 
@@ -164,7 +164,7 @@ class iCaRL(nn.Module):
 
                     #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
                     #target = [q_i, labels_hot]
-                    target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:]), dim=1)
+                    target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
                     #loss += dist_loss
 
@@ -182,7 +182,7 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                print('Max Accuracy:{:.4f} (Epoch 0)'.format(best_acc, best_epoch))
+                print('Max Accuracy:{:.4f} (Epoch {})'.format(best_acc, best_epoch))
                 print('-'*30)
             i+=1
 
