@@ -85,9 +85,9 @@ def main():
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            #net.classify_all(prev_classes_dataset, map_reverse)
+            net.classify_all(prev_classes_dataset, map_reverse)
             print('New classes')
-            #net.classify_all(all_classes_dataset, map_reverse)
+            net.classify_all(all_classes_dataset, map_reverse)
 
             print('-'*30)
 
