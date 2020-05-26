@@ -20,7 +20,7 @@ from torch.autograd import Variable
 DEVICE = 'cuda'
 BATCH_SIZE = 128
 CLASSES_BATCH = 10
-MEMORY_SIZE = 2000
+MEMORY_SIZE = 20
 ########################
 
 def main():
