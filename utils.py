@@ -121,6 +121,6 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
         map_reverse = pickle.load(handle)
 
     class_groups = [class_groups_dict[i] for i in range(len(class_groups_dict.keys()))]
-    classes_groups = np.array_split(classes_groups, 10)
+    class_groups = np.array_split(class_groups, 10)
 
     return class_groups, class_map, map_reverse
