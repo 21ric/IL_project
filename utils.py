@@ -43,7 +43,7 @@ def get_additional_datasets(prev_classes, all_classes):
     test_prev_dataset = CIFAR100(root='data/', classes=prev_classes,  train=False, download=True, transform=test_transform)
     test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
 
-    return test_prev_dataset, test_all_datasets
+    return test_prev_dataset, test_all_dataset
 
 
 def get_class_maps():
