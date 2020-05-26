@@ -111,7 +111,7 @@ class iCaRL(nn.Module):
             self.train(True)
 
         self.add_classes(n)
-        self.n_classes += n
+        #self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
