@@ -27,8 +27,8 @@ MEMORY_SIZE = 2000
 
 def main():
 
-
-    classes_groups, class_map, map_reverse = utils.get_class_maps()
+    path='orders/'
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups1.pickle', path+'map1.pickle', path+'revmap1.pickle')
 
 
     net = iCaRL(0, class_map)

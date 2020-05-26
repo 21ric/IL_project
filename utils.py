@@ -89,3 +89,37 @@ def get_class_maps():
     #print (f"Map Reverse:{map_reverse}\n")
 
     return classes_groups, class_map, map_reverse
+
+def dump_class_maps():
+
+    classes_groups, class_map, map_reverse = get_class_maps()
+
+    group_dict = {}
+
+    for i in range(len(classes_groups)):
+      group_dict[i] = classes_groups[i]
+
+    with open('map3.pickle', 'wb') as handle:
+        pickle.dump(class_map, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('revmap3.pickle', 'wb') as handle:
+        pickle.dump(map_reverse, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    with open('classgroups3.pickle', 'wb') as handle:
+        pickle.dump(map_reverse, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename):
+
+    with open(classgroup_filename, 'rb') as handle:
+    class_groups_dict = pickle.load(handle)
+
+    with open(map_filename, 'rb') as handle:
+    class_map = pickle.load(handle)
+
+    with open(revmap_filename, 'rb') as handle:
+    map_reveres = pickle.load(handle)
+
+    class_groups = [class_groups_dict[i] for i in range(len(class_groups_dict.keys()))]
+
+    return class_groups, class_map, map_reverse
