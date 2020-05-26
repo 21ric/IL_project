@@ -149,8 +149,8 @@ def main():
         #set the net to train for the next iteration 
         net.train(True)
 
-    for i in range(len(test_accs)):
-	print(f"Test accuracy at iteration {i+1}: {test_accs[i]}")    
+    for i in range(0,len(test_accs)):
+         print(f"Test accuracy at iteration {i+1}: {test_accs[i]}")    
 
 
 if __name__ == '__main__':

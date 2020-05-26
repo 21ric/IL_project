@@ -140,7 +140,7 @@ class LwF(nn.Module):
         print('Known: ', self.n_known)
      
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
-        val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4, drop_last=False)
+        val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4, drop_last=False)
         
         #Store network outputs with pre-updated parameters
         if (self.n_known > 0) :
@@ -152,8 +152,8 @@ class LwF(nn.Module):
                 indexes = indices.cuda()
                 g = torch.sigmoid(self.forward(images))
                 #g = self.forward(images) 
-                dist_target[indices] = g.data
-                
+                dist_target[indexes] = g.data
+     
             dist_target = Variable(dist_target).cuda()
             self.train(True)
 
@@ -177,7 +177,8 @@ class LwF(nn.Module):
         best_acc = 0 # This is the validation accuracy for model selection
         self.train(True)
         
-        for epoch in range(NUM_EPOCHS):              
+        for epoch in range(NUM_EPOCHS): 
+             
             if epoch%5 == 0:
                 print('-'*30)
                 print('Epoch {}/{}'.format(epoch+1, NUM_EPOCHS))
@@ -245,7 +246,7 @@ class LwF(nn.Module):
                 optimizer.step()
 
             # VALIDATION    
-            val_dataloader.dataset.transform = val_transform
+            # val_dataloader.dataset.transform = val_transform
             val_acc = validate(self, val_dataloader, map_reverse)
             '''
             running_corrects = 0.0
