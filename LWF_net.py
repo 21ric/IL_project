@@ -249,7 +249,7 @@ class LwF(nn.Module):
 
             if (val_acc > best_acc):
                 best_acc = val_acc
-                best_net = copy.deepcopy(net.state_dict())
+                best_net = copy.deepcopy(self.state_dict())
 
             scores[epoch+1] = val_acc 
 
