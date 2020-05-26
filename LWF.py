@@ -77,8 +77,8 @@ def main():
         # Create indices for train and validation
         train_indexes, val_indexes = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
         
-        val_dataset = Subset(copy.copy(train_dataset), val_indexes)   
-        train_dataset = Subset(copy.copy(train_dataset), train_indexes)
+        val_dataset = Subset(train_dataset, val_indexes)   
+        train_dataset = Subset(train_dataset, train_indexes)
    
         # Prepare dataloaders
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
@@ -95,12 +95,12 @@ def main():
         
         # takes the dictionary {num_epoch : [val_acc, avg_val_loss]}
         scores = results[0]
-        sorted_scores = sorted(scores.items(), key=lambda x: x[1],reverse = True) # sorted according to the lower val loss
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1]) # sorted according to the higher val accuracy
 
         print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
         # takes the best net
-        net = results[1]
+        #to_test = results[1]
         
         # EVALUATION STEP
         print("\nevalutation step on training and test set\n")  

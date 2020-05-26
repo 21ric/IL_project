@@ -192,11 +192,13 @@ class LwF(nn.Module):
                 logits = self.forward(images) 
 
                 # Compute classification loss 
-                #cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
+                cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
                 
+                '''
                 if self.n_known <= 0: # First iteration
                     loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-
+                '''
+                
                 if self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
                     dist_target_i = dist_target[indices] #BCE
@@ -208,17 +210,20 @@ class LwF(nn.Module):
                     # Save logits of the first "old" nodes of the network
                     # LwF doesn't use examplars, it uses the network outputs itselfs
                     #logits = torch.sigmoid(logits) #BCE
-                    #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
+                    logits_dist = logits[:,:self.n_known]  #MCCE
 
                     # Compute distillation loss
-                    target = [dist_target_i, labels_hot]
+                    #target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    loss = criterion_dist(logits, target) #richi dist_loss
+                    dist_loss = criterion_dist(logits_dist, dist_target_i) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
-                    #loss = dist_loss+cls_loss
-                    #print(dist_loss.item())           
+                    loss = dist_loss+cls_loss
+                    print(dist_loss.item())    
+                
+                else:
+                    loss = cls_loss
                     
                 loss.backward()
                 optimizer.step()
@@ -255,7 +260,7 @@ class LwF(nn.Module):
 
 
         #end epochs
-        self.load_state_dict(best_net)  
-        return [scores,self]  
+        #self.load_state_dict(best_net)  
+        return [scores] #self]  
                 
 
