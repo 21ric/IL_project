@@ -176,7 +176,7 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                pritnt('Best accuracy:{:.4f} obtained at epoch {}'.format(accuracy, epoch))
+                print('Best accuracy:{:.4f} obtained at epoch {}'.format(accuracy, epoch))
             i+=1
 
         self.load_state_dict(best_net)
