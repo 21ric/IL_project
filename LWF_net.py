@@ -277,7 +277,7 @@ class LwF(nn.Module):
             scores[epoch+1] = val_acc 
 
 
-            if epoch%5 == 0 or epoch == NUM_EPOCHS -1 
+            if epoch%5 == 0 or epoch == NUM_EPOCHS -1:
                 print("Train Loss: {:.4f}\n".format(loss.item()))
                 print('Val Acc: {:.4f}'.format(val_acc))
 
