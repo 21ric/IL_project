@@ -23,7 +23,7 @@ MEMORY_SIZE = 2000
 
 def main():
 
-    '''
+    
     #  Define images transformation
     train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                       transforms.RandomHorizontalFlip(),                    
@@ -37,13 +37,13 @@ def main():
                      #transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
                     ])
 
-    '''
+    
     print("\n")
     
-    classes_groups, class_map, map_reverse = utils.get_class_maps()
-    '''
+ 
     total_classes = 100    
-
+    
+    
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
     
@@ -64,14 +64,16 @@ def main():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
 
-    '''
+    
     # Create Network
     net = LwF(CLASSES_BATCH, class_map)
     
     #test_accs = []
       
     #iterating until the net knows total_classes with 10 by 10 steps 
-    '''for s in range(0, total_classes, CLASSES_BATCH):   
+
+    for s in range(0, total_classes, CLASSES_BATCH):   
+
         print(f"ITERATION: {(s//CLASSES_BATCH)+1} / {total_classes//CLASSES_BATCH}\n")
         print("\n")
 
@@ -90,14 +92,7 @@ def main():
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=False)
         
-        print("\n") '''
-
-    for i in range(int(100/CLASSES_BATCH)): 
-
-        train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])                                      
- 
-        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
-        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=False)
+        print("\n") 
 
         # UPDATE STEP on training set
         print("Update step\n")
@@ -108,13 +103,13 @@ def main():
         
         
         # takes the dictionary {num_epoch : val_acc}
-        #scores = results[0]
-        #sorted_scores = sorted(scores.items(), key=lambda x: x[1]) # sorted according to the higher val accuracy
+        scores = results[0]
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1]) # sorted according to the higher val accuracy
 
         #print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
         # takes the best net
-        #to_test = results[1]
+        to_test = results[1]
         
         # EVALUATION STEP
         print("\nevalutation step on training and test set\n")  
@@ -125,8 +120,8 @@ def main():
         print(f"Ready to evaluate train set, len= {len(train_dataset)}")
   
         #Evaluating on training set
-        total = 0.0
-        correct = 0.0
+        train_total = 0.0
+        train_correct = 0.0
 
         for images, labels, indices in train_dataloader:
 
@@ -134,28 +129,28 @@ def main():
             preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
-            correct += (preds == labels.numpy()).sum()
+            train_correct += (preds == labels.numpy()).sum()
 
         # Train Accuracy
-        print ('Train Accuracy : %.2f\n' % (100.0 * correct / total))
+        print ('Train Accuracy : %.2f\n' % (100.0 * train_correct / train_total))
 
 
         #EValuating on test set
         print(f"Ready to evaluate test set, len= {len(test_dataset)}")
        
-        total = 0.0
-        correct = 0.0
+        test_total = 0.0
+        test_correct = 0.0
         for images, labels, indices in test_dataloader:
 
             images = Variable(images).cuda()
-            preds = net.classify(images)
+            preds = to_test.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
-            correct += (preds == labels.numpy()).sum()
+            test_correct += (preds == labels.numpy()).sum()
 
-        #test_accs.append(100.0 * correct / total)
+        test_accs.append(100.0 * test_correct / test_total)
         # Test Accuracy
-        print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
+        print ('Test Accuracy : %.2f\n' % (100.0 * test_correct / test_total))
 
 
         #set the net to train for the next iteration 
