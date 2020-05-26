@@ -25,6 +25,25 @@ STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
 ########################
 
+def validate(net, val_dataloader, map_reverse):
+    running_corrects_val = 0
+    for inputs, labels, index in val_dataloader:
+        inputs = inputs.to(DEVICE)
+        labels = labels.to(DEVICE)
+
+        net.train(False)
+        # forward
+        outputs = net(inputs)
+        _, preds = torch.max(outputs, 1)
+        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+        running_corrects_val += (preds == labels.cpu().numpy()).sum()
+        #running_corrects_val += torch.sum(preds == labels.data)
+
+    valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
+
+    net.train(True)
+    return valid_acc
+
 
 def kaiming_normal_init(m):
     if isinstance(m, nn.Conv2d):
@@ -144,14 +163,16 @@ class LwF(nn.Module):
         # Define optimizer and classification loss
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
-        criterion_class = self.class_loss
-        criterion_dist = self.dist_loss
+        criterion = self.class_loss
+        #criterion_class = self.class_loss
+        #criterion_dist = self.dist_loss
         
         self.to(DEVICE)
 
         scores = {}
         best_acc = 0 # This is the validation accuracy for model selection
         self.train(True)
+        
         for epoch in range(NUM_EPOCHS):              
             if epoch%5 == 0:
                 print('-'*30)
@@ -178,9 +199,6 @@ class LwF(nn.Module):
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
-                # Set the network to training mode
-                self.train(True)
-
                 # Zero-ing the gradient
                 optimizer.zero_grad()
 
@@ -192,8 +210,8 @@ class LwF(nn.Module):
                 
                 
                 if self.n_known <= 0: # First iteration
-                    loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                
+                    #loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                    loss = criterion(logits, labels_hot)
                 
                 elif self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
@@ -213,7 +231,7 @@ class LwF(nn.Module):
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
                     target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,self.n_known:]),dim=1)
 
-                    loss = criterion_dist(logits, target) #richi dist_loss
+                    loss = criterion(logits, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
@@ -226,7 +244,9 @@ class LwF(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-            # VALIDATION               
+            # VALIDATION    
+            val_acc = validate(self, val_dataloader, map_reverse)
+            '''
             running_corrects = 0.0
 
             for  images, labels, indices in val_dataloader: 
@@ -245,6 +265,7 @@ class LwF(nn.Module):
                 running_corrects += (preds == labels.cpu().numpy()).sum()
                 
             val_acc = running_corrects / float(len(val_dataloader.dataset))
+            '''
 
             if (val_acc > best_acc):
                 best_acc = val_acc
@@ -260,6 +281,7 @@ class LwF(nn.Module):
 
         #end epochs
         self.load_state_dict(best_net)  
-        return [scores, self]  
+        #return [scores, self]  
+        return
                 
 
