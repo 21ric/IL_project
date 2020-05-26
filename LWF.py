@@ -68,6 +68,7 @@ def main():
     # Create Network
     net = LwF(CLASSES_BATCH, class_map)
     
+    # store test accuracies for all iterations
     test_accs = []
       
     #iterating until the net knows total_classes with 10 by 10 steps 
@@ -108,7 +109,7 @@ def main():
 
         print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
-        # takes the best net
+        # takes the best net for the test 
         to_test = results[1]
         
         # EVALUATION STEP
