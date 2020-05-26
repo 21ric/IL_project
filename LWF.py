@@ -134,7 +134,7 @@ def main():
         for images, labels, indices in test_dataloader:
 
             images = Variable(images).cuda()
-            preds = to_test.classify(images)
+            preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
             correct += (preds == labels.numpy()).sum()
