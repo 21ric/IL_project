@@ -4,6 +4,7 @@ from torchvision import transforms
 from dataset import CIFAR100
 from torch.utils.data import Subset
 
+import copy
 import numpy as np
 
 
