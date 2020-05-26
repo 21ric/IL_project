@@ -95,12 +95,12 @@ def main():
         
         # takes the dictionary {num_epoch : [val_acc, avg_val_loss]}
         scores = results[0]
-        sorted_scores = sorted(scores.items(), key=lambda x: x[1],reverse = True) # sorted according to the lower val loss
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1]) # sorted according to the higher val accuracy
 
         print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
         # takes the best net
-        to_test = results[1]
+        #to_test = results[1]
         
         # EVALUATION STEP
         print("\nevalutation step on training and test set\n")  
@@ -134,7 +134,7 @@ def main():
         for images, labels, indices in test_dataloader:
 
             images = Variable(images).cuda()
-            preds = to_test.classify(images)
+            preds = net.classify(images)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             total += labels.size(0)
             correct += (preds == labels.numpy()).sum()

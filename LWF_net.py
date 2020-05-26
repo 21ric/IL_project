@@ -260,7 +260,7 @@ class LwF(nn.Module):
 
 
         #end epochs
-        self.load_state_dict(best_net)  
-        return [scores,self]  
+        #self.load_state_dict(best_net)  
+        return [scores] #self]  
                 
 
