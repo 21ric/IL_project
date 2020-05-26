@@ -153,7 +153,7 @@ def main():
             total += labels.size(0)
             correct += (preds == labels.numpy()).sum()
 
-        test_accs.append(100.0 * correct / total)
+        #test_accs.append(100.0 * correct / total)
         # Test Accuracy
         print ('Test Accuracy : %.2f\n' % (100.0 * correct / total))
 
