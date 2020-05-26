@@ -301,17 +301,17 @@ class iCaRL(nn.Module):
         return preds
 
 
-        def classify_all(self, test_dataset, map_reverse):
+    def classify_all(self, test_dataset, map_reverse):
 
-            test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
-            running_corrects = 0
+        running_corrects = 0
 
-            for imgs, labels, _ in  test_dataloader:
-                imgs = Variable(imgs).cuda()
-                preds = self.classify(imgs)
-                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-                running_corrects += (preds == labels.numpy()).sum()
-                #running_corrects += torch.sum(preds == labels.data).data.item()
-            accuracy = running_corrects / float(len(test_dataloader.dataset))
-            print('Test Accuracy: {}'.format(accuracy))
+        for imgs, labels, _ in  test_dataloader:
+            imgs = Variable(imgs).cuda()
+            preds = self.classify(imgs)
+            preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+            running_corrects += (preds == labels.numpy()).sum()
+            #running_corrects += torch.sum(preds == labels.data).data.item()
+        accuracy = running_corrects / float(len(test_dataloader.dataset))
+        print('Test Accuracy: {}'.format(accuracy))
