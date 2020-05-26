@@ -143,6 +143,8 @@ def main():
             print('New classes')
             net.classify_all(all_classes_dataset, map_reverse)
 
+            print('-'*30)
+
         """
         if i == 0:
 
@@ -209,7 +211,7 @@ def main():
             print('Test Accuracy all classes: {}'.format(accuracy))
         """
 
-            print('-'*30)
+
 
         if i == 3:
             return
