@@ -215,7 +215,9 @@ class LwF(nn.Module):
                     # Compute distillation loss
                     #target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    dist_loss = criterion_dist(logits_dist, dist_target_i) #richi dist_loss
+                    target = torch.cat((dist_target_i[:,:self.n_known, labels_hot[:,:self.n_known]),dim=1)
+
+                    dist_loss = criterion_dist(logits_dist, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
