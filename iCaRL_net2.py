@@ -169,7 +169,7 @@ class iCaRL(nn.Module):
 
             if accuracy > best_acc:
                 best_acc = accuracy
-                best_net = copy.deepcopy(net.state_dict())
+                best_net = copy.deepcopy(self.state_dict())
 
             if i % 10 == 0:
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
