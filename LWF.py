@@ -100,7 +100,7 @@ def main():
         print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
         # takes the best net
-        to_test = results[1]
+        net = results[1]
         
         # EVALUATION STEP
         print("\nevalutation step on training and test set\n")  
