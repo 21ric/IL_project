@@ -237,6 +237,7 @@ class LwF(nn.Module):
                 indices = indices.to(DEVICE)
                 labels = labels.to(DEVICE)
 
+
                 # Set the network to evaluation mode
                 self.train(False)
 
