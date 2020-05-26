@@ -111,7 +111,7 @@ class LwF(nn.Module):
         best_acc = -1
         best_epoch = 0
 
-        #self.features_extractor.to(DEVICE)
+        self.to(DEVICE)
         self.features_extractor.train(True)
         for epoch in range(NUM_EPOCHS):
 
