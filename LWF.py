@@ -40,8 +40,8 @@ def main():
     '''
     print("\n")
     
-    classes_groups, class_map, map_reverse = utils.get_class_map()
-
+    classes_groups, class_map, map_reverse = utils.get_class_maps()
+    '''
     total_classes = 100    
 
     perm_id = np.random.permutation(total_classes)
@@ -64,11 +64,11 @@ def main():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
 
-
+    '''
     # Create Network
     net = LwF(CLASSES_BATCH, class_map)
     
-    test_accs = []
+    #test_accs = []
       
     #iterating until the net knows total_classes with 10 by 10 steps 
     '''for s in range(0, total_classes, CLASSES_BATCH):   
