@@ -200,7 +200,7 @@ class iCaRL(nn.Module):
     def construct_exemplars_set(self, images, m):
 
         features = []
-        self.to(DEVICE)
+        #self.to(DEVICE)
         self.train(False)
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
