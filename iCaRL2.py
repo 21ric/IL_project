@@ -33,6 +33,7 @@ def main():
 
 
     net = iCaRL(0, class_map)
+    net.to(DEVICE)
 
 
     for i in range(int(100/CLASSES_BATCH)):
@@ -59,13 +60,13 @@ def main():
 
         m = int(math.ceil(MEMORY_SIZE/net.n_classes))
 
-        #net.reduce_exemplars_set(m)
+        net.reduce_exemplars_set(m)
 
         print('Constructing exemplar sets ...')
         print('-'*30)
 
-        #for y in classes_groups[i]:
-        #    net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
+        for y in classes_groups[i]:
+           net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
 
         net.n_known = net.n_classes
 
@@ -73,7 +74,7 @@ def main():
         print('-'*30)
 
         print('New classes')
-        #net.classify_all(test_dataset, map_reverse)
+        net.classify_all(test_dataset, map_reverse)
 
         if i > 0:
 
