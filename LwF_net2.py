@@ -46,22 +46,16 @@ def validate(net, val_dataloader, map_reverse):
     return valid_acc
 
 
-class iCaRL(nn.Module):
+class LwF(nn.Module):
     def __init__(self, n_classes, class_map):
-        super(iCaRL, self).__init__()
+        super(LwF, self).__init__()
         self.features_extractor = resnet32(num_classes=0)
 
         self.n_classes = n_classes
         self.n_known = 0
-        self.exemplar_sets = []
 
         self.clf_loss = nn.BCEWithLogitsLoss()
         self.dist_loss = nn.BCEWithLogitsLoss()
-
-        self.exemplar_means = []
-        self.compute_means = True
-
-        self.exemplars_sets = []
 
         self.class_map = class_map
 
@@ -82,21 +76,13 @@ class iCaRL(nn.Module):
 
         self.n_classes += n
 
-    def add_exemplars(self, dataset):
-        for y, exemplars in enumerate(self.exemplars_sets):
-            dataset.append(exemplars, [y]*len(exemplars))
-
     def update_representation(self, dataset, val_dataset, class_map, map_reverse):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
 
-
-
         print('New classes:{}'.format(n))
         print('-'*30)
-
-        self.add_exemplars(dataset)
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
@@ -195,113 +181,6 @@ class iCaRL(nn.Module):
         self.load_state_dict(best_net)
         return
 
-    def reduce_exemplars_set(self, m):
-        for y, exemplars in enumerate(self.exemplars_sets):
-            self.exemplars_sets[y] = exemplars[:m]
-
-
-    def construct_exemplars_set(self, images, m):
-
-        features = []
-        #self.features_extractor(DEVICE)
-        self.features_extractor.train(False)
-        for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
-
-        #print('features shape', features[0])
-        #features = np.array(features)
-        #print('num_features',len(features))
-        class_mean = np.mean(features, axis=0)
-        #print('class_mean', class_mean)
-        class_mean = class_mean / np.linalg.norm(class_mean)
-
-        exemplar_set = []
-        exemplar_features = []
-        for k in range(m):
-            S = np.sum(exemplar_features, axis=0)
-            phi = features
-            mu = class_mean
-            mu_p = 1.0 / (k+1)*(phi+S)
-            mu_p = mu_p / np.linalg.norm(mu_p)
-            i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
-
-            exemplar_set.append(images[i])
-            exemplar_features.append(features[i])
-
-            #print('chosen i:{}'.format(i))
-
-            if i == 0:
-                images = images[1:]
-                features = features[1:]
-
-            elif i == len(features):
-                images = images[:-1]
-                features = features[:-1]
-
-            else:
-                #print('chosen i:{}'.format(i))
-                images = np.concatenate((images[:i], images[i+1:]))
-                features = np.concatenate((features[:i], features[i+1:]))
-
-        self.exemplar_sets.append(np.array(exemplar_set))
-        del features
-        self.features_extractor.train(True)
-
-
-    def classify(self, x):
-
-        batch_size = x.size(0)
-
-        if self.compute_means:
-
-            exemplar_means = []
-
-            self.features_extractor.train(False)
-            #print('exset', self.exemplar_sets)
-            for exemplars in self.exemplar_sets:
-                #print('in')
-                features = []
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / feature.data.norm()
-                    features.append(feature)
-
-                features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / mu_y.data.norm()
-                exemplar_means.append(mu_y)
-                #print('mu_y', mu_y)
-
-            self.exemplar_means = exemplar_means
-            self.compute_means = False
-        #print(self.exemplar_means)
-        exemplar_means = self.exemplar_means
-
-        means = torch.stack(exemplar_means)
-        means = torch.stack([means]*batch_size)
-        means = means.transpose(1,2)
-
-        #self.features_extractor(DEVICE)
-        x = x.to(DEVICE)
-        self.features_extractor.train(False)
-        feature = self.features_extractor.extract_features(x)
-        for i in range(feature.size(0)):
-            feature.data[i] = feature.data[i]/ feature.data[i].norm()
-        feature = feature.unsqueeze(2)
-        feature = feature.expand_as(means)
-
-
-        dists = (feature - means).pow(2).sum(1).squeeze()
-        _, preds = dists.min(1)
-
-        self.features_extractor.train(True)
-
-        return preds
 
 
     def classify_all(self, test_dataset, map_reverse):
@@ -310,10 +189,11 @@ class iCaRL(nn.Module):
 
         running_corrects = 0
         #self.features_extractor(DEVICE)
+        self.features_extractor.train(False)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs)
+            _, preds = torch.max(self(imgs), dim=1)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             running_corrects += (preds == labels.numpy()).sum()
             #running_corrects += torch.sum(preds == labels.data).data.item()
