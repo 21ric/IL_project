@@ -33,6 +33,7 @@ def get_datasets(classes):
 
     return train_dataset, val_dataset, test_dataset
 
+
 def get_additional_datasets(prev_classes, all_classes):
 
     test_prev_dataset = CIFAR100(root='data/', classes=previous_classes,  train=False, download=True, transform=test_transform)
