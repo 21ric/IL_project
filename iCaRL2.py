@@ -98,10 +98,6 @@ def main():
         net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
 
 
-        #print('Dato train sample')
-        #print(train_dataset.data[:1])
-        #print('tipo')
-        #print(type(train_dataset.data[:1]))
         print('Reducing exemplar sets ...')
         print('-'*30)
 
@@ -186,7 +182,7 @@ def main():
 
             print('-'*30)
 
-        if i == 1:
+        if i == 3:
             return
 
 if __name__ == '__main__':
