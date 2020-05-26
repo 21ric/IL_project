@@ -21,7 +21,7 @@ val_transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 30
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -277,7 +277,7 @@ class LwF(nn.Module):
             scores[epoch+1] = val_acc 
 
 
-            if epoch%5 == 0:
+            if epoch%5 == 0 or epoch == NUM_EPOCHS -1 
                 print("Train Loss: {:.4f}\n".format(loss.item()))
                 print('Val Acc: {:.4f}'.format(val_acc))
 
