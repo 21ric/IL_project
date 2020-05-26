@@ -29,6 +29,7 @@ def main():
 
     path='orders/'
     classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups1.pickle', path+'map1.pickle', path+'revmap1.pickle')
+    print(classes_groups, class_map, map_reverse)
 
 
     net = iCaRL(0, class_map)
