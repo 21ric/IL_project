@@ -173,6 +173,9 @@ class iCaRL(nn.Module):
                   print('Learning rate:{}'.format(param_group['lr']))
             i+=1
 
+        net.load_state_dict(best_net)
+        return
+
     def reduce_exemplars_set(self, m):
         for y, exemplars in enumerate(self.exemplars_sets):
             self.exemplars_sets[y] = exemplars[:m]
