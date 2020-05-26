@@ -81,6 +81,7 @@ class iCaRL(nn.Module):
             dataset.append(exemplars, [y]*len(exemplars))
 
     def update_representation(self, dataset, val_dataset, class_map):
+        dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
         print('{} new classes'.format(n))
