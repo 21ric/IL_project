@@ -92,16 +92,16 @@ def main():
         # returns the history of val loss and accuracy and the net providing the lower val loss
         results = net.update(train_dataset, val_dataset, class_map, map_reverse)
         
-        """
+        
         # takes the dictionary {num_epoch : [val_acc, avg_val_loss]}
         scores = results[0]
-        sorted_scores = sorted(scores.items(), key=lambda x: x[1][1]) # sorted according to the lower val loss
+        sorted_scores = sorted(scores.items(), key=lambda x: x[1],reverse = True) # sorted according to the lower val loss
 
-        print(f"lower validation loss: {sorted_scores[0][1][1]} at epoch:{sorted_scores[0][0]}:\n")
+        print(f"higher validation accuracy: {sorted_scores[0][1]} at epoch:{sorted_scores[0][0]}:\n")
  
         # takes the best net
         to_test = results[1]
-        """
+        
         # EVALUATION STEP
         print("\nevalutation step on training and test set\n")  
         net.eval()
