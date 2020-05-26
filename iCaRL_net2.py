@@ -98,7 +98,7 @@ class iCaRL(nn.Module):
         if self.n_known > 0:
             self.to(DEVICE)
             self.train(False)
-            q = torch.zeros(len(dataset), 100).cuda()
+            q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
