@@ -51,6 +51,11 @@ def main():
     classes_groups = np.array_split(all_classes, 10)
     print(classes_groups)
 
+    for i in range(10):
+        for list in classes_groups[:i]:
+            for y in list:
+                print(y)
+            print("fine lista")
     #num_iters = total_classes//CLASSES_BATCH      
     
     # Create class map
