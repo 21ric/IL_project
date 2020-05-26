@@ -1,7 +1,7 @@
 from iCaRL_net2 import iCaRL
 
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 
 from dataset import CIFAR100
 
