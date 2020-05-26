@@ -9,6 +9,8 @@ import numpy as np
 
 import math
 
+import copy
+
 import torch
 from torch.autograd import Variable
 
@@ -77,7 +79,14 @@ def main():
         train_dataset = CIFAR100(root='data/', classes=classes_groups[i], train=True, download=True, transform=train_transform)
         test_dataset = CIFAR100(root='data/', classes=classes_groups[i],  train=False, download=True, transform=test_transform)
 
-        net.update_representation(dataset = train_dataset, class_map=class_map)
+        train_indices, val_indices = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
+
+        val_dataset = Subset(copy.deepcopy(train_dataset), val_indices)
+        train_dataset = Subset(train_dataset, train_indices)
+
+        val_dataset.dataset.transform = test_transform
+
+        net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map)
 
         #print('Dato train sample')
         #print(train_dataset.data[:1])
