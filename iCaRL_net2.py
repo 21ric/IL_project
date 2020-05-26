@@ -134,7 +134,7 @@ class iCaRL(nn.Module):
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
                     #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
                     target = [q_i, labels_hot]
-                    loss = bce_with_logits(output, target)
+                    loss = self.dist_loss(output, target)
                     #loss += dist_loss
 
                 loss.backward()
