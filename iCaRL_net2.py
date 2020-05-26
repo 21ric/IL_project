@@ -22,7 +22,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 10
 DEVICE = 'cuda'
 ########################
 
@@ -148,9 +148,9 @@ class iCaRL(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                    loss = self.clf_loss(out, labels_hot)
 
-                if self.n_known > 0:
+                else:
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
                     #print('g', g[:,1])
