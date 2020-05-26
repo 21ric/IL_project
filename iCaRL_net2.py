@@ -97,6 +97,7 @@ class iCaRL(nn.Module):
         print('-'*30)
 
         self.add_exemplars(dataset)
+        print('a')
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
@@ -116,6 +117,7 @@ class iCaRL(nn.Module):
 
 
         self.add_classes(n)
+        print('b')
         #self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
@@ -138,7 +140,9 @@ class iCaRL(nn.Module):
                 imgs = imgs.to(DEVICE)
                 indexes = indexes.to(DEVICE)
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
+                print('c')
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                print('d')
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
