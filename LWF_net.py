@@ -192,14 +192,14 @@ class LwF(nn.Module):
                 logits = self.forward(images) 
 
                 # Compute classification loss 
-                cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
+                #cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
                 
-                '''
+                
                 if self.n_known <= 0: # First iteration
                     loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                '''
                 
-                if self.n_known > 0: # If not first iteration
+                
+                elif self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
                     dist_target_i = dist_target[indices] #BCE
                     #dist_target_batch = prev_model.forward(images)  #MCCE
@@ -210,22 +210,22 @@ class LwF(nn.Module):
                     # Save logits of the first "old" nodes of the network
                     # LwF doesn't use examplars, it uses the network outputs itselfs
                     #logits = torch.sigmoid(logits) #BCE
-                    logits_dist = logits[:,:self.n_known]  #MCCE
+                    #logits_dist = logits[:,:self.n_known]  #MCCE
 
                     # Compute distillation loss
                     #target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,:self.n_known]),dim=1)
+                    target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,self.n_known:]),dim=1)
 
-                    dist_loss = criterion_dist(logits_dist, target) #richi dist_loss
+                    loss = criterion_dist(logits_dist, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
-                    loss = dist_loss+cls_loss
+                    #loss = dist_loss+cls_loss
                     #print(dist_loss.item())    
                 
-                else:
-                    loss = cls_loss
+                #else:
+                #   loss = cls_loss
                     
                 loss.backward()
                 optimizer.step()
