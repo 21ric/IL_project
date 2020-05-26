@@ -75,7 +75,7 @@ class iCaRL(nn.Module):
         if self.n_known > 0:
             self.to(DEVICE)
             self.train(False)
-            q = torch.zeros(len(dataset), self.n_classes).cuda()
+            q = torch.zeros(len(dataset), 100).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
@@ -191,7 +191,7 @@ class iCaRL(nn.Module):
                 images = images[:-1]
                 features = features[:-1]
             else:
-                print('chosen i:{}'.format(i))
+                #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
                 features = np.concatenate((features[:i], features[i+1:]))
 
