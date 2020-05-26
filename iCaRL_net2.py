@@ -162,7 +162,7 @@ class iCaRL(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-            accuracry = validate(self, val_dataloader)
+            accuracry = validate(self, val_loader)
 
             if accuracy > best_acc:
                 best_acc = accuracy
