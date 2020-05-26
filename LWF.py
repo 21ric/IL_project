@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 import copy
 
 from dataset import CIFAR100
+import utils
 
 import numpy as np
 from numpy import random
@@ -21,6 +22,8 @@ MEMORY_SIZE = 2000
 
 
 def main():
+
+    '''
     #  Define images transformation
     train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                       transforms.RandomHorizontalFlip(),                    
@@ -34,10 +37,11 @@ def main():
                      #transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))
                     ])
 
-
+    '''
     print("\n")
-
-
+    
+    classes_groups, class_map, map_reverse = utils.get_class_maps()
+    '''
     total_classes = 100    
 
     perm_id = np.random.permutation(total_classes)
@@ -60,16 +64,17 @@ def main():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
 
-
+    '''
     # Create Network
     net = LwF(CLASSES_BATCH, class_map)
     
-    test_accs = []
+    #test_accs = []
       
     #iterating until the net knows total_classes with 10 by 10 steps 
-    for s in range(0, total_classes, CLASSES_BATCH):   
+    '''for s in range(0, total_classes, CLASSES_BATCH):   
         print(f"ITERATION: {(s//CLASSES_BATCH)+1} / {total_classes//CLASSES_BATCH}\n")
         print("\n")
+
         
         # Creating dataset for current iteration        
         train_dataset = CIFAR100(root='data',train=True,classes=all_classes[s:s+CLASSES_BATCH],download=True,transform=train_transform)
@@ -85,7 +90,14 @@ def main():
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=False)
         
-        print("\n")                                       
+        print("\n") '''
+
+    for i in range(int(100/CLASSES_BATCH)): 
+
+        train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])                                      
+ 
+        train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
+        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=False)
 
         # UPDATE STEP on training set
         print("Update step\n")
