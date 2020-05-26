@@ -14,6 +14,7 @@ from resnet import resnet32
 import math
 import copy
 
+val_transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
 ####Hyper-parameters####
 LR = 2
@@ -56,7 +57,7 @@ class LwF(nn.Module):
     def __init__(self, n_classes, classes_map):
         super(LwF,self).__init__()        
         self.model = resnet32(num_classes=10)
-        self.model.apply(kaiming_normal_init)
+        #self.model.apply(kaiming_normal_init)
         self.model.fc = nn.Linear(64, n_classes) # Modify output layers
 
         # Save FC layer in attributes
@@ -111,7 +112,7 @@ class LwF(nn.Module):
         # Update attribute self.fc
         self.fc = self.model.fc
         # Initialize weights with kaiming normal
-        kaiming_normal_init(self.fc.weight)
+        #kaiming_normal_init(self.fc.weight)
         
         
         # Upload old FC weights on first "out_features" nodes
@@ -151,7 +152,9 @@ class LwF(nn.Module):
                 g = torch.sigmoid(self.forward(images))
                 #g = self.forward(images) 
                 dist_target[indices] = g.data
+                
             dist_target = Variable(dist_target).cuda()
+            self.train(True)
 
         new_classes = classes #lista (non duplicati) con targets di train. len(classes)=10
         
@@ -163,9 +166,9 @@ class LwF(nn.Module):
         # Define optimizer and classification loss
         self.optimizer = optim.SGD(self.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
         optimizer = self.optimizer
-        criterion = self.class_loss
-        #criterion_class = self.class_loss
-        #criterion_dist = self.dist_loss
+        #criterion = self.class_loss
+        criterion_class = self.class_loss
+        criterion_dist = self.dist_loss
         
         self.to(DEVICE)
 
@@ -187,10 +190,6 @@ class LwF(nn.Module):
 
 
             for  images, labels, indices in train_dataloader:
-
-                seen_labels = [] # ---------try to comment this
-
-                images = Variable(images)
                 images = images.to(DEVICE)
                 indices = indices.to(DEVICE)
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
@@ -203,7 +202,7 @@ class LwF(nn.Module):
                 optimizer.zero_grad()
 
                 # Compute outputs on the new model 
-                logits = self.forward(images) 
+                logits = self(images) 
 
                 # Compute classification loss 
                 #cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
@@ -211,7 +210,7 @@ class LwF(nn.Module):
                 
                 if self.n_known <= 0: # First iteration
                     #loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                    loss = criterion(logits, labels_hot)
+                    loss = criterion_class(logits, labels_hot)
                 
                 elif self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
@@ -229,9 +228,9 @@ class LwF(nn.Module):
                     # Compute distillation loss
                     #target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,self.n_known:]),dim=1)
+                    target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,self.n_known:self.n_classes]),dim=1)
 
-                    loss = criterion(logits, target) #richi dist_loss
+                    loss = criterion_dist(logits, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
@@ -245,6 +244,7 @@ class LwF(nn.Module):
                 optimizer.step()
 
             # VALIDATION    
+            val_dataloader.dataset.transform = val_transform
             val_acc = validate(self, val_dataloader, map_reverse)
             '''
             running_corrects = 0.0
