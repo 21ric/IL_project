@@ -193,7 +193,6 @@ class iCaRL(nn.Module):
             i+=1
 
         self.load_state_dict(best_net)
-        del loss, output
         return
 
     def reduce_exemplars_set(self, m):
