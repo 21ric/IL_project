@@ -21,7 +21,7 @@ val_transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 70
+NUM_EPOCHS = 30
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -177,7 +177,7 @@ class LwF(nn.Module):
         best_acc = 0 # This is the validation accuracy for model selection
         self.train(True)
         
-        for epoch in range(30): 
+        for epoch in range(NUM_EPOCHS): 
              
             if epoch%5 == 0:
                 print('-'*30)
