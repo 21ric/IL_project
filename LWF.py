@@ -77,8 +77,8 @@ def main():
         # Create indices for train and validation
         train_indexes, val_indexes = train_test_split(range(len(train_dataset)), test_size=0.1, stratify=train_dataset.targets)
         
-        val_dataset = Subset(train_dataset, val_indexes)   
-        train_dataset = Subset(train_dataset, train_indexes)
+        val_dataset = Subset(copy.copy(train_dataset), val_indexes)   
+        train_dataset = Subset(copy.copy(train_dataset), train_indexes)
    
         # Prepare dataloaders
         train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE,shuffle=False, num_workers=4, drop_last=True)
