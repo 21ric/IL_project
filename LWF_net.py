@@ -19,7 +19,7 @@ import copy
 LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
-NUM_EPOCHS = 70
+NUM_EPOCHS = 10
 DEVICE = 'cuda'
 STEPDOWN_EPOCHS = [int(0.7 * NUM_EPOCHS), int(0.9 * NUM_EPOCHS)]
 STEPDOWN_FACTOR = 5
@@ -112,10 +112,6 @@ class LwF(nn.Module):
     def update(self, train_dataset, val_dataset, class_map, map_reverse):
 
         self.cuda()
-
-        # Save a copy to compute distillation outputs
-        prev_model = copy.deepcopy(self)
-        prev_model.to(DEVICE)
 
         # Save true labels (new images)
         classes = list(set(train_dataset.dataset.targets)) #list of true labels
@@ -217,7 +213,7 @@ class LwF(nn.Module):
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
                     target = torch.cat((dist_target_i[:,:self.n_known], labels_hot[:,self.n_known:]),dim=1)
 
-                    loss = criterion_dist(logits_dist, target) #richi dist_loss
+                    loss = criterion_dist(logits, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
