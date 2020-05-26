@@ -155,7 +155,7 @@ class LwF(nn.Module):
 
         scores = {}
         best_acc = 0 # This is the validation accuracy for model selection
-
+        self.train(True)
         for epoch in range(NUM_EPOCHS):              
             if epoch%5 == 0:
                 print('-'*30)
@@ -192,10 +192,12 @@ class LwF(nn.Module):
                 logits = self.forward(images) 
 
                 # Compute classification loss 
-                cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
+                #cls_loss = criterion_class(logits[:, self.n_known:], labels_hot[:, self.n_known:])
+                
+                if self.n_known <= 0: # First iteration
+                    loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
-                # If not first iteration
-                if self.n_known > 0:
+                if self.n_known > 0: # If not first iteration
                     # Save outputs of the previous model on the current batch
                     dist_target_i = dist_target[indices] #BCE
                     #dist_target_batch = prev_model.forward(images)  #MCCE
@@ -209,18 +211,15 @@ class LwF(nn.Module):
                     #logits_dist = logits[:,:-(self.n_classes-self.n_known)]  #MCCE
 
                     # Compute distillation loss
+                    target = [dist_target_i, labels_hot]
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known)) #BCE
-                    dist_loss = criterion_dist(logits[:,:self.n_known], dist_target_i) #richi dist_loss
+                    loss = criterion_dist(logits, target) #richi dist_loss
                     #dist_loss = criterion_dist(logits_dist, dist_target_batch)  #MCCE
 
                     # Compute total loss
-                    loss = dist_loss+cls_loss
+                    #loss = dist_loss+cls_loss
                     #print(dist_loss.item())           
-
-                # If first iteration
-                else:
-                    loss = cls_loss
-
+                    
                 loss.backward()
                 optimizer.step()
 
