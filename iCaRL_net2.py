@@ -49,7 +49,7 @@ def validate(net, val_dataloader, map_reverse):
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=10)
+        self.features_extractor = resnet32(num_classes=0)
 
         self.n_classes = n_classes
         self.n_known = 0
