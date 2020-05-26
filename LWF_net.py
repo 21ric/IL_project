@@ -225,26 +225,22 @@ class LwF(nn.Module):
                 optimizer.step()
 
             # VALIDATION               
-            total = 0.0
             running_corrects = 0.0
 
-            for  images, labels, indices in val_dataloader:
+            for  images, labels, indices in val_dataloader: 
+                images = Variable(images)
+                images = images.to(DEVICE)
+                indices = indices.to(DEVICE)
+                labels = labels.to(DEVICE)
 
-                    images = Variable(images)
-                    images = images.to(DEVICE)
-                    indices = indices.to(DEVICE)
-                    labels = labels.to(DEVICE)
+                # Set the network to evaluation mode
+                self.train(False)
 
-                    # Set the network to evaluation mode
-                    self.train(False)
-
-                    # Forward + classify
-                    preds = self.classify(images)
-                    preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-                    total += labels.size(0)          
-                    running_corrects += (preds == labels.cpu().numpy()).sum()
-
-            print ('Validation Accuracy : %.2f\n' % (100.0 * running_corrects / total))
+                # Forward + classify
+                preds = self.classify(images)
+                preds = [map_reverse[pred] for pred in preds.cpu().numpy()]        
+                running_corrects += (preds == labels.cpu().numpy()).sum()
+                
             val_acc = running_corrects / float(len(val_dataloader.dataset))
 
             if (val_acc > best_acc):
