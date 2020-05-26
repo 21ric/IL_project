@@ -119,7 +119,6 @@ class iCaRL(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    print('qui')
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
@@ -134,7 +133,6 @@ class iCaRL(nn.Module):
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
                     #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
-                    print('qui1')
                     target = [q_i, labels_hot]
                     loss = self.dist_loss(output, target)
                     #loss += dist_loss
