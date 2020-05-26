@@ -91,8 +91,8 @@ def main():
 
         net.reduce_exemplars_set(m)
 
-
-        for y in range(net.n_known, net.n_classes):
+        for y in classes_groups[:i]:
+        #for y in range(net.n_known, net.n_classes):
             net.construct_exemplars_set(train_dataset.get_class_imgs(y), m)
 
         net.n_known = net.n_classes
