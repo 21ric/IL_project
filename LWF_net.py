@@ -244,7 +244,7 @@ class LwF(nn.Module):
                     total += labels.size(0)          
                     running_corrects += (preds == labels.cpu().numpy()).sum()
 
-            print ('Validation Accuracy : %.2f\n' % (100.0 * corrects / total))
+            print ('Validation Accuracy : %.2f\n' % (100.0 * running_corrects / total))
             val_acc = running_corrects / float(len(val_dataloader.dataset))
 
             if (val_acc > best_acc):
