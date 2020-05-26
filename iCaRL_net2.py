@@ -169,15 +169,17 @@ class iCaRL(nn.Module):
 
             if accuracy > best_acc:
                 best_acc = accuracy
+                best_epoch = epoch
                 best_net = copy.deepcopy(self.state_dict())
 
             if i % 10 == 0:
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
+                pritnt('Best accuracy:{:.4f} obtained at epoch {}'.format(accuracy, epoch))
             i+=1
 
-        net.load_state_dict(best_net)
+        self.load_state_dict(best_net)
         return
 
     def reduce_exemplars_set(self, m):
