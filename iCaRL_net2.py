@@ -23,18 +23,6 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
-def to_onehot(targets, n_classes, class_map):
-    one_hots = []
-    #print('len targets', len(targets))
-    #print('targets', targets)
-    for t in targets:
-        temp = np.zeros(n_classes)
-        temp[t] = 1
-        one_hots.append(temp)
-    #print(one_hots)
-    one_hots = torch.FloatTensor(one_hots)
-    #print(one_hots.size())
-    return one_hots
 
 
 class iCaRL(nn.Module):
