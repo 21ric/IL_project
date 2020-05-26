@@ -91,7 +91,7 @@ class iCaRL(nn.Module):
         targets = list(set(dataset.targets))
         n = len(targets)
 
-        self.to(DEVICE)
+
 
         print('New classes:{}'.format(n))
         print('-'*30)
@@ -102,7 +102,7 @@ class iCaRL(nn.Module):
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
         if self.n_known > 0:
-            #self.to(DEVICE)
+            self.to(DEVICE)
             self.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
@@ -124,7 +124,7 @@ class iCaRL(nn.Module):
         best_acc = -1
         best_epoch = 0
 
-        #self.to(DEVICE)
+        self.to(DEVICE)
         self.train(True)
         for epoch in range(NUM_EPOCHS):
 
