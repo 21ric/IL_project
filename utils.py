@@ -118,7 +118,7 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
         class_map = pickle.load(handle)
 
     with open(revmap_filename, 'rb') as handle:
-        map_reveres = pickle.load(handle)
+        map_reverse = pickle.load(handle)
 
     class_groups = [class_groups_dict[i] for i in range(len(class_groups_dict.keys()))]
 
