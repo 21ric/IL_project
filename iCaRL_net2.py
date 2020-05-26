@@ -102,17 +102,18 @@ class iCaRL(nn.Module):
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
         if self.n_known > 0:
-            self.to(DEVICE)
-            self.train(False)
+            self.features_extractor.to(DEVICE)
+            self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                g = torch.sigmoid(self.forward(images))
+                g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
             q = Variable(q).cuda()
-            self.train(True)
+            self.features_extractor.train(True)
+
 
         self.add_classes(n)
         #self.n_classes += n
@@ -124,8 +125,8 @@ class iCaRL(nn.Module):
         best_acc = -1
         best_epoch = 0
 
-        self.to(DEVICE)
-        self.train(True)
+        self.features_extractor(DEVICE)
+        self.features_extractor.train(True)
         for epoch in range(NUM_EPOCHS):
 
             if epoch in STEPDOWN_EPOCHS:
@@ -145,6 +146,7 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 #out = torch.sigmoid(self(imgs))
+                print('here')
                 out = self(imgs)
 
                 #print(out[0])
@@ -203,8 +205,8 @@ class iCaRL(nn.Module):
     def construct_exemplars_set(self, images, m):
 
         features = []
-        #self.to(DEVICE)
-        self.train(False)
+        #self.features_extractor(DEVICE)
+        self.features_extractor.train(False)
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
@@ -248,7 +250,7 @@ class iCaRL(nn.Module):
 
         self.exemplar_sets.append(np.array(exemplar_set))
         del features
-        self.train(True)
+        self.features_extractor.train(True)
 
 
     def classify(self, x):
@@ -259,7 +261,7 @@ class iCaRL(nn.Module):
 
             exemplar_means = []
 
-            self.train(False)
+            self.features_extractor.train(False)
             #print('exset', self.exemplar_sets)
             for exemplars in self.exemplar_sets:
                 #print('in')
@@ -286,9 +288,9 @@ class iCaRL(nn.Module):
         means = torch.stack([means]*batch_size)
         means = means.transpose(1,2)
 
-        #self.to(DEVICE)
+        #self.features_extractor(DEVICE)
         x = x.to(DEVICE)
-        self.train(False)
+        self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
@@ -299,9 +301,8 @@ class iCaRL(nn.Module):
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)
 
-        self.train(True)
+        self.features_extractor.train(True)
 
-        del features 
         return preds
 
 
@@ -310,7 +311,7 @@ class iCaRL(nn.Module):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
         running_corrects = 0
-        #self.to(DEVICE)
+        #self.features_extractor(DEVICE)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
