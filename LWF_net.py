@@ -220,7 +220,7 @@ class LwF(nn.Module):
 
                     # Compute total loss
                     loss = dist_loss+cls_loss
-                    print(dist_loss.item())    
+                    #print(dist_loss.item())    
                 
                 else:
                     loss = cls_loss
@@ -236,6 +236,7 @@ class LwF(nn.Module):
                 images = images.to(DEVICE)
                 indices = indices.to(DEVICE)
                 labels = labels.to(DEVICE)
+
 
                 # Set the network to evaluation mode
                 self.train(False)
@@ -260,7 +261,7 @@ class LwF(nn.Module):
 
 
         #end epochs
-        #self.load_state_dict(best_net)  
-        return [scores] #self]  
+        self.load_state_dict(best_net)  
+        return [scores, self]  
                 
 
