@@ -37,6 +37,9 @@ def main():
 
 
     for i in range(int(100/CLASSES_BATCH)):
+        
+        print(f'**** ITERATION {i} ****')
+        print('-'*30)
 
         #torch.cuda.empty_cache()
 
