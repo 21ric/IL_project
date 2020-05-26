@@ -220,7 +220,7 @@ class LwF(nn.Module):
 
                     # Compute total loss
                     loss = dist_loss+cls_loss
-                    print(dist_loss.item())    
+                    #print(dist_loss.item())    
                 
                 else:
                     loss = cls_loss
