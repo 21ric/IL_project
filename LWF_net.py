@@ -223,7 +223,7 @@ class LwF(nn.Module):
                     print(dist_loss.item())    
                 
                 else:
-                    liss = cls_loss
+                    loss = cls_loss
                     
                 loss.backward()
                 optimizer.step()
