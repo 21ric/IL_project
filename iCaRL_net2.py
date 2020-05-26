@@ -25,6 +25,7 @@ DEVICE = 'cuda'
 ########################
 
 def validate(net, val_dataloader):
+    running_corrects_val = 0
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
         labels = labels.to(DEVICE)
