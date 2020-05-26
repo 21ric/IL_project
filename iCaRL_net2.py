@@ -192,6 +192,7 @@ class iCaRL(nn.Module):
             i+=1
 
         self.load_state_dict(best_net)
+        del loss, output
         return
 
     def reduce_exemplars_set(self, m):
@@ -246,6 +247,7 @@ class iCaRL(nn.Module):
                 features = np.concatenate((features[:i], features[i+1:]))
 
         self.exemplar_sets.append(np.array(exemplar_set))
+        del features
         self.train(True)
 
 
@@ -299,6 +301,7 @@ class iCaRL(nn.Module):
 
         self.train(True)
 
+        del features 
         return preds
 
 
