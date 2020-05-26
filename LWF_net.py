@@ -29,7 +29,6 @@ STEPDOWN_FACTOR = 5
 
 def validate(net, val_dataloader, map_reverse):
     
-    print(f"len val_dataset : {len(val_dataloader.dataset)}")
     running_corrects_val = 0
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
@@ -135,7 +134,7 @@ class LwF(nn.Module):
     def update(self, train_dataset, val_dataset, class_map, map_reverse):
 
         self.cuda()
-
+        loss = 0.0 
         # Save true labels (new images)
         classes = list(set(train_dataset.dataset.targets)) #list of true labels
         print("Classes: ", classes)
