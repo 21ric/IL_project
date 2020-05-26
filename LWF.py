@@ -150,7 +150,7 @@ def main():
         net.train(True)
 
     for i in range(0,len(test_accs)):
-    print(f"Test accuracy at iteration {i+1}: {test_accs[i]}")    
+         print(f"Test accuracy at iteration {i+1}: {test_accs[i]}")    
 
 
 if __name__ == '__main__':
