@@ -6,6 +6,7 @@ from torch.utils.data import Subset
 
 import copy
 import numpy as np
+import pickle
 
 
 train_transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
@@ -44,6 +45,19 @@ def get_additional_datasets(prev_classes, all_classes):
     test_all_dataset = CIFAR100(root='data/', classes=all_classes,  train=False, download=True, transform=test_transform)
 
     return test_prev_dataset, test_all_dataset
+
+
+
+def get_class_maps_from_file(map_filename, revmap_filename):
+
+    with open(map_filename, 'rb') as handle:
+        class_map = pickle.load(handle)
+
+    with open(revmap_filename, 'rb') as handle:
+        map_reverse = pickle.load(handle)
+
+
+    return class_map, map_reverse
 
 
 def get_class_maps():
