@@ -108,11 +108,12 @@ class iCaRL(nn.Module):
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                g = torch.sigmoid(self.forward(images))
+                g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
             q = Variable(q).cuda()
             self.features_extractor.train(True)
+
 
         self.add_classes(n)
         #self.n_classes += n
@@ -145,6 +146,7 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 #out = torch.sigmoid(self(imgs))
+                print('here')
                 out = self(imgs)
 
                 #print(out[0])
