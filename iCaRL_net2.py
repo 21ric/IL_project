@@ -255,7 +255,7 @@ class iCaRL(nn.Module):
 
             exemplar_means = []
 
-            self.to(DEVICE)
+            #self.to(DEVICE)
             self.train(False)
             #print('exset', self.exemplar_sets)
             for exemplars in self.exemplar_sets:
@@ -306,6 +306,7 @@ class iCaRL(nn.Module):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
         running_corrects = 0
+        self.to(DEVICE)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
