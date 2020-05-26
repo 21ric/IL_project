@@ -28,7 +28,7 @@ DEVICE = 'cuda'
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=0)
+        self.features_extractor = resnet32(num_classes=n_classes)
 
         self.n_classes = 0
         self.n_known = 0
