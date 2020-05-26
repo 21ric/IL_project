@@ -119,6 +119,7 @@ class iCaRL(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
+                    print('qui')
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 if self.n_known > 0:
