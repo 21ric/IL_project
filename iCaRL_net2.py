@@ -22,7 +22,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 ########################
 
@@ -282,7 +282,7 @@ class iCaRL(nn.Module):
         means = torch.stack([means]*batch_size)
         means = means.transpose(1,2)
 
-        self.to(DEVICE)
+        #self.to(DEVICE)
         x = x.to(DEVICE)
         self.train(False)
         feature = self.features_extractor.extract_features(x)
@@ -305,7 +305,7 @@ class iCaRL(nn.Module):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
         running_corrects = 0
-        self.to(DEVICE)
+        #self.to(DEVICE)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
