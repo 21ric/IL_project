@@ -39,38 +39,38 @@ def main():
     #classes che è una lista di labels, il dataset carica solo le foto con quelle labels
 
 
-    total_classes = 100    
+    total_classes = 100
 
     perm_id = np.random.permutation(total_classes)
     all_classes = np.arange(total_classes)
-    
+
     #mix the classes indexes
     for i in range(len(all_classes)):
       all_classes[i] = perm_id[all_classes[i]]
 
     #Create groups of 10
     classes_groups = np.array_split(all_classes, 10)
-    print(classes_groups)    
-    
+    print(classes_groups)
+
     # Create class map
     class_map = {}
     #takes 10 new classes randomly
     for i, cl in enumerate(all_classes):
         class_map[cl] = i
-    print (f"Class map:{class_map}\n")     
-    
+    print (f"Class map:{class_map}\n")
+
     # Create class map reversed
     map_reverse = {}
     for cl, map_cl in class_map.items():
         map_reverse[map_cl] = int(cl)
     print (f"Map Reverse:{map_reverse}\n")
-    
+
 
     #range_classes = np.arange(100)
     #classes_groups = np.array_split(range_classes, 10)
 
 
-    net = iCaRL(0, class_map)
+    net = iCaRL(100, class_map)
 
     for i in range(int(100/CLASSES_BATCH)):
 
@@ -106,7 +106,7 @@ def main():
                 preds = net.classify(imgs, compute_means=True)
                 preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
                 running_corrects += (preds == labels.numpy()).sum()
-                #running_corrects += torch.sum(preds == labels.data).data.item() 
+                #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(test_dataloader.dataset))
             print('Test Accuracy: {}'.format(accuracy))
         else:
@@ -158,7 +158,7 @@ def main():
                 #running_corrects += torch.sum(preds == labels.data).data.item()
             accuracy = running_corrects / float(len(all_dataloader.dataset))
             print('Test Accuracy all classes: {}'.format(accuracy))
-            
+
         if i == 1:
             return
 

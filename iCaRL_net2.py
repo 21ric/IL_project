@@ -85,7 +85,8 @@ class iCaRL(nn.Module):
             q = Variable(q).cuda()
             self.train(True)
 
-        self.add_classes(n)
+        #self.add_classes(n)
+        self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
@@ -107,7 +108,7 @@ class iCaRL(nn.Module):
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
-                
+
 
                 optimizer.zero_grad()
                 #out = torch.sigmoid(self(imgs))
@@ -117,11 +118,12 @@ class iCaRL(nn.Module):
 
                 #print('out', out[0], 'labels', labels[0])
 
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                if self.n_known <= 0:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 if self.n_known > 0:
                     #out = torch.sigmoid(out)
-                    q_i = q[indexes]
+                    #q_i = q[indexes]
                     #print('g', g[:,1])
                     #print('q_i', q_i[:,1])
                     #controllare dist loss
@@ -130,9 +132,10 @@ class iCaRL(nn.Module):
                     #print(q_i)
                     #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
                     #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
-
-                    loss += dist_loss
+                    #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
+                    target = [q_i, labels_hot]
+                    loss = bce_with_logits(output, target)
+                    #loss += dist_loss
 
                 loss.backward()
                 optimizer.step()
