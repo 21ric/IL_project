@@ -80,7 +80,9 @@ class LwF(nn.Module):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
-
+        
+        self.add_classes(n)
+        
         print('New classes:{}'.format(n))
         print('-'*30)
 
@@ -102,7 +104,7 @@ class LwF(nn.Module):
             self.features_extractor.train(True)
 
 
-        self.add_classes(n)
+        #self.add_classes(n)
         #self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
