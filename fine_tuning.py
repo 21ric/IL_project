@@ -20,7 +20,7 @@ from torchvision.models import resnet18
 DEVICE = 'cuda'
 NUM_CLASSES = 10
 BATCH_SIZE = 128
-ClASSES_BATCH =10
+CLASSES_BATCH =10
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 LR = 2
@@ -176,10 +176,10 @@ def main():
 
 
   #net = resnet18()
-  net = resnet32()
+  net = resnet32(num_classes=0)
   print(net)
 
-  for i in range(int(100/ClASSES_BATCH)):
+  for i in range(int(100/CLASSES_BATCH)):
 
     print(f"ITERATION {i+1} / {100/CLASSES_BATCH}")
     #cambio il numero di classi di output
