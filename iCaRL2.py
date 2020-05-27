@@ -27,11 +27,18 @@ MEMORY_SIZE = 2000
 
 def main():
 
-    path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups2.pickle', path+'map2.pickle', path+'revmap2.pickle')
+    #path='orders/'
+    #classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups2.pickle', path+'map2.pickle', path+'revmap2.pickle')
     #print(classes_groups, class_map, map_reverse)
 
+    class_map ={}
+    map_reverse = {}
 
+    for i in range(100):
+        class_map[i] = i
+        map_reverse[i] = i
+
+    classes_groups = np.split(np.arange(100), 10)
     net = iCaRL(100, class_map)
     #net.to(DEVICE)
 
