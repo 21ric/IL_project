@@ -33,7 +33,7 @@ def main():
 
 
     net = iCaRL(0, class_map)
-    net.to(DEVICE)
+    #net.to(DEVICE)
 
 
     for i in range(int(100/CLASSES_BATCH)):
