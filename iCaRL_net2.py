@@ -101,10 +101,11 @@ class iCaRL(nn.Module):
         #val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
 
-        self.features_extractor.to(DEVICE)
+
 
         self.add_classes(n)
 
+        self.features_extractor.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).cuda()
         for images, labels, indexes in loader:
             self.features_extractor.train(False)
