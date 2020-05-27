@@ -215,7 +215,7 @@ class LwF(nn.Module):
                     #loss = criterion_class(logits[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
                     loss = criterion_class(logits, labels_hot)
                 
-                elif self.n_known > 0: # If not first iteration
+                else: # If not first iteration
                     # Save outputs of the previous model on the current batch
                     dist_target_i = dist_target[indices] #BCE
                     #dist_target_batch = prev_model.forward(images)  #MCCE

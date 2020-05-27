@@ -1,4 +1,4 @@
-from iCaRL_net2 import iCaRL
+from LwF_net2 import LwF
 
 from torchvision import transforms
 from torch.utils.data import DataLoader, Subset
@@ -28,27 +28,24 @@ MEMORY_SIZE = 2000
 def main():
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups2.pickle', path+'map2.pickle', path+'revmap2.pickle')
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups1.pickle', path+'map1.pickle', path+'revmap1.pickle')
     #print(classes_groups, class_map, map_reverse)
 
 
-    net = iCaRL(0, class_map)
+    net = LwF(0, class_map)
     net.to(DEVICE)
 
 
     for i in range(int(100/CLASSES_BATCH)):
-
+        
         print('-'*30)
-        print(f'**** Iteration {i+1} ****')
+        print(f'**** ITERATION {i+1} ****')
         print('-'*30)
 
-        torch.cuda.empty_cache()
-
-        net.compute_means = True
+        #torch.cuda.empty_cache()
 
         print('Loading the Datasets ...')
         print('-'*30)
-
 
         train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])
 
@@ -58,7 +55,7 @@ def main():
 
         net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
 
-
+        '''
         print('Reducing exemplar sets ...')
         print('-'*30)
 
@@ -71,6 +68,7 @@ def main():
 
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
+        '''
 
         net.n_known = net.n_classes
 
@@ -90,7 +88,7 @@ def main():
 
             print('Old classes')
             net.classify_all(prev_classes_dataset, map_reverse)
-            print('New classes')
+            print('All classes')
             net.classify_all(all_classes_dataset, map_reverse)
 
             print('-'*30)
