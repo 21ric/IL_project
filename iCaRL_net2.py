@@ -50,7 +50,7 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=100)
 
-        self.n_classes = n_classes
+        self.n_classes = 0
         self.n_known = 0
         self.exemplar_sets = []
 
