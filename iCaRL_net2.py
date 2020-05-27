@@ -26,6 +26,7 @@ NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
+@torch.no_grad()
 def validate(net, val_dataloader, map_reverse):
     running_corrects_val = 0    
     for inputs, labels, index in val_dataloader:
@@ -65,7 +66,7 @@ class iCaRL(nn.Module):
         self.exemplars_sets = []
 
         self.class_map = class_map
-        self.no_grad = True
+        #self.no_grad = True
 
 
     def forward(self, x):
@@ -202,7 +203,8 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplars_sets):
             self.exemplars_sets[y] = exemplars[:m]
 
-
+            
+    @torch.no_grad()
     def construct_exemplars_set(self, images, m):
 
         features = []
@@ -257,7 +259,8 @@ class iCaRL(nn.Module):
         del features
         self.features_extractor.train(True)
 
-
+        
+    @torch.no_grad()
     def classify(self, x):
 
         batch_size = x.size(0)
