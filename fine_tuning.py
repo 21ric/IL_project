@@ -36,7 +36,7 @@ def train(net, train_dataloader, val_dataloader, n_classes):
   #criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy
   criterion = nn.BCEWithLogitsLoss() #binary CrossEntropyLoss
   parameters_to_optimize = net.parameters() # In this case we optimize over all the parameters of AlexNet
-  optimizer = optim.SGD(parameters_to_optimize, lr=LR, weight_decay=WEIGHT_DECAY)
+  optimizer = optim.SGD(parameters_to_optimize, lr=LR, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
   #scheduler = optim.lr_scheduler.StepLR(optimizer)#, step_size=STEP_SIZE, gamma=GAMMA)
   net.to(DEVICE)
 
