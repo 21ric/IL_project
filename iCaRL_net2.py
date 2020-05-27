@@ -340,7 +340,7 @@ class iCaRL(nn.Module):
             fetures = []
             for ex in exemplars:
                 feature = self.features_extractor.extract_features(Variable(transform(Image.fromarray(ex))))
-                feature = self._l2_normalize(feature)
+                feature = self._l2_normalize(feature.unsqueeze(0))
                 features.append(feature)
             features = torch.FloatTensor(features)
             self.exemplars_means.append(self._l2_normalize(torch.mean(features, axis=1)))
