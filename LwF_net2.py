@@ -82,6 +82,7 @@ class LwF(nn.Module):
         n = len(targets)
         
         self.add_classes(n)
+        self.features_extractor.to(DEVICE)
         
         print('New classes:{}'.format(n))
         print('-'*30)
