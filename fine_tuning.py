@@ -176,7 +176,7 @@ def main():
 
 
   #net = resnet18()
-  net = resnet32()
+  net = resnet32(num_classes=0)
   print(net)
 
   for i in range(int(100/ClASSES_BATCH)):
