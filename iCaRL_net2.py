@@ -104,17 +104,15 @@ class iCaRL(nn.Module):
 
         if self.n_known > 0:
             #self.features_extractor.to(DEVICE)
-            '''
-            self.features_extractor.train(False)
-            '''
-            q = torch.zeros(len(dataset), self.n_classes).cuda()
-            with torch.no_grad():
-                for images, labels, indexes in loader:
-                    images = Variable(images).cuda()
-                    indexes = indexes.cuda()
-                    g = torch.sigmoid(self.features_extractor.forward(images))
-                    #g = self.forward(images)
-                    q[indexes] = g.data
+            
+            self.features_extractor.train(False)  
+            q = torch.zeros(len(dataset), self.n_classes).cuda()    
+            for images, labels, indexes in loader:
+                images = Variable(images).cuda()
+                indexes = indexes.cuda()
+                g = torch.sigmoid(self.features_extractor.forward(images))
+                #g = self.forward(images)
+                q[indexes] = g.data
             q = Variable(q).cuda()
             self.features_extractor.train(True)
 
