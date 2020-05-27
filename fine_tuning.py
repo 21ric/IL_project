@@ -251,7 +251,7 @@ def main():
       test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
       val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
-      net = train(net, train_dataloader, val_dataloader)
+      net = train(net, train_dataloader, val_dataloader, n_classes)
       print('Test on first 10 classes')
       test(net, test_dataloader)
 
