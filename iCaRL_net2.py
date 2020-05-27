@@ -77,7 +77,7 @@ class iCaRL(nn.Module):
         in_features = self.features_extractor.fc.in_features
         out_features = self.features_extractor.fc.out_features
         weight = copy.deepcopy(self.features_extractor.fc.weight.data)
-        #bias = copy.deepcopy(self.features_extractor.fc.bias.data)
+        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
         self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
