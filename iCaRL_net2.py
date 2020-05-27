@@ -131,7 +131,7 @@ class iCaRL(nn.Module):
         #self.add_classes(n)
         self.n_classes += n
 
-        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
+        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
 
         i = 0
 
@@ -251,7 +251,7 @@ class iCaRL(nn.Module):
             exemplar_features.append(features[i])
 
             #print('chosen i:{}'.format(i))
-            """
+
             if i == 0:
                 images = images[1:]
                 features = features[1:]
@@ -264,7 +264,7 @@ class iCaRL(nn.Module):
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
                 features = np.concatenate((features[:i], features[i+1:]))
-            """
+            
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
         #self.features_extractor.train(True)
