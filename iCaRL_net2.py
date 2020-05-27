@@ -108,10 +108,10 @@ class iCaRL(nn.Module):
                 indexes = indexes.cuda()
                 g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
-                q[indexes] = g[:self.n_classes].data
+                q[indexes] = g[:, :self.n_classes].data
 
             #self.features_extractor.to(DEVICE)
-
+            """
             self.features_extractor.train(False)
             with torch.no_grad():
                 q = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -121,6 +121,7 @@ class iCaRL(nn.Module):
                     g = torch.sigmoid(self.features_extractor.forward(images))
                     #g = self.forward(images)
                     q[indexes] = g.data
+            """
 
             q = Variable(q).cuda()
             self.features_extractor.train(True)
