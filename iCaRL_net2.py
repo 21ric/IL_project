@@ -28,7 +28,7 @@ DEVICE = 'cuda'
 
 @torch.no_grad()
 def validate(net, val_dataloader, map_reverse):
-    running_corrects_val = 0    
+    running_corrects_val = 0
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
         labels = labels.to(DEVICE)
@@ -99,7 +99,7 @@ class iCaRL(nn.Module):
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
         if self.n_known > 0:
-<<<<<<< HEAD
+
             self.features_extractor.to(DEVICE)
             self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -109,19 +109,19 @@ class iCaRL(nn.Module):
                 g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
-=======
+
             #self.features_extractor.to(DEVICE)
-            
-            self.features_extractor.train(False) 
+
+            self.features_extractor.train(False)
             with torch.no_grad():
-                q = torch.zeros(len(dataset), self.n_classes).cuda()    
+                q = torch.zeros(len(dataset), self.n_classes).cuda()
                 for images, labels, indexes in loader:
                     images = Variable(images).cuda()
                     indexes = indexes.cuda()
                     g = torch.sigmoid(self.features_extractor.forward(images))
                     #g = self.forward(images)
                     q[indexes] = g.data
->>>>>>> c023514d31eb8b40eeccd45b921a7998c7cb7cb8
+
             q = Variable(q).cuda()
             self.features_extractor.train(True)
 
@@ -210,29 +210,29 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplars_sets):
             self.exemplars_sets[y] = exemplars[:m]
 
-            
+
     @torch.no_grad()
     def construct_exemplars_set(self, images, m):
 
         features = []
-<<<<<<< HEAD
+
         self.features_extractor(DEVICE)
-=======
+
         #self.features_extractor(DEVICE)
-        
->>>>>>> c023514d31eb8b40eeccd45b921a7998c7cb7cb8
+
+
         self.features_extractor.train(False)
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature)
-            features.append(feature[0]) 
+            features.append(feature[0])
 
 
         #print('features shape', features[0])
         features = np.array(features)
         #print('num_features',len(features))
-        class_mean = np.mean(features, axis=0) 
+        class_mean = np.mean(features, axis=0)
         #print('class_mean', class_mean)
         class_mean = class_mean / np.linalg.norm(class_mean)
 
@@ -268,7 +268,7 @@ class iCaRL(nn.Module):
         del features
         self.features_extractor.train(True)
 
-        
+
     @torch.no_grad()
     def classify(self, x):
 
@@ -277,7 +277,7 @@ class iCaRL(nn.Module):
         if self.compute_means:
 
             exemplar_means = []
-            
+
             self.features_extractor.train(False)
             #print('exset', self.exemplar_sets)
             for exemplars in self.exemplar_sets:
@@ -309,7 +309,7 @@ class iCaRL(nn.Module):
         x = x.to(DEVICE)
         self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
-            
+
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
         feature = feature.unsqueeze(2)
