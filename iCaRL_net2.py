@@ -29,10 +29,10 @@ DEVICE = 'cuda'
 @torch.no_grad()
 def validate(net, val_dataloader, map_reverse):
     running_corrects_val = 0
+    net.train(False)
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
         labels = labels.to(DEVICE)
-        net.train(False)
         # forward
         outputs = net(inputs)
         _, preds = torch.max(outputs, 1)
@@ -146,9 +146,8 @@ class iCaRL(nn.Module):
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-
+            self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
-                self.features_extractor.train(True)
                 imgs = imgs.to(DEVICE)
                 indexes = indexes.to(DEVICE)
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
@@ -191,18 +190,19 @@ class iCaRL(nn.Module):
                 loss.backward()
                 optimizer.step()
 
-            accuracy = validate(self.features_extractor, val_loader, map_reverse)
+            #accuracy = validate(self.features_extractor, val_loader, map_reverse)
 
+            """
             if accuracy > best_acc:
                 best_acc = accuracy
                 best_epoch = epoch
                 best_net = copy.deepcopy(self.state_dict())
-
+            """
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                print('Max Accuracy:{:.4f} (Epoch {})'.format(best_acc, best_epoch))
+                #print('Max Accuracy:{:.4f} (Epoch {})'.format(best_acc, best_epoch))
                 print('-'*30)
             i+=1
 
@@ -222,9 +222,8 @@ class iCaRL(nn.Module):
         self.features_extractor.to(DEVICE)
 
 
-
+        self.features_extractor.train(False)
         for img in images:
-            self.features_extractor.train(False)
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature)
@@ -282,11 +281,12 @@ class iCaRL(nn.Module):
 
             #self.features_extractor.train(False)
             #print('exset', self.exemplar_sets)
+            self.features_extractor.train(False)
             for exemplars in self.exemplar_sets:
                 #print('in')
                 features = []
                 for ex in  exemplars:
-                    self.features_extractor.train(False)
+
                     ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
