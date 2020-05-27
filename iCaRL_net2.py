@@ -22,7 +22,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -214,16 +214,14 @@ class iCaRL(nn.Module):
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            #feature = feature.squeeze(0) # new
             feature = feature / np.linalg.norm(feature)
-            features.append(feature[0]) #old
-            #features.append(feature) #new
+            features.append(feature[0]) 
+
 
         #print('features shape', features[0])
         #features = np.array(features)
         #print('num_features',len(features))
-        class_mean = np.mean(features, axis=0) #OLD
-        #class_mean = np. #NEW
+        class_mean = np.mean(features, axis=0) 
         #print('class_mean', class_mean)
         class_mean = class_mean / np.linalg.norm(class_mean)
 
