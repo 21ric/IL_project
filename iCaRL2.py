@@ -27,7 +27,7 @@ MEMORY_SIZE = 2000
 
 def main():
 
-    #path='orders/'
+    path='orders/'
     classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups2.pickle', path+'map2.pickle', path+'revmap2.pickle')
     #print(classes_groups, class_map, map_reverse)
 
