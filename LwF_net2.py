@@ -80,7 +80,9 @@ class LwF(nn.Module):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
-
+        
+        #self.add_classes(n)
+        
         print('New classes:{}'.format(n))
         print('-'*30)
 
@@ -128,7 +130,7 @@ class LwF(nn.Module):
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
-                print(labels_hot)
+                #print(labels_hot)
                 labels_hot = labels_hot.to(DEVICE)
                 
                 self.features_extractor.train(True)
