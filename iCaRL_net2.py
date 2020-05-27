@@ -101,9 +101,10 @@ class iCaRL(nn.Module):
         if self.n_known > 0:
 
             self.features_extractor.to(DEVICE)
-            self.features_extractor.train(False)
+
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
+                self.features_extractor.train(False)
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
                 g = torch.sigmoid(self.features_extractor.forward(images))
@@ -138,7 +139,7 @@ class iCaRL(nn.Module):
         best_epoch = 0
 
         self.features_extractor.to(DEVICE)
-        self.features_extractor.train(True)
+
         for epoch in range(NUM_EPOCHS):
 
             if epoch in STEPDOWN_EPOCHS:
@@ -147,6 +148,7 @@ class iCaRL(nn.Module):
 
 
             for imgs, labels, indexes in loader:
+                self.features_extractor.train(True)
                 imgs = imgs.to(DEVICE)
                 indexes = indexes.to(DEVICE)
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
@@ -220,8 +222,9 @@ class iCaRL(nn.Module):
         self.features_extractor.to(DEVICE)
 
 
-        self.features_extractor.train(False)
+
         for img in images:
+            self.features_extractor.train(False)
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature)
@@ -265,15 +268,13 @@ class iCaRL(nn.Module):
 
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
-        self.features_extractor.train(True)
+        #self.features_extractor.train(True)
 
 
     @torch.no_grad()
     def classify(self, x):
 
         batch_size = x.size(0)
-
-        self.features_extractor.train(False)
 
         if self.compute_means:
 
@@ -285,6 +286,7 @@ class iCaRL(nn.Module):
                 #print('in')
                 features = []
                 for ex in  exemplars:
+                    self.features_extractor.train(False)
                     ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
@@ -309,6 +311,7 @@ class iCaRL(nn.Module):
 
         #self.features_extractor(DEVICE)
         x = x.to(DEVICE)
+        self.features_extractor.train(False)
         #self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
 
