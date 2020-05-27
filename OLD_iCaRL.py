@@ -1,4 +1,4 @@
-from iCaRL_net import iCaRL
+from OLD_iCaRL_net import iCaRL
 
 from torchvision import transforms
 from torch.utils.data import DataLoader
