@@ -16,7 +16,6 @@ import math
 
 transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                                     transforms.RandomHorizontalFlip(),
-                                    transforms.RandomVerticalFlip(),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -53,9 +52,9 @@ def validate(net, val_dataloader, map_reverse):
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=100)
+        self.features_extractor = resnet32(num_classes=n_classes)
 
-        self.n_classes = 0
+        self.n_classes = n_classes
         self.n_known = 0
         self.exemplar_sets = []
 
@@ -78,11 +77,11 @@ class iCaRL(nn.Module):
         in_features = self.features_extractor.fc.in_features
         out_features = self.features_extractor.fc.out_features
         weight = copy.deepcopy(self.features_extractor.fc.weight.data)
-        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
+        #bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
         self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
-        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
+        #self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
 
         self.n_classes += n
 
@@ -114,27 +113,17 @@ class iCaRL(nn.Module):
                 indexes = indexes.cuda()
                 g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
-                q[indexes] = g[:, :self.n_classes].data
+                q[indexes] = g.data
 
             #self.features_extractor.to(DEVICE)
-            """
-            self.features_extractor.train(False)
-            with torch.no_grad():
-                q = torch.zeros(len(dataset), self.n_classes).cuda()
-                for images, labels, indexes in loader:
-                    images = Variable(images).cuda()
-                    indexes = indexes.cuda()
-                    g = torch.sigmoid(self.features_extractor.forward(images))
-                    #g = self.forward(images)
-                    q[indexes] = g.data
-            """
+
 
             q = Variable(q).cuda()
             #self.features_extractor.train(True)
 
 
-        #self.add_classes(n)
-        self.n_classes += n
+        self.add_classes(n)
+        #self.n_classes += n
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
 
@@ -171,14 +160,14 @@ class iCaRL(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    loss = self.clf_loss(out[:, :self.n_classes], labels_hot[:, :self.n_classes])
+                    loss = self.clf_loss(out, labels_hot)
 
                 else:
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
 
                     target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                    loss = self.dist_loss(out[:, :self.n_classes], target)
+                    loss = self.dist_loss(out, target)
                     #loss += dist_loss
 
                 loss.backward()

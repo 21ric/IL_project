@@ -42,7 +42,7 @@ def main():
     """
 
     #classes_groups = np.split(np.arange(100), 10)
-    net = iCaRL(100, class_map)
+    net = iCaRL(0, class_map)
     #net.to(DEVICE)
 
 
