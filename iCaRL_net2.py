@@ -298,6 +298,9 @@ class iCaRL(nn.Module):
             self.exemplar_means = exemplar_means
             self.compute_means = False
         #print(self.exemplar_means)
+
+        self.features_extractor.train(False)
+        
         exemplar_means = self.exemplar_means
 
         means = torch.stack(exemplar_means)
