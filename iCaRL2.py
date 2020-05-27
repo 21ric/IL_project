@@ -32,7 +32,7 @@ def main():
     #print(classes_groups, class_map, map_reverse)
 
 
-    net = iCaRL(0, class_map)
+    net = iCaRL(100, class_map)
     #net.to(DEVICE)
 
 
@@ -90,7 +90,7 @@ def main():
 
             print('Old classes')
             net.classify_all(prev_classes_dataset, map_reverse)
-            print('New classes')
+            print('All classes')
             net.classify_all(all_classes_dataset, map_reverse)
 
             print('-'*30)

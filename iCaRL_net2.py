@@ -22,7 +22,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 ########################
 
@@ -48,7 +48,7 @@ def validate(net, val_dataloader, map_reverse):
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=0)
+        self.features_extractor = resnet32(num_classes=100)
 
         self.n_classes = n_classes
         self.n_known = 0
@@ -108,7 +108,7 @@ class iCaRL(nn.Module):
                 indexes = indexes.cuda()
                 g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
-                q[indexes] = g.data
+                q[indexes] = g[:self.n_classes].data
 
             #self.features_extractor.to(DEVICE)
 
@@ -126,8 +126,8 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
 
 
-        self.add_classes(n)
-        #self.n_classes += n
+        #self.add_classes(n)
+        self.n_classes += n
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
@@ -164,7 +164,7 @@ class iCaRL(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    loss = self.clf_loss(out, labels_hot)
+                    loss = self.clf_loss(out[:self.n_classes], labels_hot[:self.n_classes])
 
                 else:
                     #out = torch.sigmoid(out)
@@ -217,8 +217,6 @@ class iCaRL(nn.Module):
         features = []
 
         self.features_extractor.to(DEVICE)
-
-        #self.features_extractor(DEVICE)
 
 
         self.features_extractor.train(False)
