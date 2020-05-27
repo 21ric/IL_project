@@ -27,20 +27,19 @@ DEVICE = 'cuda'
 ########################
 
 def validate(net, val_dataloader, map_reverse):
-    running_corrects_val = 0
-    with torch.no_grad():
-        for inputs, labels, index in val_dataloader:
-            inputs = inputs.to(DEVICE)
-            labels = labels.to(DEVICE)
-            '''
-            net.train(False)
-            '''
-            # forward
-            outputs = net(inputs)
-            _, preds = torch.max(outputs, 1)
-            preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-            running_corrects_val += (preds == labels.cpu().numpy()).sum()
-            #running_corrects_val += torch.sum(preds == labels.data)
+    running_corrects_val = 0    
+    for inputs, labels, index in val_dataloader:
+        inputs = inputs.to(DEVICE)
+        labels = labels.to(DEVICE)
+
+        net.train(False)
+
+        # forward
+        outputs = net(inputs)
+        _, preds = torch.max(outputs, 1)
+        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+        running_corrects_val += (preds == labels.cpu().numpy()).sum()
+        #running_corrects_val += torch.sum(preds == labels.data)
 
     valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
 
