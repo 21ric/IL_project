@@ -15,7 +15,7 @@ import copy
 import math
 
 transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
-                                    transforms.RandomHorizontalFlip(),
+                                    transforms.RandomHorizontalFlip(p=0.3),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -80,8 +80,8 @@ class iCaRL(nn.Module):
         #bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        #self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
-        #self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
+        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
 
         self.n_classes += n
 
