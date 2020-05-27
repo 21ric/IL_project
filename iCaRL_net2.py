@@ -14,10 +14,8 @@ import copy
 
 import math
 
-transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
-                                    transforms.RandomHorizontalFlip(p=0.3),
-                                    transforms.ToTensor(),
-                                    transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
+transform = transforms.Compose([transforms.ToTensor(),
+                                transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
@@ -102,27 +100,27 @@ class iCaRL(nn.Module):
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         #val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
-        if self.n_known > 0:
 
-            self.features_extractor.to(DEVICE)
+        self.features_extractor.to(DEVICE)
 
-            q = torch.zeros(len(dataset), self.n_classes).cuda()
-            for images, labels, indexes in loader:
-                self.features_extractor.train(False)
-                images = Variable(images).cuda()
-                indexes = indexes.cuda()
-                g = torch.sigmoid(self.features_extractor.forward(images))
-                #g = self.forward(images)
-                q[indexes] = g.data
+        self.add_classes(n)
+
+        q = torch.zeros(len(dataset), self.n_classes).cuda()
+        for images, labels, indexes in loader:
+            self.features_extractor.train(False)
+            images = Variable(images).cuda()
+            indexes = indexes.cuda()
+            g = torch.sigmoid(self.features_extractor.forward(images))
+            #g = self.forward(images)
+            q[indexes] = g.data
 
             #self.features_extractor.to(DEVICE)
 
-
-            q = Variable(q).cuda()
+        q = Variable(q).cuda()
             #self.features_extractor.train(True)
 
 
-        self.add_classes(n)
+
         #self.n_classes += n
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
@@ -191,6 +189,7 @@ class iCaRL(nn.Module):
 
         #self.load_state_dict(best_net)
         return
+
 
     def reduce_exemplars_set(self, m):
         for y, exemplars in enumerate(self.exemplars_sets):
