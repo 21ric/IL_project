@@ -189,7 +189,7 @@ class iCaRL(nn.Module):
                 best_epoch = epoch
                 best_net = copy.deepcopy(self.state_dict())
 
-            if i % 10 == 0 or i == (NUM_EPOCHS-1):
+            if i % 2 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
