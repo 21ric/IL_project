@@ -37,7 +37,11 @@ def main():
 
 
     for i in range(int(100/CLASSES_BATCH)):
-
+        
+        print('-'*30)
+        print(f'**** Iteration {i+1} ****')
+        print('-'*30)
+        
         torch.cuda.empty_cache()
 
         net.compute_means = True
@@ -91,8 +95,8 @@ def main():
 
             print('-'*30)
 
-        if i == 3:
-            return
+        #if i == 3:
+            #return
 
 if __name__ == '__main__':
     main()
