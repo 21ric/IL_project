@@ -89,11 +89,12 @@ class LwF(nn.Module):
 
         if self.n_known > 0:
             #self.features_extractor.to(DEVICE)
-            self.features_extractor.train(False)
+            #self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
+                self.features_extractor.train(False)
                 g = torch.sigmoid(self.features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
@@ -128,7 +129,8 @@ class LwF(nn.Module):
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
-
+                
+                self.features_extractor.train(True)
 
                 optimizer.zero_grad()
                 #out = torch.sigmoid(self(imgs))
@@ -189,13 +191,15 @@ class LwF(nn.Module):
 
         running_corrects = 0
         #self.features_extractor(DEVICE)
-        self.features_extractor.train(False)
+        #self.features_extractor.train(False)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
+            self.features_extractor.train(False)
             _, preds = torch.max(self(imgs), dim=1)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             running_corrects += (preds == labels.numpy()).sum()
             #running_corrects += torch.sum(preds == labels.data).data.item()
+        self.features_extractor.train(True)
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
