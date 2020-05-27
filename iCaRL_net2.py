@@ -253,6 +253,7 @@ class iCaRL(nn.Module):
         #self.features_extractor.train(True)
 
 
+    """
     @torch.no_grad()
     def classify(self, x):
 
@@ -286,6 +287,7 @@ class iCaRL(nn.Module):
             self.compute_means = False
         #print(self.exemplar_means)
 
+
         exemplar_means = self.exemplar_means
 
         means = torch.stack(exemplar_means)
@@ -311,7 +313,7 @@ class iCaRL(nn.Module):
 
         return preds
 
-
+    """
     def classify_all(self, test_dataset, map_reverse):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
@@ -327,3 +329,34 @@ class iCaRL(nn.Module):
             #running_corrects += torch.sum(preds == labels.data).data.item()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
+
+
+    @torch.no_grad()
+    def classify(self, images):
+        #assert self.exemplar_means is not None
+        #assert self._means.shape[0] == self._n_classes
+
+        for exemplars in self.exemplar_sets:
+            features = self.features_extractor.extract_features(exemplars)
+            features = self._l2_normalize(features)
+            self.exemplars_means.append(self._l2_normalize(torch.mean(features)))
+
+
+        features = self.features_extractor.extract_features(images)
+        features = self._l2_normalize(features)
+        return self._get_closest(self.exemplar_means, features)
+
+
+    @staticmethod
+    def _l2_normalize(tensor):
+        return tensor / torch.norm(tensor, p=2)
+
+    @staticmethod
+    def _get_closest(centers, features):
+        pred_labels = []
+
+        for feature in features:
+            distances = torch.pow(centers - feature, 2).sum(-1)
+            pred_labels.append(distances.argmin().item())
+
+        return np.array(pred_labels)
