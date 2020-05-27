@@ -118,7 +118,7 @@ class iCaRL(nn.Module):
             #self.features_extractor.to(DEVICE)
 
         q = Variable(q).cuda()
-            #self.features_extractor.train(True)
+        self.features_extractor.train(True)
 
 
 
