@@ -206,7 +206,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-        self.load_state_dict(best_net)
+        #self.load_state_dict(best_net)
         return
 
     def reduce_exemplars_set(self, m):

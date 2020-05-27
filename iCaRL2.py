@@ -50,7 +50,7 @@ def main():
         print('-'*30)
 
 
-        train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])
+        train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
 
         print('-'*30)
         print('Updating representation ...')

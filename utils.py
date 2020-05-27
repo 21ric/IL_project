@@ -22,6 +22,13 @@ test_transform = transforms.Compose([transforms.ToTensor(),
                                   ])
 
 
+def get_train_test(classes):
+    train_dataset = CIFAR100(root='data/', classes=classes, train=True, download=True, transform=train_transform)
+    test_dataset = CIFAR100(root='data/', classes=classes,  train=False, download=True, transform=test_transform)
+
+    return train_dataset, test_dataset
+
+
 def get_datasets(classes):
     #define images transformation
     #define images transformation
