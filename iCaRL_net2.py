@@ -206,17 +206,15 @@ class iCaRL(nn.Module):
 
         features = []
         #self.features_extractor(DEVICE)
-        '''
+        
         self.features_extractor.train(False)
-        '''
-        with torch.no_grad():
-            for img in images:
-                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-                #feature = feature.squeeze(0) # new
-                feature = feature / np.linalg.norm(feature)
-                features.append(feature[0]) #old
-                #features.append(feature) #new
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            #feature = feature.squeeze(0) # new
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0]) #old
+            #features.append(feature) #new
 
         #print('features shape', features[0])
         #features = np.array(features)
@@ -266,27 +264,24 @@ class iCaRL(nn.Module):
         if self.compute_means:
 
             exemplar_means = []
-            '''
-            self.features_extractor.train(False)
-            '''
             
+            self.features_extractor.train(False)
             #print('exset', self.exemplar_sets)
-            with torch.no_grad():
-                for exemplars in self.exemplar_sets:
-                    #print('in')
-                    features = []
-                    for ex in  exemplars:
-                        ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                        feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                        feature = feature.squeeze()
-                        feature.data = feature.data / feature.data.norm()
-                        features.append(feature)
+            for exemplars in self.exemplar_sets:
+                #print('in')
+                features = []
+                for ex in  exemplars:
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / feature.data.norm()
+                    features.append(feature)
 
-                    features = torch.stack(features)
-                    mu_y = features.mean(0).squeeze()
-                    mu_y.data = mu_y.data / mu_y.data.norm()
-                    exemplar_means.append(mu_y)
-                    #print('mu_y', mu_y)
+                features = torch.stack(features)
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / mu_y.data.norm()
+                exemplar_means.append(mu_y)
+                #print('mu_y', mu_y)
 
             self.exemplar_means = exemplar_means
             self.compute_means = False
@@ -299,11 +294,8 @@ class iCaRL(nn.Module):
 
         #self.features_extractor(DEVICE)
         x = x.to(DEVICE)
-        '''
         self.features_extractor.train(False)
-        '''
-        with torch.no_grad():
-            feature = self.features_extractor.extract_features(x)
+        feature = self.features_extractor.extract_features(x)
             
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ feature.data[i].norm()
