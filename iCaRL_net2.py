@@ -32,9 +32,7 @@ def validate(net, val_dataloader, map_reverse):
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
         labels = labels.to(DEVICE)
-
         net.train(False)
-
         # forward
         outputs = net(inputs)
         _, preds = torch.max(outputs, 1)
@@ -43,7 +41,6 @@ def validate(net, val_dataloader, map_reverse):
         #running_corrects_val += torch.sum(preds == labels.data)
 
     valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
-
     net.train(True)
     return valid_acc
 
@@ -66,7 +63,6 @@ class iCaRL(nn.Module):
         self.exemplars_sets = []
 
         self.class_map = class_map
-        #self.no_grad = True
 
 
     def forward(self, x):
@@ -93,8 +89,6 @@ class iCaRL(nn.Module):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
-
-
 
         print('New classes:{}'.format(n))
         print('-'*30)
