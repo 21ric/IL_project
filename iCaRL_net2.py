@@ -14,7 +14,8 @@ import copy
 
 import math
 
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
+#transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
 LR = 2
@@ -131,7 +132,7 @@ class iCaRL(nn.Module):
         #self.add_classes(n)
         self.n_classes += n
 
-        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
 
         i = 0
 
@@ -264,7 +265,7 @@ class iCaRL(nn.Module):
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
                 features = np.concatenate((features[:i], features[i+1:]))
-            
+
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
         #self.features_extractor.train(True)
@@ -290,12 +291,12 @@ class iCaRL(nn.Module):
                     ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
-                    feature.data = feature.data / feature.data.norm()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
                     features.append(feature)
 
                 features = torch.stack(features)
                 mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / mu_y.data.norm()
+                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
                 exemplar_means.append(mu_y)
                 #print('mu_y', mu_y)
 
@@ -316,7 +317,7 @@ class iCaRL(nn.Module):
         feature = self.features_extractor.extract_features(x)
 
         for i in range(feature.size(0)):
-            feature.data[i] = feature.data[i]/ feature.data[i].norm()
+            feature.data[i] = feature.data[i]/ torch.norm(feature.data[i], p=2)
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
 
