@@ -80,7 +80,7 @@ class iCaRL(nn.Module):
         #bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        #self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
         #self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
 
         self.n_classes += n
