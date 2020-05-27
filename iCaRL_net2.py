@@ -277,7 +277,7 @@ class iCaRL(nn.Module):
                     features.append(feature)
 
                 features = torch.stack(features)
-                mu_y = features.mean(1).squeeze()
+                mu_y = features.mean(0).squeeze()
                 mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
                 exemplar_means.append(mu_y)
                 #print('mu_y', mu_y)
@@ -331,43 +331,4 @@ class iCaRL(nn.Module):
         print('Test Accuracy: {}'.format(accuracy))
 
 
-    """
-    @torch.no_grad()
-    def classify(self, images):
-        #assert self.exemplar_means is not None
-        #assert self._means.shape[0] == self._n_classes
-
-        for exemplars in self.exemplar_sets:
-            #print('in')
-            features = []
-            for ex in  exemplars:
-
-                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                feature = feature.squeeze()
-                feature.data = feature.data / torch.norm(feature.data, p=2)
-                features.append(feature)
-
-
-            self.exemplars_means.append(self._l2_normalize(torch.mean(features, axis=1)))
-
-
-        features = self.features_extractor.extract_features(images)
-        features = self._l2_normalize(features)
-        return self._get_closest(self.exemplar_means, features)
-
-
-    @staticmethod
-    def _l2_normalize(tensor):
-        return tensor / torch.norm(tensor, p=2)
-
-    @staticmethod
-    def _get_closest(centers, features):
-        pred_labels = []
-
-        for feature in features:
-            distances = torch.pow(centers - feature, 2).sum(-1)
-            pred_labels.append(distances.argmin().item())
-
-        return np.array(pred_labels)
-    """
+    
