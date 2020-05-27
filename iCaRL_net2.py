@@ -253,7 +253,6 @@ class iCaRL(nn.Module):
         #self.features_extractor.train(True)
 
 
-    """
     @torch.no_grad()
     def classify(self, x):
 
@@ -278,7 +277,7 @@ class iCaRL(nn.Module):
                     features.append(feature)
 
                 features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
+                mu_y = features.mean(1).squeeze()
                 mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
                 exemplar_means.append(mu_y)
                 #print('mu_y', mu_y)
@@ -313,7 +312,8 @@ class iCaRL(nn.Module):
 
         return preds
 
-    """
+
+
     def classify_all(self, test_dataset, map_reverse):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
@@ -331,18 +331,24 @@ class iCaRL(nn.Module):
         print('Test Accuracy: {}'.format(accuracy))
 
 
+    """
     @torch.no_grad()
     def classify(self, images):
         #assert self.exemplar_means is not None
         #assert self._means.shape[0] == self._n_classes
 
         for exemplars in self.exemplar_sets:
-            fetures = []
-            for ex in exemplars:
-                feature = self.features_extractor.extract_features(Variable(transform(Image.fromarray(ex))))
-                feature = self._l2_normalize(feature.unsqueeze(0))
+            #print('in')
+            features = []
+            for ex in  exemplars:
+
+                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                feature = feature.squeeze()
+                feature.data = feature.data / torch.norm(feature.data, p=2)
                 features.append(feature)
-            features = torch.FloatTensor(features)
+
+
             self.exemplars_means.append(self._l2_normalize(torch.mean(features, axis=1)))
 
 
@@ -364,3 +370,4 @@ class iCaRL(nn.Module):
             pred_labels.append(distances.argmin().item())
 
         return np.array(pred_labels)
+    """
