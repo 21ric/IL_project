@@ -32,7 +32,7 @@ def validate(net, val_dataloader, map_reverse):
     for inputs, labels, index in val_dataloader:
         inputs = inputs.to(DEVICE)
         labels = labels.to(DEVICE)
-        net.train(False)
+        #net.train(False)
         # forward
         outputs = net(inputs)
         _, preds = torch.max(outputs, 1)
@@ -41,7 +41,7 @@ def validate(net, val_dataloader, map_reverse):
         #running_corrects_val += torch.sum(preds == labels.data)
 
     valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
-    net.train(True)
+    #net.train(True)
     return valid_acc
 
 
@@ -220,7 +220,7 @@ class iCaRL(nn.Module):
         self.features_extractor.to(DEVICE)
 
 
-        self.features_extractor.train(False)
+        #self.features_extractor.train(False)
         for img in images:
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
@@ -265,7 +265,7 @@ class iCaRL(nn.Module):
 
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
-        self.features_extractor.train(True)
+        #self.features_extractor.train(True)
 
 
     @torch.no_grad()
@@ -273,7 +273,7 @@ class iCaRL(nn.Module):
 
         batch_size = x.size(0)
 
-        self.features_extractor.train(False)
+        #self.features_extractor.train(False)
 
         if self.compute_means:
 
@@ -321,7 +321,7 @@ class iCaRL(nn.Module):
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)
 
-        self.features_extractor.train(True)
+        #self.features_extractor.train(True)
 
         return preds
 
