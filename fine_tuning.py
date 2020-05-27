@@ -23,7 +23,7 @@ BATCH_SIZE = 128
 ClASSES_BATCH =10
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-LR = 0.2
+LR = 2
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.00001
 NUM_EPOCHS = 70
@@ -31,10 +31,10 @@ NUM_EPOCHS = 70
 
 
 #train function
-def train(net, train_dataloader, val_dataloader):
+def train(net, train_dataloader, val_dataloader, n_classes):
 
-  criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy
-  #criterion = nn.BCELoss()#binary CrossEntropyLoss
+  #criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy
+  criterion = nn.BCEWithLogitsLoss() #binary CrossEntropyLoss
   parameters_to_optimize = net.parameters() # In this case we optimize over all the parameters of AlexNet
   optimizer = optim.SGD(parameters_to_optimize, lr=LR, weight_decay=WEIGHT_DECAY)
   #scheduler = optim.lr_scheduler.StepLR(optimizer)#, step_size=STEP_SIZE, gamma=GAMMA)
@@ -67,6 +67,8 @@ def train(net, train_dataloader, val_dataloader):
       for inputs, labels, index in train_dataloader:
           inputs = inputs.to(DEVICE)
           labels = labels.to(DEVICE)
+          labels_hot = torch.eye(n_classes)[labels] #one hot
+          labels_hot = labels_hot.to(DEVICE)
 
           net.train(True)
           # zero the parameter gradients
@@ -74,7 +76,7 @@ def train(net, train_dataloader, val_dataloader):
           # forward
           outputs = net(inputs)
           _, preds = torch.max(outputs, 1)
-          loss = criterion(outputs, labels)
+          loss = criterion(outputs, labels_hot)
           loss.backward()
           optimizer.step()
 
@@ -88,12 +90,14 @@ def train(net, train_dataloader, val_dataloader):
       for inputs, labels, index in val_dataloader:
           inputs = inputs.to(DEVICE)
           labels = labels.to(DEVICE)
+          labels_hot = torch.eye(n_classes)[labels] #one hot
+          labels_hot = labels_hot.to(DEVICE)
 
           net.train(False)
           # forward
           outputs = net(inputs)
           _, preds = torch.max(outputs, 1)
-          loss = criterion(outputs, labels)
+          loss = criterion(outputs, labels_hot)
 
           # statistics
           valid_loss += loss.item() * inputs.size(0)
@@ -180,7 +184,8 @@ def main():
     print(f"ITERATION {i+1} / {100/CLASSES_BATCH}")
     #cambio il numero di classi di output
     net.fc = nn.Linear(64, 10+i*10)
-
+    n_classes = 10+i*10
+    
     if i != 0:
 
       # Creating dataset for current iteration
@@ -216,7 +221,7 @@ def main():
       print('Valid Dataset: {}'.format(len(val_dataset)))
       print('Test Dataset (new classes): {}'.format(len(test_dataset)))
 
-      net = train(net, train_dataloader, val_dataloader)
+      net = train(net, train_dataloader, val_dataloader, n_classes)
       print('Test on new classes')
       test(net, test_dataloader)
       print('Test on old classes')
