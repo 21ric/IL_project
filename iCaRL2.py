@@ -41,7 +41,7 @@ def main():
         map_reverse[i] = i
     """
 
-    classes_groups = np.split(np.arange(100), 10)
+    #classes_groups = np.split(np.arange(100), 10)
     net = iCaRL(100, class_map)
     #net.to(DEVICE)
 
