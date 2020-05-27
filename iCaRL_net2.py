@@ -273,11 +273,13 @@ class iCaRL(nn.Module):
 
         batch_size = x.size(0)
 
+        self.features_extractor.train(False)
+
         if self.compute_means:
 
             exemplar_means = []
 
-            self.features_extractor.train(False)
+            #self.features_extractor.train(False)
             #print('exset', self.exemplar_sets)
             for exemplars in self.exemplar_sets:
                 #print('in')
@@ -299,8 +301,6 @@ class iCaRL(nn.Module):
             self.compute_means = False
         #print(self.exemplar_means)
 
-        self.features_extractor.train(False)
-        
         exemplar_means = self.exemplar_means
 
         means = torch.stack(exemplar_means)
