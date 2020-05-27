@@ -337,7 +337,7 @@ class iCaRL(nn.Module):
         #assert self._means.shape[0] == self._n_classes
 
         for exemplars in self.exemplar_sets:
-            features = self.features_extractor.extract_features(exemplars)
+            features = self.features_extractor.extract_features(torch.FloatTensor(exemplars))
             features = self._l2_normalize(features)
             self.exemplars_means.append(self._l2_normalize(torch.mean(features)))
 
