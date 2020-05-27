@@ -105,7 +105,7 @@ class LwF(nn.Module):
         self.add_classes(n)
         #self.n_classes += n
 
-        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
+        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
 
         i = 0
 
