@@ -16,6 +16,7 @@ import math
 
 transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
                                     transforms.RandomHorizontalFlip(),
+                                    transforms.RandomVerticalFlip(),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -175,7 +176,7 @@ class iCaRL(nn.Module):
                 else:
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
-                    
+
                     target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out[:, :self.n_classes], target)
                     #loss += dist_loss
