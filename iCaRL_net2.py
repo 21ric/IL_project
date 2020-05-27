@@ -216,7 +216,7 @@ class iCaRL(nn.Module):
 
         features = []
 
-        self.features_extractor(DEVICE)
+        self.features_extractor.to(DEVICE)
 
         #self.features_extractor(DEVICE)
 
