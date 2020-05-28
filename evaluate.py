@@ -23,15 +23,6 @@ def main():
 
     dict_1,dict_2,dict_3 = utils.get_dict_from_file()
 
-         '''
-            if i == '1': 
-                dict_1[learner_name] = [accuracy for accuracy in acc_]
-                print(dict_1)
-            if i == '2':
-                dict_2[learner_name] = [accuracy for accuracy in acc_]
-            if i == '3':
-                dict_3[learner_name] = [accuracy for accuracy in acc_]
-            '''
 
 
 
