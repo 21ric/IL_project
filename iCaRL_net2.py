@@ -317,10 +317,17 @@ class iCaRL(nn.Module):
 
         preds = []
         a = 3
+        cond = True
 
         for feat in feature:
             dists = []
             feat = feat / torch.norm(feat, p=2)
+
+            if cond:
+                print(len(exemplar_means))
+                cond = False
+
+
             for mean in exemplar_means:
 
                 if a>0:
