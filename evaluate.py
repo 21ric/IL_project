@@ -7,14 +7,14 @@ import utils
 
 def main():
     for i in ['1','2','3']:
-        for inc_lrng in [lwf,ft,icarl]
+        for inc_lrng in [lwf,ft,icarl]:
         
-        print(f"Incremental learning: {str(inc_lrng)}\n")
-        print(f"Classes group {i}\n")
-        acc_lwf = inc_lrng.incremental_learning(i)
-        #acc_icarl = icarl.train(i)
+           print(f"Incremental learning: {str(inc_lrng)}\n")
+           print(f"Classes group {i}\n")
+           acc_ = inc_lrng.incremental_learning(i)
+           #acc_icarl = icarl.train(i)
 
-    print(acc_lwf)
+           print(acc_)
 
 
 
