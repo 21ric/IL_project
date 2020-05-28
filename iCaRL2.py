@@ -117,5 +117,5 @@ def incremental_learning(num):
         #if i == 3:
             #return
 
-        return acc_list 
+    return acc_list 
 
