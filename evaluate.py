@@ -24,6 +24,7 @@ def main():
            if i == '1': 
 
               dict_1[learner] = [accuracy for accuracy in acc_]
+              print(dict_1)
 
            if i == '2':
                
