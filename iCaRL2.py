@@ -48,6 +48,8 @@ def incremental_learning(num):
     net = iCaRL(0, class_map)
     #net.to(DEVICE)
 
+    acc_list = []
+
 
     for i in range(int(100/CLASSES_BATCH)):
 
@@ -106,11 +108,14 @@ def incremental_learning(num):
             net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
             net.classify_all(all_classes_dataset, map_reverse)
-
+  
+            acc_list.append(acc)
             print('-'*30)
 
+        elif i == 0:
+            acc_list.append(acc)
         #if i == 3:
             #return
 
-if __name__ == '__main__':
-    main()
+        return acc_list 
+
