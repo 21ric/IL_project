@@ -334,6 +334,7 @@ class iCaRL(nn.Module):
                 dists.append((feature - mean).pow(2).sum().squeeze())
 
                 if cond:
+                    print('all dists')
                     print(dists)
                     cond = False
 
