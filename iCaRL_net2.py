@@ -123,8 +123,8 @@ class iCaRL(nn.Module):
 
 
         #self.n_classes += n
-        #optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
-        optimizer = optim.Adam(self.features_extractor.parameters(), lr=0.002, weight_decay=0.00001)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
+        #optimizer = optim.Adam(self.features_extractor.parameters(), lr=0.2, weight_decay=0.00001)
 
         i = 0
 
