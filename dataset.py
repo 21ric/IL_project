@@ -157,8 +157,12 @@ class CIFAR10(VisionDataset):
         self.data = np.concatenate((self.data, data), axis = 0)
 
     def get_class_imgs(self, target):
-
-        return self.data[np.array(self.targets) == target]
+        data_to_return = []
+        for index, elem in enumerate(self.targets):
+            if (elem == target):
+                data_to_return.append(self.data[index])
+        return data_to_return #list of PIL images
+        #return self.data[np.array(self.targets) == target] #richi implemented this
 
 
 class CIFAR100(CIFAR10):
