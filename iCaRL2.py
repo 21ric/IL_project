@@ -94,7 +94,7 @@ def incremental_learning(num):
         print('-'*30)
 
         print('New classes')
-        net.classify_all(test_dataset, map_reverse)
+        acc = net.classify_all(test_dataset, map_reverse)
 
         if i > 0:
 
@@ -105,9 +105,9 @@ def incremental_learning(num):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            net.classify_all(prev_classes_dataset, map_reverse)
+            acc = net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
-            net.classify_all(all_classes_dataset, map_reverse)
+            acc = net.classify_all(all_classes_dataset, map_reverse)
   
             acc_list.append(acc)
             print('-'*30)
