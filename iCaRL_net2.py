@@ -235,7 +235,7 @@ class iCaRL(nn.Module):
 
             #print('chosen i:{}'.format(i))
             
-            '''
+            
             if i == 0:
                 images = images[1:]
                 features = features[1:]
@@ -248,7 +248,7 @@ class iCaRL(nn.Module):
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
                 features = np.concatenate((features[:i], features[i+1:]))
-            '''
+            
 
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
@@ -301,7 +301,7 @@ class iCaRL(nn.Module):
         #self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
 
-        for i in range(feature.size(0)):
+        for i in xrange(feature.size(0)):
             feature.data[i] = feature.data[i]/ torch.norm(feature.data[i], p=2)
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
