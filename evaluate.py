@@ -19,7 +19,7 @@ def main():
             dict_acc[learner_name] = [accuracy for accuracy in acc_]
             #print(dict_acc)
 
-        utils.dumb_dict(dict_acc,i)
+        utils.dumb_dict(i, dict_acc)
 
     dict_1,dict_2,dict_3 = utils.get_dict_from_file()
 
