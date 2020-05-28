@@ -76,7 +76,7 @@ def train(net, train_dataloader, n_classes, class_map):
     epoch_acc = running_corrects_train.double() / len(train_dataloader.dataset)
 
     if epoch % 10 == 0 or epoch == (NUM_EPOCHS-1):
-      print('Epoch {} Loss:{:.4f}'.format(epoch, epoch_loss.item()))
+      print('Epoch {} Avg Loss:{:.4f}'.format(epoch, epoch_loss))
       for param_group in optimizer.param_groups:
         print('Learning rate:{}'.format(param_group['lr']))
       print('-'*30)
