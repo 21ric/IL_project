@@ -6,9 +6,13 @@ import utils
 
 
 def main():
-    for i in ['1','2','3']:
-        acc_lwf = lwf.train(i)
+    for i, inc_lrng in enumerate([ft,lwf,icarl]):
+        
+        print("Incremental learning: {str(inc_lrng)}\n"):
+        print(f"Classes group {i}\n"):
+        acc_lwf = inc_lrng.train(i)
         #acc_icarl = icarl.train(i)
+
     print(acc_lwf)
 
 
