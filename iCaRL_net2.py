@@ -99,7 +99,7 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
 
-        #self.add_exemplars(dataset, class_map, map_reverse)
+        self.add_exemplars(dataset, class_map, map_reverse)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
