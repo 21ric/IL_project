@@ -6,7 +6,10 @@ import utils
 
 
 def main():
-    print(basta)
+    for i in ['1','2','3']:
+        acc_lwf = lwf.train(i)
+        #acc_icarl = icarl.train(i)
+    print(acc_lwf)
 
 
 
