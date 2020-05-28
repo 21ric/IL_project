@@ -11,9 +11,9 @@ def main():
     dict_2 = {}
     dict_3 = {}
 
-    for i in ['1'] #'2','3']:
+    for i in ['1','2','3']:
 
-        for learner in [lwf]: #,ft,icarl
+        for learner in [lwf,ft,icarl]
         
            print(f"Incremental learning: {learner.__name__}\n")
            print(f"Classes group {i}\n")
@@ -33,7 +33,7 @@ def main():
           
               dict_3[learner] = [accuracy for accuracy in acc_]
 
-
+   
 
 
 
