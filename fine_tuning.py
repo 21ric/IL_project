@@ -148,6 +148,7 @@ def incremental_learning(num):
 
     print('New classes')
     acc = test(net, test_dataloader, map_reverse)
+    print(acc)
     
     if i > 0:
 
@@ -159,13 +160,15 @@ def incremental_learning(num):
       prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
       # Prepare Dataloaders
-      test_prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-      test_all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+      test_prev_dataloader = DataLoader(prev_classes_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+      test_all_dataloader = DataLoader(all_classes_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
       print('Old classes')
-      _ = test(net, test_prev_dataloader, map_reverse)
+      acc = test(net, test_prev_dataloader, map_reverse)
+      print(acc)
       print('All classes')
       acc = test(net, test_all_dataloader, map_reverse)
+      print(acc)
       
       acc_list.append(acc)
       print('-'*30)
