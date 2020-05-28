@@ -245,9 +245,12 @@ class iCaRL(nn.Module):
                 features = features[:-1]
 
             else:
-                #print('chosen i:{}'.format(i))
-                images = np.concatenate((images[:i], images[i+1:]))
-                features = np.concatenate((features[:i], features[i+1:]))
+
+                try:
+                    images = np.concatenate((images[:i], images[i+1:]))
+                    features = np.concatenate((features[:i], features[i+1:]))
+                except:
+                    print('chosen i:{}'.format(i))
 
 
         self.exemplar_sets.append(np.array(exemplar_set))
@@ -312,17 +315,19 @@ class iCaRL(nn.Module):
         """
 
         preds = []
+        cond = True
 
         for feat in feature:
             dists = []
             for mean in exemplar_means:
-                cond = True
+
                 if cond:
                     print('mean')
                     print(mean)
                     print('feat')
                     print(feat)
-                dists.append((feature - mean).pow(2).sum(1))
+                    cond = False
+                dists.append((feature - mean).pow(2).sum(0))
 
             preds.append(np.argmin(np.array(dists)))
 
