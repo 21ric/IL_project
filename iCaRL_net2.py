@@ -334,8 +334,11 @@ class iCaRL(nn.Module):
 
                 dists.append((feature - mean).pow(2).sum().squeeze().item())
 
+            a = 4
+            if a >= 0
             print('all dists')
             print(dists)
+            a = a-1
 
 
             preds.append(np.argmin(np.array(dists)))
