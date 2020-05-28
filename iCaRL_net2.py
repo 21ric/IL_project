@@ -306,9 +306,10 @@ class iCaRL(nn.Module):
         #self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
 
+        """
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ torch.norm(feature.data[i], p=2)
-
+        """
         """
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
@@ -319,6 +320,7 @@ class iCaRL(nn.Module):
 
         for feat in feature:
             dists = []
+            feat = feat / torch.norm(feat, p=2)
             for mean in exemplar_means:
 
                 if cond:
@@ -326,7 +328,7 @@ class iCaRL(nn.Module):
                     print(mean)
                     print('feat')
                     print(feat)
-                    print('diff')
+                    print('dist')
                     print((feat - mean).pow(2).sum().squeeze())
 
                 dists.append((feature - mean).pow(2).sum().squeeze())
