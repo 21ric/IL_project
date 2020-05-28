@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
 
 
         #print('features shape', features[0])
-        features = np.array(features)
+        #features = np.array(features)
         #print('num_features',len(features))
         class_mean = np.mean(features, axis=0)
         #print('class_mean', class_mean)
