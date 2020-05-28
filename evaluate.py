@@ -21,7 +21,7 @@ def main():
             print(acc_)
             learner_name = learner.__name__
             #acc_icarl = icarl.train(i)
-            ''' LALLA
+
             
             if i == '1': 
 
@@ -35,7 +35,7 @@ def main():
             if i == '3':
 
                 dict_3[learner_name] = [accuracy for accuracy in acc_]
-            '''
+
 
     print(dict_1,dict_2)
 
