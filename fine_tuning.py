@@ -11,6 +11,7 @@ import numpy as np
 
 from torchvision import transforms
 from torch.utils.data import DataLoader
+from torch.autograd import Variable
 
 from resnet import resnet32
 
@@ -52,7 +53,7 @@ def train(net, train_dataloader, n_classes, class_map):
       # We need to save labels in this way because classes are randomly shuffled at the beginning
       seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
       labels = Variable(seen_labels).to(DEVICE)
-      labels_hot=torch.eye(self.n_classes)[labels]
+      labels_hot=torch.eye(n_classes)[labels]
       labels_hot = labels_hot.to(DEVICE)
 
       net.train(True)
@@ -75,7 +76,7 @@ def train(net, train_dataloader, n_classes, class_map):
     epoch_acc = running_corrects_train.double() / len(train_dataloader.dataset)
 
     if epoch % 10 == 0 or epoch == (NUM_EPOCHS-1):
-      print('Epoch {} Loss:{:.4f}'.format(epoch, epoch_loss.item()))
+      print('Epoch {} Avg Loss:{:.4f}'.format(epoch, epoch_loss))
       for param_group in optimizer.param_groups:
         print('Learning rate:{}'.format(param_group['lr']))
       print('-'*30)
@@ -147,6 +148,7 @@ def incremental_learning(num):
 
     print('New classes')
     acc = test(net, test_dataloader, map_reverse)
+    print(acc)
     
     if i > 0:
 
@@ -158,13 +160,15 @@ def incremental_learning(num):
       prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
       # Prepare Dataloaders
-      test_prev_dataloader = DataLoader(test_prev_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-      test_all_dataloader = DataLoader(test_all_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+      test_prev_dataloader = DataLoader(prev_classes_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
+      test_all_dataloader = DataLoader(all_classes_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
       print('Old classes')
-      _ = test(net, test_prev_dataloader, map_reverse)
+      acc = test(net, test_prev_dataloader, map_reverse)
+      print(acc)
       print('All classes')
       acc = test(net, test_all_dataloader, map_reverse)
+      print(acc)
       
       acc_list.append(acc)
       print('-'*30)
