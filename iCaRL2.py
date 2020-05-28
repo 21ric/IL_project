@@ -25,10 +25,12 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def main():
+def incremental_learning(num):
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups3.pickle', path+'map3.pickle', path+'revmap3.pickle')
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle', 
+                                                                             path+'map'+ num +'.pickle', 
+                                                                             path+'revmap'+ num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
     """
