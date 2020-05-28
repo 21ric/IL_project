@@ -7,7 +7,7 @@ import utils
 
 def main():
     for i in ['1','2','3']:
-        for inc_lrng in [lwf,ft,icarl]:
+        for inc_lrng in [ft,lwf,icarl]:
         
            print(f"Incremental learning: {str(inc_lrng)}\n")
            print(f"Classes group {i}\n")
