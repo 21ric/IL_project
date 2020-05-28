@@ -140,14 +140,14 @@ class iCaRL(nn.Module):
         best_epoch = 0
 
         self.features_extractor.to(DEVICE)
-
+        cond = True
         for epoch in range(NUM_EPOCHS):
 
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-            cond = True
+            
             self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
