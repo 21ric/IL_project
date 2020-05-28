@@ -7,9 +7,7 @@ import utils
 
 def main():
     
-    dict_1 = {}
-    dict_2 = {}
-    dict_3 = {}
+    dict_acc = {}
 
     for i in ['1','2','3']:
 
@@ -20,23 +18,17 @@ def main():
             acc_ = learner.incremental_learning(i)
             print(acc_)
             learner_name = learner.__name__
-            #acc_icarl = icarl.train(i)
-
-            
+            dict_acc[learner_name] = [accuracy for accuracy in acc_]
+            print(dict_acc)
+            '''
             if i == '1': 
-
                 dict_1[learner_name] = [accuracy for accuracy in acc_]
                 print(dict_1)
-
             if i == '2':
-
                 dict_2[learner_name] = [accuracy for accuracy in acc_]
-
             if i == '3':
-
                 dict_3[learner_name] = [accuracy for accuracy in acc_]
-
-
+            '''
     print(dict_1,dict_2)
 
 
