@@ -55,7 +55,7 @@ class LwF(nn.Module):
         self.n_classes = n_classes
         self.n_known = 0
 
-        self.clf_loss = nn.BCEWithLogitsLoss()
+        #self.clf_loss = nn.BCEWithLogitsLoss()
         self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.class_map = class_map
@@ -68,12 +68,12 @@ class LwF(nn.Module):
     def add_classes(self, n):
         in_features = self.features_extractor.fc.in_features
         out_features = self.features_extractor.fc.out_features
-        weight = self.features_extractor.fc.weight.data
-        bias = self.features_extractor.fc.bias.data
+        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
+        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.features_extractor.fc.weight.data[:out_features] = weight
-        self.features_extractor.fc.bias.data[:out_features] = bias
+        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
 
         self.n_classes += n
 
@@ -82,7 +82,7 @@ class LwF(nn.Module):
         targets = list(set(dataset.targets))
         n = len(targets)
         
-        #self.add_classes(n)
+        
         
         print('New classes:{}'.format(n))
         print('-'*30)
@@ -90,7 +90,15 @@ class LwF(nn.Module):
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
+        #self.add_classes(n)
+
+        self.features_extractor.to(DEVICE)
+        #saving the old model 
+        #old_features_extractor = copy.deepcopy(self.features_extractor)
+        #old_features_extractor.to(DEVICE)
+
         if self.n_known > 0:
+
             #self.features_extractor.to(DEVICE)
             #self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -98,9 +106,13 @@ class LwF(nn.Module):
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
                 self.features_extractor.train(False)
+                #old_features_extractor.train(False)
                 g = torch.sigmoid(self.features_extractor.forward(images))
+                #g = torch.sigmoid(old_features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
+            
+
             q = Variable(q).cuda()
             self.features_extractor.train(True)
 
@@ -144,7 +156,7 @@ class LwF(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    loss = self.clf_loss(out, labels_hot)
+                    loss = self.dist_loss(out, labels_hot)
 
                 else:
                     #out = torch.sigmoid(out)
