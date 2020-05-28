@@ -26,6 +26,8 @@ MEMORY_SIZE = 2000
 ########################
 
 def incremental_learning(num):
+    
+    torch.cuda.empty_cache()
 
     path='orders/'
     classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle', 
