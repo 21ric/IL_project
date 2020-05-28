@@ -218,3 +218,4 @@ class LwF(nn.Module):
         self.features_extractor.train(True)
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
+        return accuracy
