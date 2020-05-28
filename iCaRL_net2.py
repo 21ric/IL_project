@@ -354,7 +354,8 @@ class iCaRL(nn.Module):
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
             preds = self.classify(imgs)
-            preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+            #preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+            preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()
             #running_corrects += torch.sum(preds == labels.data).data.item()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
