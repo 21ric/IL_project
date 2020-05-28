@@ -24,7 +24,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 3
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -342,11 +342,12 @@ class iCaRL(nn.Module):
 
                 dists.append((feat - mean).pow(2).sum().squeeze().item())
 
-
+            """
             if a > 0:
                 print('all dists')
                 print(dists)
                 a = a-1
+            """
 
 
             preds.append(np.argmin(np.array(dists)))
