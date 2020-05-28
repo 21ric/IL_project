@@ -316,7 +316,7 @@ class iCaRL(nn.Module):
         for feat in feature:
             dists = []
             for mean in exemplar_means:
-                dists.append(feature - mean).pow(2).sum(1)
+                dists.append((feature - mean).pow(2).sum(1))
 
             preds.append(np.argmin(np.array(dists)))
 
