@@ -106,7 +106,7 @@ class LwF(nn.Module):
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
                 #self.features_extractor.train(False)
-                self.old_features_extractor.train(False)
+                old_features_extractor.train(False)
                 #g = torch.sigmoid(self.features_extractor.forward(images))
                 g = torch.sigmoid(old_features_extractor.forward(images))
                 #g = self.forward(images)
