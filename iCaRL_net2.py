@@ -328,9 +328,12 @@ class iCaRL(nn.Module):
                     print(feat)
                     print('diff')
                     print((feat - mean).pow(2).sum().squeeze())
-                    cond = False
 
                 dists.append((feature - mean).pow(2).sum().squeeze())
+
+                if cond:
+                    print(dists)
+                    cond = False
 
             preds.append(np.argmin(np.array(dists)))
 
