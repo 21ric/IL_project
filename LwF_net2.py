@@ -90,7 +90,7 @@ class LwF(nn.Module):
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
-        self.add_classes(n)
+        #self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
         #saving the old model 
@@ -117,7 +117,7 @@ class LwF(nn.Module):
             self.features_extractor.train(True)
 
 
-        #self.add_classes(n)
+        self.add_classes(n)
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
