@@ -158,7 +158,7 @@ class CIFAR10(VisionDataset):
 
     def get_class_imgs(self, target):
 
-        return self.data[np.array(self.targets) == target]
+        return self.data[np.array(self.targets) == target] 
 
 
 class CIFAR100(CIFAR10):

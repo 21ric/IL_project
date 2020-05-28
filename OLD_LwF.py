@@ -1,4 +1,4 @@
-from LWF_net import LwF
+from OLD_LWF_net import LwF
 
 from torchvision import transforms
 from torch.utils.data import Subset, DataLoader

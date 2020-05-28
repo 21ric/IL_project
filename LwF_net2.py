@@ -26,6 +26,7 @@ NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
+@torch.no_grad()
 def validate(net, val_dataloader, map_reverse):
     running_corrects_val = 0
     for inputs, labels, index in val_dataloader:
@@ -105,9 +106,8 @@ class LwF(nn.Module):
 
 
         self.add_classes(n)
-        #self.n_classes += n
 
-        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
         i = 0
 
@@ -187,7 +187,7 @@ class LwF(nn.Module):
         return
 
 
-
+    @torch.no_grad()
     def classify_all(self, test_dataset, map_reverse):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)

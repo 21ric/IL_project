@@ -14,9 +14,9 @@ import copy
 
 import math
 
-transform = transforms.Compose([transforms.ToTensor(),
-                                transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
-#transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+#transform = transforms.Compose([transforms.ToTensor(),
+#                               transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
 ####Hyper-parameters####
 LR = 2
@@ -24,7 +24,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 3
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 
@@ -123,8 +123,8 @@ class iCaRL(nn.Module):
 
 
         #self.n_classes += n
-
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
+        #optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.Adam(self.features_extractor.parameters(), lr=0.002, weight_decay=0.00001)
 
         i = 0
 
@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
 
 
         #print('features shape', features[0])
-        features = np.array(features)
+        #features = np.array(features)
         #print('num_features',len(features))
         class_mean = np.mean(features, axis=0)
         #print('class_mean', class_mean)
@@ -234,7 +234,8 @@ class iCaRL(nn.Module):
             exemplar_features.append(features[i])
 
             #print('chosen i:{}'.format(i))
-
+            
+            
             if i == 0:
                 images = images[1:]
                 features = features[1:]
@@ -247,6 +248,7 @@ class iCaRL(nn.Module):
                 #print('chosen i:{}'.format(i))
                 images = np.concatenate((images[:i], images[i+1:]))
                 features = np.concatenate((features[:i], features[i+1:]))
+            
 
         self.exemplar_sets.append(np.array(exemplar_set))
         #del features
