@@ -10,7 +10,7 @@ def main():
         
         print(f"Incremental learning: {str(inc_lrng)}\n")
         print(f"Classes group {i}\n")
-        acc_lwf = inc_lrng.incremental_learning(i)
+        acc_lwf = inc_lrng.incremental_learning(str(i))
         #acc_icarl = icarl.train(i)
 
     print(acc_lwf)
