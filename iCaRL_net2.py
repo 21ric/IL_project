@@ -340,6 +340,8 @@ class iCaRL(nn.Module):
         """
         #self.features_extractor.train(True)
 
+        print(preds)
+
         return preds
 
 
