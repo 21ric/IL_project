@@ -52,8 +52,8 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
-        torch.nn.init.xavier_uniform_(self.features_extractor.fc.weight)
-        self.features_extractor.fc.bias.data.fill_(0.01)
+        #orch.nn.init.xavier_uniform_(self.features_extractor.fc.weight)
+        #self.features_extractor.fc.bias.data.fill_(0.01)
 
 
         self.n_classes = n_classes
@@ -330,7 +330,7 @@ class iCaRL(nn.Module):
             feat = feat / torch.norm(feat, p=2)
 
             if cond:
-                print(len(exemplar_means))
+                #print(len(exemplar_means))
                 cond = False
 
 
