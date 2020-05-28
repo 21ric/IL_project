@@ -19,7 +19,7 @@ def main():
             dict_acc[learner_name] = [accuracy for accuracy in acc_]
             #print(dict_acc)
 
-        utils.dumb_dict(dict_acc,i)
+        utils.dumb_dict(i, dict_acc)
 
             '''
             if i == '1': 
