@@ -25,16 +25,19 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def main():
+def train(num):
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups3.pickle', path+'map3.pickle', path+'revmap3.pickle')
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle', 
+                                                                             path+'map'+ num +'.pickle', 
+                                                                             path+'revmap'+ num +'.pickle')
     #print(classes_groups, class_map, map_reverse)
 
 
     net = LwF(0, class_map)
     net.to(DEVICE)
-
+    
+    acc_list = []
 
     for i in range(int(100/CLASSES_BATCH)):
         
@@ -55,28 +58,13 @@ def main():
 
         net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse)
 
-        '''
-        print('Reducing exemplar sets ...')
-        print('-'*30)
-
-        m = int(math.ceil(MEMORY_SIZE/net.n_classes))
-
-        net.reduce_exemplars_set(m)
-
-        print('Constructing exemplar sets ...')
-        print('-'*30)
-
-        for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m)
-        '''
-
         net.n_known = net.n_classes
 
         print('Testing ...')
         print('-'*30)
 
         print('New classes')
-        net.classify_all(test_dataset, map_reverse)
+        acc = net.classify_all(test_dataset, map_reverse)
 
         if i > 0:
 
@@ -87,14 +75,17 @@ def main():
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            net.classify_all(prev_classes_dataset, map_reverse)
+            _ = net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
-            net.classify_all(all_classes_dataset, map_reverse)
-
+            acc = net.classify_all(all_classes_dataset, map_reverse)
+            
+            acc_list.append(acc)
             print('-'*30)
+            
+        elif i == 0:
+            acc_list.append(acc)
 
-        #if i == 3:
-            #return
+    return acc_list
+     
 
-if __name__ == '__main__':
-    main()
+
