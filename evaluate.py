@@ -9,7 +9,7 @@ def main():
     for i, inc_lrng in enumerate([ft,lwf,icarl]):
         
         print("Incremental learning: {str(inc_lrng)}\n")
-        print(f"Classes group {i}\n"):
+        print(f"Classes group {i}\n")
         acc_lwf = inc_lrng.train(i)
         #acc_icarl = icarl.train(i)
 
