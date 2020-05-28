@@ -123,8 +123,8 @@ class iCaRL(nn.Module):
 
 
         #self.n_classes += n
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
-        #optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum = 0.9)
+        #optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.Adam(self.features_extractor.parameters(), lr=0.02, weight_decay=0.00001)
 
         i = 0
 
@@ -301,7 +301,7 @@ class iCaRL(nn.Module):
         #self.features_extractor.train(False)
         feature = self.features_extractor.extract_features(x)
 
-        for i in xrange(feature.size(0)):
+        for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ torch.norm(feature.data[i], p=2)
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
