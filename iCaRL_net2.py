@@ -52,6 +52,10 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
+        torch.nn.init.xavier_uniform_(self.features_extractor.fc.weight)
+        self.features_extractor.fc.bias.data.fill_(0.01)
+
+
         self.n_classes = n_classes
         self.n_known = 0
         self.exemplar_sets = []
@@ -106,12 +110,14 @@ class iCaRL(nn.Module):
         self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
+        f_ex = copy.deepcopy(self.features_extractor)
+        f_ex.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).cuda()
         for images, labels, indexes in loader:
-            self.features_extractor.train(False)
+            f_ex.train(False)
             images = Variable(images).cuda()
             indexes = indexes.cuda()
-            g = torch.sigmoid(self.features_extractor.forward(images))
+            g = torch.sigmoid(f_ex.forward(images))
             #g = self.forward(images)
             q[indexes] = g.data
 
@@ -358,7 +364,7 @@ class iCaRL(nn.Module):
         """
         #self.features_extractor.train(True)
 
-        print(preds)
+        #print(preds)
 
         return preds
 
