@@ -22,15 +22,15 @@ def main():
 
            if i == '1': 
 
-              dict_1{learner} = [accuracy for accuracy in acc_]
+              dict_1[learner] = [accuracy for accuracy in acc_]
 
            if i == '2':
                
-              dict_2{learner} = [accuracy for accuracy in acc_]
+              dict_2[learner] = [accuracy for accuracy in acc_]
             
            if i == '3':
           
-              dict_3{learner} = [accuracy for accuracy in acc_]
+              dict_3[learner] = [accuracy for accuracy in acc_]
 
     print(dict_2) 
 
