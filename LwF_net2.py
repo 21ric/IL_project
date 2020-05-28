@@ -95,7 +95,7 @@ class LwF(nn.Module):
         self.features_extractor.to(DEVICE)
         #saving the old model to compute the dist loss 
         old_features_extractor = copy.deepcopy(self.features_extractor)
-        olt_features_extractor.to(DEVICE)
+        old_features_extractor.to(DEVICE)
 
         if self.n_known > 0:
             #self.features_extractor.to(DEVICE)
