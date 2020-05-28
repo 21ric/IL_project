@@ -13,7 +13,7 @@ def main():
 
     for i in ['1','2']: #,'3']:
 
-        for learner in [lwf,icarl] #,ft
+        for learner in [lwf,icarl]: #,ft
         
            print(f"Incremental learning: {learner.__name__}\n")
            print(f"Classes group {i}\n")
