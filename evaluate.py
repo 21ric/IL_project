@@ -29,7 +29,7 @@ def main():
             if i == '3':
                 dict_3[learner_name] = [accuracy for accuracy in acc_]
             '''
-    print(dict_1,dict_2)
+
 
 
 
