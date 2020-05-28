@@ -68,12 +68,12 @@ class LwF(nn.Module):
     def add_classes(self, n):
         in_features = self.features_extractor.fc.in_features
         out_features = self.features_extractor.fc.out_features
-        weight = self.features_extractor.fc.weight.data
-        bias = self.features_extractor.fc.bias.data
+        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
+        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
 
         self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.features_extractor.fc.weight.data[:out_features] = weight
-        self.features_extractor.fc.bias.data[:out_features] = bias
+        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
 
         self.n_classes += n
 
@@ -82,13 +82,20 @@ class LwF(nn.Module):
         targets = list(set(dataset.targets))
         n = len(targets)
         
-        #self.add_classes(n)
+        
         
         print('New classes:{}'.format(n))
         print('-'*30)
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
+
+        self.add_classes(n)
+
+        self.features_extractor.to(DEVICE)
+        #saving the old model to compute the dist loss 
+        old_features_extractor = copy.deepcopy(self.features_extractor)
+        olt_features_extractor.to(DEVICE)
 
         if self.n_known > 0:
             #self.features_extractor.to(DEVICE)
@@ -97,15 +104,19 @@ class LwF(nn.Module):
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                self.features_extractor.train(False)
-                g = torch.sigmoid(self.features_extractor.forward(images))
+                #self.features_extractor.train(False)
+                self.old_features_extractor.train(False)
+                #g = torch.sigmoid(self.features_extractor.forward(images))
+                g = torch.sigmoid(self.old_features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
+            
+
             q = Variable(q).cuda()
             self.features_extractor.train(True)
 
 
-        self.add_classes(n)
+        #self.add_classes(n)
 
         optimizer = optim.SGD(self.parameters(), lr=2.0, weight_decay=0.00001)
 
