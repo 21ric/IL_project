@@ -401,3 +401,5 @@ class iCaRL(nn.Module):
             #running_corrects += torch.sum(preds == labels.data).data.item()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
+        
+        return accuracy
