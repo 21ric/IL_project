@@ -101,6 +101,8 @@ class iCaRL(nn.Module):
 
         self.add_exemplars(dataset)
 
+        print('Datset extend to {} elements'.format(len(dataset)))
+
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         #val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
