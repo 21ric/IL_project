@@ -55,7 +55,7 @@ class LwF(nn.Module):
         self.n_classes = n_classes
         self.n_known = 0
 
-        self.clf_loss = nn.BCEWithLogitsLoss()
+        #self.clf_loss = nn.BCEWithLogitsLoss()
         self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.class_map = class_map
@@ -156,7 +156,7 @@ class LwF(nn.Module):
                 #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
-                    loss = self.clf_loss(out, labels_hot)
+                    loss = self.dist_loss(out, labels_hot)
 
                 else:
                     #out = torch.sigmoid(out)
