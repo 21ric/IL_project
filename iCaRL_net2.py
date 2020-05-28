@@ -99,7 +99,7 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
 
-        self.add_exemplars(dataset, class_map)
+        self.add_exemplars(dataset, class_map, map_reverse)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
@@ -147,7 +147,7 @@ class iCaRL(nn.Module):
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-            
+
             self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
