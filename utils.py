@@ -71,17 +71,17 @@ def get_class_maps_from_file(map_filename, revmap_filename):
 
 def dumb_dict(num,dictionary):
    
-    with open('dict'+num+'.pickle', 'wb') as handle:
+    with open('accuracy'+num+'.pickle', 'wb') as handle:
         pickle.dump(dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         
 def get_dict_from_file():
       
-    with open('dict1.pickle', 'rb') as handle:
+    with open('accuracy1.pickle', 'rb') as handle:
         dict_1 = pickle.load(handle)
-    with open('dict2.pickle', 'rb') as handle:
+    with open('accuracy2.pickle', 'rb') as handle:
         dict_2 = pickle.load(handle)
-    with open('dict3.pickle', 'rb') as handle:
+    with open('accuracy3.pickle', 'rb') as handle:
         dict_3 = pickle.load(handle)  
 
     return dict_1,dict_2,dict_3
