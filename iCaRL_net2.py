@@ -156,7 +156,7 @@ class iCaRL(nn.Module):
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 if cond:
-                    print('labels', list(set(labels.tolist()))
+                    print('labels', list(set(labels.tolist())))
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
