@@ -340,7 +340,7 @@ class iCaRL(nn.Module):
                     print((feat - mean).pow(2).sum().squeeze().item())
                 """
 
-                dists.append((feature - mean).pow(2).sum().squeeze().item())
+                dists.append((feat - mean).pow(2).sum().squeeze().item())
 
 
             if a > 0:
