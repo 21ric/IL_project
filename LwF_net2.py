@@ -92,10 +92,10 @@ class LwF(nn.Module):
 
         self.add_classes(n)
 
-        self.features_extractor.to(DEVICE)
+        #self.features_extractor.to(DEVICE)
         #saving the old model 
-        old_features_extractor = copy.deepcopy(self.features_extractor)
-        old_features_extractor.to(DEVICE)
+        #old_features_extractor = copy.deepcopy(self.features_extractor)
+        #old_features_extractor.to(DEVICE)
 
         if self.n_known > 0:
 
@@ -105,10 +105,10 @@ class LwF(nn.Module):
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
-                #self.features_extractor.train(False)
-                old_features_extractor.train(False)
-                #g = torch.sigmoid(self.features_extractor.forward(images))
-                g = torch.sigmoid(old_features_extractor.forward(images))
+                self.features_extractor.train(False)
+                #old_features_extractor.train(False)
+                g = torch.sigmoid(self.features_extractor.forward(images))
+                #g = torch.sigmoid(old_features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
             
