@@ -289,9 +289,11 @@ class iCaRL(nn.Module):
 
         exemplar_means = self.exemplar_means
 
+        """
         means = torch.stack(exemplar_means)
         means = torch.stack([means]*batch_size)
         means = means.transpose(1,2)
+        """
 
         #self.features_extractor(DEVICE)
         x = x.to(DEVICE)
@@ -301,13 +303,25 @@ class iCaRL(nn.Module):
 
         for i in range(feature.size(0)):
             feature.data[i] = feature.data[i]/ torch.norm(feature.data[i], p=2)
+
+        """
         feature = feature.unsqueeze(2)
         feature = feature.expand_as(means)
+        """
 
+        preds = []
 
+        for feat in feature:
+            dists = []
+            for mean in exemplar_means:
+                dists.append(feature - means).pow(2).sum(1)
+
+            preds.append(np.argmin(np.array(dists)))
+
+        """
         dists = (feature - means).pow(2).sum(1).squeeze()
         _, preds = dists.min(1)
-
+        """
         #self.features_extractor.train(True)
 
         return preds
@@ -329,6 +343,3 @@ class iCaRL(nn.Module):
             #running_corrects += torch.sum(preds == labels.data).data.item()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
-
-
-    
