@@ -157,6 +157,7 @@ class iCaRL(nn.Module):
                 labels = Variable(seen_labels).to(DEVICE)
                 if cond:
                     print('labels', list(set(labels.tolist())))
+                    cond =False
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
