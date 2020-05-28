@@ -87,9 +87,9 @@ class iCaRL(nn.Module):
 
         self.n_classes += n
 
-    def add_exemplars(self, dataset):
+    def add_exemplars(self, dataset, class_map):
         for y, exemplars in enumerate(self.exemplar_sets):
-            dataset.append(exemplars, [y]*len(exemplars))
+            dataset.append(exemplars, class_map[y]*len(exemplars))
 
     def update_representation(self, dataset, class_map, map_reverse):
         #dataset = dataset.dataset
@@ -99,7 +99,7 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
 
-        self.add_exemplars(dataset)
+        self.add_exemplars(dataset, class_map)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
