@@ -21,7 +21,9 @@ def main():
 
         utils.dumb_dict(dict_acc,i)
 
-            '''
+    dict_1,dict_2,dict_3 = utils.get_dict_from_file()
+
+         '''
             if i == '1': 
                 dict_1[learner_name] = [accuracy for accuracy in acc_]
                 print(dict_1)
