@@ -89,7 +89,7 @@ class iCaRL(nn.Module):
 
     def add_exemplars(self, dataset, class_map, map_reverse):
         for y, exemplars in enumerate(self.exemplar_sets):
-            print(map_reverse[y])
+            #print(map_reverse[y])
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
     def update_representation(self, dataset, class_map, map_reverse):
@@ -157,7 +157,7 @@ class iCaRL(nn.Module):
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 if cond:
-                    print('labels', list(set(labels.tolist())))
+                    #print('labels', list(set(labels.tolist())))
                     cond =False
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
