@@ -10,7 +10,7 @@ def main():
     dict_acc = {}
 
     for i in ['1','2','3']:
-
+        dict_acc = {}
         for learner in [ft, lwf, icarl]:
             
             print(f"Incremental learning: {learner.__name__}\n")
