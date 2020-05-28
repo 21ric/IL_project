@@ -93,11 +93,12 @@ class LwF(nn.Module):
         self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
-        #saving the old model to compute the dist loss 
+        #saving the old model 
         old_features_extractor = copy.deepcopy(self.features_extractor)
         old_features_extractor.to(DEVICE)
 
         if self.n_known > 0:
+
             #self.features_extractor.to(DEVICE)
             #self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
@@ -107,7 +108,7 @@ class LwF(nn.Module):
                 #self.features_extractor.train(False)
                 self.old_features_extractor.train(False)
                 #g = torch.sigmoid(self.features_extractor.forward(images))
-                g = torch.sigmoid(self.old_features_extractor.forward(images))
+                g = torch.sigmoid(old_features_extractor.forward(images))
                 #g = self.forward(images)
                 q[indexes] = g.data
             
