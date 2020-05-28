@@ -330,6 +330,7 @@ class iCaRL(nn.Module):
 
             for mean in exemplar_means:
 
+                """
                 if a>0:
                     print('mean')
                     print(mean)
@@ -337,7 +338,7 @@ class iCaRL(nn.Module):
                     print(feat)
                     print('dist')
                     print((feat - mean).pow(2).sum().squeeze().item())
-                    cond = False
+                """
 
                 dists.append((feature - mean).pow(2).sum().squeeze().item())
 
