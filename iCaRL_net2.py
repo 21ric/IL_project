@@ -101,7 +101,7 @@ class iCaRL(nn.Module):
 
         self.add_exemplars(dataset)
 
-        print('Datset extend to {} elements'.format(len(dataset)))
+        print('Datset extended to {} elements'.format(len(dataset)))
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         #val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
@@ -147,6 +147,7 @@ class iCaRL(nn.Module):
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
+            cond = True
             self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
@@ -154,7 +155,8 @@ class iCaRL(nn.Module):
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
-                print('labels', labels)
+                if cond:
+                    print('labels', list(set(labels.tolist()))
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
