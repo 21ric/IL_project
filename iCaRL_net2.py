@@ -12,6 +12,8 @@ from resnet import resnet32
 
 import copy
 
+import random
+
 import math
 
 #transform = transforms.Compose([transforms.ToTensor(),
@@ -66,8 +68,6 @@ class iCaRL(nn.Module):
         self.exemplar_means = []
         self.compute_means = True
 
-        self.exemplars_sets = []
-
         self.class_map = class_map
 
 
@@ -88,7 +88,7 @@ class iCaRL(nn.Module):
         self.n_classes += n
 
     def add_exemplars(self, dataset):
-        for y, exemplars in enumerate(self.exemplars_sets):
+        for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [y]*len(exemplars))
 
     def update_representation(self, dataset, class_map, map_reverse):
@@ -199,69 +199,77 @@ class iCaRL(nn.Module):
 
 
     def reduce_exemplars_set(self, m):
-        for y, exemplars in enumerate(self.exemplars_sets):
-            self.exemplars_sets[y] = exemplars[:m]
+        for y, exemplars in enumerate(self.exemplar_sets):
+            self.exemplar_sets[y] = exemplars[:m]
 
 
     @torch.no_grad()
-    def construct_exemplars_set(self, images, m):
+    def construct_exemplars_set(self, images, m, random=False):
 
-        features = []
+        if random:
+            exemplar_set = []
+            indexes = random.sample(range(len(images)), m)
+            for i in indexes:
+                exemplar_set.append(images[i])
+            self.exemplar_sets.append(exemplar_set)
 
-        self.features_extractor.to(DEVICE)
+        else:
+            features = []
 
-
-        self.features_extractor.train(False)
-        for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
-
-
-        #print('features shape', features[0])
-        #features = np.array(features)
-        #print('num_features',len(features))
-        class_mean = np.mean(features, axis=0)
-        #print('class_mean', class_mean)
-        class_mean = class_mean / np.linalg.norm(class_mean)
-
-        exemplar_set = []
-        exemplar_features = []
-        for k in range(m):
-            S = np.sum(exemplar_features, axis=0)
-            phi = features
-            mu = class_mean
-            mu_p = 1.0 / (k+1)*(phi+S)
-            mu_p = mu_p / np.linalg.norm(mu_p)
-            i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
-
-            exemplar_set.append(images[i])
-            exemplar_features.append(features[i])
-
-            #print('chosen i:{}'.format(i))
+            self.features_extractor.to(DEVICE)
 
 
-            if i == 0:
-                images = images[1:]
-                features = features[1:]
-
-            elif i == len(features):
-                images = images[:-1]
-                features = features[:-1]
-
-            else:
-
-                try:
-                    images = np.concatenate((images[:i], images[i+1:]))
-                    features = np.concatenate((features[:i], features[i+1:]))
-                except:
-                    print('chosen i:{}'.format(i))
+            self.features_extractor.train(False)
+            for img in images:
+                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                feature = feature / np.linalg.norm(feature)
+                features.append(feature[0])
 
 
-        self.exemplar_sets.append(np.array(exemplar_set))
-        #del features
-        #self.features_extractor.train(True)
+            #print('features shape', features[0])
+            #features = np.array(features)
+            #print('num_features',len(features))
+            class_mean = np.mean(features, axis=0)
+            #print('class_mean', class_mean)
+            class_mean = class_mean / np.linalg.norm(class_mean)
+
+            exemplar_set = []
+            exemplar_features = []
+            for k in range(m):
+                S = np.sum(exemplar_features, axis=0)
+                phi = features
+                mu = class_mean
+                mu_p = 1.0 / (k+1)*(phi+S)
+                mu_p = mu_p / np.linalg.norm(mu_p)
+                i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+
+                exemplar_set.append(images[i])
+                exemplar_features.append(features[i])
+
+                #print('chosen i:{}'.format(i))
+
+
+                if i == 0:
+                    images = images[1:]
+                    features = features[1:]
+
+                elif i == len(features):
+                    images = images[:-1]
+                    features = features[:-1]
+
+                else:
+
+                    try:
+                        images = np.concatenate((images[:i], images[i+1:]))
+                        features = np.concatenate((features[:i], features[i+1:]))
+                    except:
+                        print('chosen i:{}'.format(i))
+
+
+            self.exemplar_sets.append(np.array(exemplar_set))
+            #del features
+            #self.features_extractor.train(True)
 
 
     @torch.no_grad()
