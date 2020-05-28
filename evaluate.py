@@ -9,7 +9,7 @@ def main():
     
     for i in ['1','2','3']:
         dict_acc = {}
-        for learner in [ft, lwf, icarl]:
+        for learner in [icarl, lwf, ft]:
             
             print(f"Incremental learning: {learner.__name__}\n")
             print(f"Classes group {i}\n")
