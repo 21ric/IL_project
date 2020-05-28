@@ -11,6 +11,7 @@ import numpy as np
 
 from torchvision import transforms
 from torch.utils.data import DataLoader
+from torch.autograd import Variable
 
 from resnet import resnet32
 
