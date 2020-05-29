@@ -32,7 +32,7 @@ def plot_accuracy(classes_split,num):
     
     return
 
-def main(i):   # This parameter can be set to ['1','2','3'] depending on the random split of the dataset you want to load.
+def main(i):   # The parameter i can be set to ['1','2','3'] depending on the random split of the dataset you want to load.
                # Change this value if you want to perform calculations with other random splits
     
     dict_acc = {}
