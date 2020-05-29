@@ -31,21 +31,31 @@ DEVICE = 'cuda'
 ########################
 
 @torch.no_grad()
-def validate(net, val_dataloader, map_reverse):
-    running_corrects_val = 0
-    net.train(False)
-    for inputs, labels, index in val_dataloader:
-        inputs = inputs.to(DEVICE)
-        labels = labels.to(DEVICE)
-        # forward
-        outputs = net(inputs)
-        _, preds = torch.max(outputs, 1)
-        preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
-        running_corrects_val += (preds == labels.cpu().numpy()).sum()
+def validate(net, val_dataloader, class_map, q_val):
 
-    valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
+    net.train(False)
+    loss = 0
+    for inputs, labels, indexes in val_dataloader:
+        inputs = inputs.to(DEVICE)
+        indexes = indexes.to(DEVICE)
+        seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+        labels = Variable(seen_labels).to(DEVICE)
+        labels_hot=torch.eye(self.n_classes)[labels]
+        labels_hot = labels_hot.to(DEVICE)
+
+        out = net(inputs)
+
+        if net.n_known <= 0:
+            loss += net.clf_loss(out, labels_hot)*inputs.size(0)
+
+        else:
+            q_i = q_val[indexes]
+            target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+            loss += net.dist_loss(out, target)*inputs.size(0)
+
+    loss = loss/len(val_dataloader.dataset)
     net.train(True)
-    return valid_acc
+    return loss
 
 
 class iCaRL(nn.Module):
@@ -82,7 +92,7 @@ class iCaRL(nn.Module):
 
         self.n_classes += n
 
-    def add_exemplars(self, dataset, class_map, map_reverse):
+    def add_exemplars(self, dataset, val_dataset, class_map, map_reverse):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
@@ -98,12 +108,16 @@ class iCaRL(nn.Module):
         print('Datset extended to {} elements'.format(len(dataset)))
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         self.add_classes(n)
+
 
         self.features_extractor.to(DEVICE)
         f_ex = copy.deepcopy(self.features_extractor)
         f_ex.to(DEVICE)
+
+        #compute previous output for training
         q = torch.zeros(len(dataset), self.n_classes).cuda()
         for images, labels, indexes in loader:
             f_ex.train(False)
@@ -112,7 +126,17 @@ class iCaRL(nn.Module):
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
 
+        #compute previous output for validation
+        q_val = torch.zeros(len(val_dataset), self.n_classes).cuda()
+        f_ex.to(DEVICE)
+        for images, labels, indexes in val_loader:
+            f_ex.train(False)
+            images = Variable(images).cuda()
+            indexes = indexes.cuda()
+            g = torch.sigmoid(f_ex.forward(images))
+            q_val[indexes] = g.data
 
+        q_val = Variable(q_val).cuda()
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
@@ -120,7 +144,7 @@ class iCaRL(nn.Module):
 
         i = 0
 
-        best_acc = -1
+        best_loss = None
         best_epoch = 0
 
         self.features_extractor.to(DEVICE)
@@ -156,6 +180,14 @@ class iCaRL(nn.Module):
                 loss.backward()
                 optimizer.step()
 
+
+            val_loss = validate(self, val_loader, class_map, q_val)
+
+            if best_loss is None or val_loss < best_loss:
+                best_loss = val_loss
+                best_epoch = i
+                best_net_dict = copy.deepcopy(sefl.state_dict())
+
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
@@ -163,6 +195,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
+        self.load_state_dict(best_net_dict)
         return
 
 
