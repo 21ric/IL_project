@@ -21,8 +21,19 @@ i = '1'     # This parameter can be set to ['1','2','3'] depending on the random
             # Change this value if you want to perform calculations with other random splits.
 ########################
 
-def plot_accuracy():
-    pass
+def plot_accuracy(classes_split):
+    
+    plt.figure(figsize=(8, 6))
+    for key in classes_split:
+       plt.plot([i for i in range(10,110,10)],classes_split[key],marker = 'o', markersize=7, label=key)
+
+    plt.title('Results for classes group: 1')
+    plt.legend()
+    plt.xlabel('Known classes')
+    plt.ylabel('Accuracy')
+    plt.show()
+    
+    return
 
 def main():
     
@@ -54,17 +65,7 @@ def main():
               'LwF2': [0.158, 0.1165, 0.07366666666666667, 0.04575, 0.0376, 0.029833333333333333, 0.037142857142857144, 0.03325, 0.03133333333333333, 0.0285],
               'iCaRL2': [0.147, 0.09, 0.058333333333333334, 0.043, 0.0344, 0.0315, 0.024428571428571428, 0.024625, 0.02033333333333333, 0.0197]
              }
-    
-    # Plot it !
-    plt.figure(figsize=(10, 6))
-    for key in dict_1:
-       plt.plot([i for i in range(10,110,10)],dict_1[key],marker = 'o', markersize=7, label=key)
-
-    plt.title('Results for classes group: 1')
-    plt.legend()
-    plt.xlabel('Known classes')
-    plt.ylabel('Accuracy')
-    plt.show()
+    plot_accuracy(dict_1)
 
 
 
