@@ -148,7 +148,7 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
     return class_groups, class_map, map_reverse
 
 
-def elaborate_restults(dict_files):
+def elaborate_results(dict_files):
     ft = []
     lwf = []
     icarl = []
