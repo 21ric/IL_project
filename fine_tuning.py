@@ -36,11 +36,11 @@ def train(net, train_dataloader, n_classes, class_map):
   criterion = nn.BCEWithLogitsLoss() #binary CrossEntropyLoss
   parameters_to_optimize = net.parameters() # In this case we optimize over all the parameters of AlexNet
   optimizer = optim.SGD(parameters_to_optimize, lr=LR, weight_decay=WEIGHT_DECAY)
-  #scheduler = optim.lr_scheduler.StepLR(optimizer)#, step_size=STEP_SIZE, gamma=GAMMA)
+
   net.to(DEVICE)
 
   for epoch in range(NUM_EPOCHS):
-      
+
     if epoch in STEPDOWN_EPOCHS:
       for param_group in optimizer.param_groups:
         param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
@@ -110,53 +110,54 @@ def test(net, test_dataloader, map_reverse):
 def incremental_learning(num):
 
   path='orders/'
-  classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+ num +'.pickle', 
-                                                                             path+'map'+ num +'.pickle', 
+  classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+ num +'.pickle',
+                                                                             path+'map'+ num +'.pickle',
                                                                              path+'revmap'+ num +'.pickle')
   print(classes_groups, class_map, map_reverse)
 
   net = resnet32(num_classes=0)
   #print(net)
-  
+
   acc_list = []
   for i in range(int(100/CLASSES_BATCH)):
-    
+
     print('-'*30)
     print(f'**** ITERATION {i+1} ****')
     print('-'*30)
-    
-    net.fc = nn.Linear(64, 10+i*10) # Change output nodes
-    n_classes = 10+i*10 
-    
+
+    in_features = net.fc.in_features
+    net.fc = nn.Linear(in_features, 10+i*10) # Change output nodes
+    n_classes = 10+i*10
+
     print('Loading the Datasets ...')
     print('-'*30)
-    
+
     train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])
-    
+
     print('-'*30)
     print('Training ...')
     print('-'*30)
-    
+
     # Prepare Dataloaders
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, num_workers=4)
     test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
-  
+
     net = train(net, train_dataloader, n_classes, class_map)
-    
+
     print('Testing ...')
     print('-'*30)
 
     print('New classes')
     acc = test(net, test_dataloader, map_reverse)
     print(acc)
-    
+
     if i > 0:
 
       # Creating dataset for test on previous classes
       previous_classes = np.array([])
       for j in range(i):
         previous_classes = np.concatenate((previous_classes, classes_groups[j]))
-    
+
       prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
       # Prepare Dataloaders
@@ -169,12 +170,11 @@ def incremental_learning(num):
       print('All classes')
       acc = test(net, test_all_dataloader, map_reverse)
       print(acc)
-      
+
       acc_list.append(acc)
       print('-'*30)
 
-    elif i == 0: 
+    elif i == 0:
       acc_list.append(acc)
-      
-  return acc_list
 
+  return acc_list
