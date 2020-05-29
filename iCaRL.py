@@ -64,7 +64,6 @@ def incremental_learning(num):
         print('Reducing exemplar sets ...')
         print('-'*30)
 
-        #m = int(math.ceil(MEMORY_SIZE/net.n_classes))
         m = MEMORY_SIZE // net.n_classes
 
         net.reduce_exemplars_set(m)
@@ -99,5 +98,5 @@ def incremental_learning(num):
             print('-'*30)
 
         acc_list.append(acc)
-        
+
     return acc_list

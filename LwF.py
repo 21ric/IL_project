@@ -26,28 +26,24 @@ MEMORY_SIZE = 2000
 ########################
 
 def incremental_learning(num):
-    
+
     torch.cuda.empty_cache()
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle', 
-                                                                             path+'map'+ num +'.pickle', 
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle',
+                                                                             path+'map'+ num +'.pickle',
                                                                              path+'revmap'+ num +'.pickle')
-    #print(classes_groups, class_map, map_reverse)
-
 
     net = LwF(0, class_map)
     net.to(DEVICE)
-    
+
     acc_list = []
 
     for i in range(int(100/CLASSES_BATCH)):
-        
+
         print('-'*30)
         print(f'**** ITERATION {i+1} ****')
         print('-'*30)
-
-        #torch.cuda.empty_cache()
 
         print('Loading the Datasets ...')
         print('-'*30)
@@ -80,14 +76,11 @@ def incremental_learning(num):
             _ = net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
             acc = net.classify_all(all_classes_dataset, map_reverse)
-            
+
             acc_list.append(acc)
             print('-'*30)
-            
+
         elif i == 0:
             acc_list.append(acc)
 
     return acc_list
-     
-
-

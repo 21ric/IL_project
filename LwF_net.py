@@ -39,7 +39,6 @@ def validate(net, val_dataloader, map_reverse):
         _, preds = torch.max(outputs, 1)
         preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
         running_corrects_val += (preds == labels.cpu().numpy()).sum()
-        #running_corrects_val += torch.sum(preds == labels.data)
 
     valid_acc = running_corrects_val / float(len(val_dataloader.dataset))
 
@@ -81,37 +80,28 @@ class LwF(nn.Module):
         dataset = dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
-        
-        
-        
+
+
+
         print('New classes:{}'.format(n))
         print('-'*30)
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4)
 
-        #self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
-        #saving the old model 
-        #old_features_extractor = copy.deepcopy(self.features_extractor)
-        #old_features_extractor.to(DEVICE)
 
         if self.n_known > 0:
 
-            #self.features_extractor.to(DEVICE)
-            #self.features_extractor.train(False)
             q = torch.zeros(len(dataset), self.n_classes).cuda()
             for images, labels, indexes in loader:
                 images = Variable(images).cuda()
                 indexes = indexes.cuda()
                 self.features_extractor.train(False)
-                #old_features_extractor.train(False)
                 g = torch.sigmoid(self.features_extractor.forward(images))
-                #g = torch.sigmoid(old_features_extractor.forward(images))
-                #g = self.forward(images)
                 q[indexes] = g.data
-            
+
 
             q = Variable(q).cuda()
             self.features_extractor.train(True)
@@ -142,40 +132,20 @@ class LwF(nn.Module):
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
-                #print(labels_hot)
                 labels_hot = labels_hot.to(DEVICE)
-                
+
                 self.features_extractor.train(True)
 
                 optimizer.zero_grad()
-                #out = torch.sigmoid(self(imgs))
                 out = self(imgs)
-
-                #print(out[0])
-
-                #print('out', out[0], 'labels', labels[0])
 
                 if self.n_known <= 0:
                     loss = self.dist_loss(out, labels_hot)
 
                 else:
-                    #out = torch.sigmoid(out)
                     q_i = q[indexes]
-                    #print('g', g[:,1])
-                    #print('q_i', q_i[:,1])
-                    #controllare dist loss
-                    #print('here?')
-                    #print(out[:, self.n_known])
-                    #print(q_i)
-                    #dist_loss = sum(criterion_dist(logits[:, y], dist_target_i[:, y]) for y in range(self.n_known))
-                    #dist_loss = sum(self.dist_loss(out[:,y], q_i[:,y]) for y in range(self.n_known))
-
-                    #dist_loss = self.dist_loss(out[:, :self.n_known], q_i)
-                    #target = [q_i, labels_hot]
-                    #print('known classe', self.n_known, self.n_classes)
                     target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
-                    #loss += dist_loss
 
                 loss.backward()
                 optimizer.step()
@@ -205,8 +175,6 @@ class LwF(nn.Module):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
         running_corrects = 0
-        #self.features_extractor(DEVICE)
-        #self.features_extractor.train(False)
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
@@ -214,7 +182,6 @@ class LwF(nn.Module):
             _, preds = torch.max(self(imgs), dim=1)
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
             running_corrects += (preds == labels.numpy()).sum()
-            #running_corrects += torch.sum(preds == labels.data).data.item()
         self.features_extractor.train(True)
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
