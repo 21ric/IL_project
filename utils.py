@@ -173,8 +173,8 @@ def elaborate_results(dict_files):
     lwf_mean, lwf_std = np.mean(lwf, axis=0), np.std(lwf, axis=0)
     icarl_mean, icarl_std = np.mean(icarl, axis=0), np.std(icarl, axis=0)
 
-    print(ft_mean)
-    print(ft_std)
+    #print(ft_mean)
+    #print(ft_std)
 
     x = list(map(str,list(range(10,110,10))))
 
@@ -187,7 +187,7 @@ def elaborate_results(dict_files):
 
 def create_plot(xs, ys, errs, title):
 
-    print(xs[0], ys[0])
+    #print(xs[0], ys[0])
 
     fig, ax = plt.subplots()
     for i, label in zip([0,1,2], ['fine_tuning', 'LwF', 'iCaRL']):
@@ -196,6 +196,7 @@ def create_plot(xs, ys, errs, title):
     ax.set_ylim(bottom=0.)
     ax.legend(loc='upper right')
     fig.suptitle(title)
+    fig.grid(True)
 
     ax.set_xlabel('Known classes')
     ax.set_ylabel('Accuracy')
