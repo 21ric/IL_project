@@ -56,7 +56,7 @@ def main():
              }
     
     # Plot it !
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(10, 6))
     for key in dict_1:
        plt.plot([i for i in range(10,110,10)],dict_1[key],marker = 'o', markersize=7, label=key)
 
