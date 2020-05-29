@@ -188,7 +188,7 @@ def create_plot(xs, ys, errs, title):
     print(xs[0], ys[0])
 
     fig, ax = plt.subplots()
-    for i, label in zip([0,1,2], 'fine_tuning', 'LwF', 'iCaRL'):
+    for i, label in zip([0,1,2], ['fine_tuning', 'LwF', 'iCaRL']):
         ax.errorbar(xs[i], ys[i], yerr=errs[i], fmt='o', label=label)
     ax.set_yticks(np.arange(0, 1., 0.1))
     ax.set_ylim(bottom=0.)
