@@ -40,7 +40,7 @@ def validate(net, val_dataloader, class_map, q_val):
         indexes = indexes.to(DEVICE)
         seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
         labels = Variable(seen_labels).to(DEVICE)
-        labels_hot=torch.eye(self.n_classes)[labels]
+        labels_hot=torch.eye(net.n_classes)[labels]
         labels_hot = labels_hot.to(DEVICE)
 
         out = net(inputs)
