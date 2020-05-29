@@ -97,6 +97,8 @@ class iCaRL(nn.Module):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
     def update_representation(self, dataset, val_dataset, class_map, map_reverse):
+        dataset = dataset.dataset
+        val_dataset = val_dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
 
