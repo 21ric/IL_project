@@ -58,9 +58,10 @@ def main():
     # Plot it !
     plt.figure(figsize=(8, 6))
     for c in [acc_ft, acc_lwf, acc_icarl]:
-        plt.plot(c, label=c)
-
-    plt.legend()
+        plt.plot(c, label=c,'-ok')
+        
+    plt.style.use('seaborn-whitegrid')
+    #plt.legend()
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     
