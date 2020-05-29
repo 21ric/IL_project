@@ -17,10 +17,6 @@ import matplotlib.pyplot as plt
 import utils
 
 
-########################
-#i = '1'     # This parameter can be set to ['1','2','3'] depending on the random split of the dataset you want to load.
-            # Change this value if you want to perform calculations with other random splits.
-########################
 
 def plot_accuracy(classes_split,num):
     
@@ -36,7 +32,8 @@ def plot_accuracy(classes_split,num):
     
     return
 
-def main(i):
+def main(i):   # This parameter can be set to ['1','2','3'] depending on the random split of the dataset you want to load.
+               # Change this value if you want to perform calculations with other random splits
     
     dict_acc = {}
     for learner in [ft, lwf, icarl]:
