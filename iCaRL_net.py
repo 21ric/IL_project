@@ -188,13 +188,14 @@ class iCaRL(nn.Module):
             if best_loss is None or val_loss < best_loss:
                 best_loss = val_loss
                 best_epoch = i
-                best_net_dict = copy.deepcopy(sefl.state_dict())
+                best_net_dict = copy.deepcopy(self.state_dict())
 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
+                print('Best validation Loss:{:.4f} (Epoch {})'.format(best_loss, best_epoch))
             i+=1
 
         self.load_state_dict(best_net_dict)
