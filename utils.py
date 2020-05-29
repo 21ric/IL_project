@@ -173,6 +173,9 @@ def elaborate_results(dict_files):
     lwf_mean, lwf_std = np.mean(lwf, axis=0), np.std(lwf, axis=1)
     icarl_mean, icarl_std = np.mean(icarl, axis=0), np.std(icarl, axis=1)
 
+    print(ft_mean)
+    print(ft_std)
+
     xs = [list(range(10,110,10)),list(range(10,110,10)), list(range(10,110,10))]
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
