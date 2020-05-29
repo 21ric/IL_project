@@ -188,11 +188,11 @@ def create_plot(xs, ys, errs, title):
     print(xs[0], ys[0])
 
     fig, ax = plt.subplots()
-    ax.errorbar(xs[0], ys[0], yerr=errs[0], fmt='o', label='fine_tuning')
-    ax.errorbar(xs[1], ys[1], yerr=errs[1], fmt='o', label='LwF')
-    ax.errorbar(xs[2], ys[2], yerr=errs[2], fmt='o', label='iCaRL')
+    ax.rc('lines')
+    for i, label in zip([0,1,2], 'fine_tuning', 'LwF', 'iCaRL')
+        ax.errorbar(xs[i], ys[i], yerr=errs[i], fmt='o', label=label)
     ax.set_yticks(np.arange(0, 1., 0.1))
-    ax.ylim(bottom=0.)
+    ax.set_ylim(bottom=0.)
     ax.legend(loc='upper right')
     fig.suptitle(title)
 
