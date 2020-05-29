@@ -57,8 +57,8 @@ def main():
     
     # Plot it !
     plt.figure(figsize=(8, 6))
-    for c in [acc_ft, acc_lwf, acc_icarl]:
-        plt.plot(c, label=c,'-ok')
+    for acc in [acc_ft, acc_lwf, acc_icarl]:
+        plt.plot(acc, label=acc,'-ok')
         
     plt.style.use('seaborn-whitegrid')
     #plt.legend()
