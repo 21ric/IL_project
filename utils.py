@@ -26,6 +26,14 @@ test_transform = transforms.Compose([transforms.ToTensor(),
                                   ])
 
 
+def set_seed(seed):
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+
 def get_train_test(classes):
     train_dataset = CIFAR100(root='data/', classes=classes, train=True, download=True, transform=train_transform)
     test_dataset = CIFAR100(root='data/', classes=classes,  train=False, download=True, transform=test_transform)

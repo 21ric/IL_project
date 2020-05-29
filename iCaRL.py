@@ -27,6 +27,8 @@ MEMORY_SIZE = 2000
 
 def incremental_learning(num):
 
+    utils.set_seed(0)
+
     path='orders/'
     classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle',
                                                                              path+'map'+ num +'.pickle',
