@@ -36,7 +36,7 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
                # Change this value if you want to perform calculations with other random splits
 
     dict_acc = {}
-    for learner in [ft]:#, lwf, icarl]:
+    for learner in [ft, lwf, icarl]:
 
         print(f"Incremental learning: {learner.__name__}\n")
         print(f"Classes group {i}\n")
