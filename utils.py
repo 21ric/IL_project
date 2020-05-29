@@ -75,16 +75,12 @@ def dump_dict(num,dictionary):
         pickle.dump(dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def get_dict_from_file():
+def get_dict_from_file(file_name):
 
-    with open('accuracy1.pickle', 'rb') as handle:
-        dict_1 = pickle.load(handle)
-    with open('accuracy2.pickle', 'rb') as handle:
-        dict_2 = pickle.load(handle)
-    with open('accuracy3.pickle', 'rb') as handle:
-        dict_3 = pickle.load(handle)
+    with open(file_name, 'rb') as handle:
+        dict = pickle.load(handle)
 
-    return dict_1,dict_2,dict_3
+    return dict
 
 
 def get_class_maps():
@@ -150,3 +146,46 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
     class_groups = np.array_split(class_groups, 10)
 
     return class_groups, class_map, map_reverse
+
+
+def elaborate_restults(dict_files):
+    ft = []
+    lwf = []
+    icarl = []
+
+    for file in dict_files:
+        dict = get_dict_from_file(file)
+        ft.append(dict['fine_tuning'])
+        lwf.append(dict['LwF'])
+        icarl.append(dict['iCaRL'])
+
+    ft = np.array(ft)
+    lwf = np.array(lwf)
+    icarl = np.array(icarl)
+
+    ft_mean, ft_std = np.mean(ft, axis=1), np.std(ft, axis=1)
+    lwf_mean, lwf_std = np.mean(lwf, axis=1), np.std(lwf, axis=1)
+    icarl_mean, icarl_st = np.mean(icarl, axis=1), np.std(icarl, axis=1)
+
+    xs = [range(10,110,10)*3]
+    ys = [ft_mean, lwf_mean, icarl_mean]
+    errs = [ft_std, lwf_std, icarl_std]
+
+    create_plot(xs, ys, errs)
+
+
+def create_plot(xs, ys, errs, title):
+
+    fig, ax = plt.subplots()
+    ax.errorbar(x[0], y[0], yerr=errs[0], fmt='o')
+    ax.errorbar(x[1], y[1], yerr=errs[1], fmt='o')
+    ax.errorbar(x[2], y[2], yerr=errs[2], fmt='o')
+    fig.suptitle(title)
+
+    ax.xlabel('Known classes')
+    ax.ylabel('Accuracy')
+
+    fig.savefig('results.png')
+    fig.show()
+
+    return
