@@ -176,7 +176,9 @@ def elaborate_results(dict_files):
     print(ft_mean)
     print(ft_std)
 
-    xs = [list(range(10,110,10)),list(range(10,110,10)), list(range(10,110,10))]
+    x = map(str,list(range(10,110,10)))
+
+    xs = [x, x, x]
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
 
