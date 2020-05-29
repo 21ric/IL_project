@@ -165,9 +165,13 @@ def elaborate_results(dict_files):
     lwf = np.array(lwf)
     icarl = np.array(icarl)
 
-    ft_mean, ft_std = np.mean(ft, axis=1), np.std(ft, axis=1)
-    lwf_mean, lwf_std = np.mean(lwf, axis=1), np.std(lwf, axis=1)
-    icarl_mean, icarl_std = np.mean(icarl, axis=1), np.std(icarl, axis=1)
+    print(ft)
+    print(lwf)
+    print(icarl)
+
+    ft_mean, ft_std = np.mean(ft, axis=0), np.std(ft, axis=1)
+    lwf_mean, lwf_std = np.mean(lwf, axis=0), np.std(lwf, axis=1)
+    icarl_mean, icarl_std = np.mean(icarl, axis=0), np.std(icarl, axis=1)
 
     xs = [list(range(10,110,10)),list(range(10,110,10)), list(range(10,110,10))]
     ys = [ft_mean, lwf_mean, icarl_mean]
