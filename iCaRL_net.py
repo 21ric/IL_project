@@ -92,7 +92,7 @@ class iCaRL(nn.Module):
 
         self.n_classes += n
 
-    def add_exemplars(self, dataset, val_dataset, class_map, map_reverse):
+    def add_exemplars(self, dataset, map_reverse):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
