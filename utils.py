@@ -171,7 +171,7 @@ def elaborate_restults(dict_files):
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
 
-    create_plot(xs, ys, errs)
+    create_plot(xs, ys, errs, 'Mean accuracies over 3 different splits')
 
 
 def create_plot(xs, ys, errs, title):
