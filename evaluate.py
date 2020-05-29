@@ -58,7 +58,7 @@ def main():
     # Plot it !
     plt.figure(figsize=(8, 6))
     for acc in [acc_ft, acc_lwf, acc_icarl]:
-        plt.plot(acc, label=acc,'-ok')
+        plt.plot(acc,'-ok', colormap='sunset', markersize=7)
         
     plt.style.use('seaborn-whitegrid')
     #plt.legend()
