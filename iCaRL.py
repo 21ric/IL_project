@@ -52,13 +52,13 @@ def incremental_learning(num):
         print('-'*30)
 
 
-        train_dataset, val_dataset, test_dataset = utils.get_datasets(classes_groups[i])
+        train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
 
         print('-'*30)
         print('Updating representation ...')
         print('-'*30)
 
-        net.update_representation(dataset=train_dataset, val_dataset=val_dataset, class_map=class_map, map_reverse=map_reverse) #val_dataset=val_dataset
+        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse) #val_dataset=val_dataset
 
 
         print('Reducing exemplar sets ...')
@@ -72,7 +72,7 @@ def incremental_learning(num):
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m, random_flag=True)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=True)
 
         net.n_known = net.n_classes
 

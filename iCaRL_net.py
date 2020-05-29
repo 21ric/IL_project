@@ -96,9 +96,9 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
-    def update_representation(self, dataset, val_dataset, class_map, map_reverse):
-        dataset = dataset.dataset
-        val_dataset = val_dataset.dataset
+    def update_representation(self, dataset, class_map, map_reverse):
+        #dataset = dataset.dataset
+        #val_dataset = val_dataset.dataset
         targets = list(set(dataset.targets))
         n = len(targets)
 
@@ -110,7 +110,7 @@ class iCaRL(nn.Module):
         print('Datset extended to {} elements'.format(len(dataset)))
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        #val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         self.add_classes(n)
 
@@ -128,6 +128,7 @@ class iCaRL(nn.Module):
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
 
+        """
         #compute previous output for validation
         q_val = torch.zeros(len(val_dataset), self.n_classes).cuda()
         f_ex.to(DEVICE)
@@ -139,6 +140,8 @@ class iCaRL(nn.Module):
             q_val[indexes] = g.data
 
         q_val = Variable(q_val).cuda()
+        """
+
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
@@ -146,8 +149,8 @@ class iCaRL(nn.Module):
 
         i = 0
 
-        best_loss = None
-        best_epoch = 0
+        #best_loss = None
+        #best_epoch = 0
 
         self.features_extractor.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
@@ -183,18 +186,18 @@ class iCaRL(nn.Module):
                 optimizer.step()
 
 
-            val_loss = validate(self, val_loader, class_map, q_val)
-
+            #val_loss = validate(self, val_loader, class_map, q_val)
+            """
             if best_loss is None or val_loss < best_loss:
                 best_loss = val_loss
                 best_epoch = i
                 best_net_dict = copy.deepcopy(self.state_dict())
-
+            """
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                print('Best validation Loss:{:.4f} (Epoch {})'.format(best_loss, best_epoch))
+                #print('Best validation Loss:{:.4f} (Epoch {})'.format(best_loss, best_epoch))
                 print('-'*30)
             i+=1
 
