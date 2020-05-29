@@ -69,7 +69,8 @@ def main():
               'iCaRL2': [0.147, 0.09, 0.058333333333333334, 0.043, 0.0344, 0.0315, 0.024428571428571428, 0.024625, 0.02033333333333333, 0.0197]
              }
  
-    for d in [dict_1,dict_2]:
+    for i,d in enumerate([dict_1,dict_2]):
+        print(f"plotting results for classes split {i+1}\n")
     	plot_accuracy(d)
 
 
