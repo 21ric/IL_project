@@ -239,6 +239,7 @@ class iCaRL(nn.Module):
 
 
             self.exemplar_sets.append(np.array(exemplar_set))
+            self.features_extractor.train(True)
 
 
     @torch.no_grad()
