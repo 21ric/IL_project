@@ -4,6 +4,8 @@ from torchvision import transforms
 from dataset import CIFAR100
 from torch.utils.data import Subset
 
+import matplotlib.pyplot as plt
+
 import copy
 import numpy as np
 import pickle
