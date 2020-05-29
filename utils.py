@@ -6,6 +6,8 @@ from torch.utils.data import Subset
 
 import matplotlib.pyplot as plt
 
+import torch
+
 import copy
 import numpy as np
 import pickle
