@@ -58,7 +58,7 @@ def main():
     # Plot it !
     plt.figure(figsize=(8, 6))
     for key in dict_1:
-       plt.plot(dict_1[key], markersize=7, label=key)
+       plt.plot(dict_1[key],marker = 'o', markersize=7, label=key)
 
     #plt.style.use('seaborn-whitegrid')
     plt.legend()
