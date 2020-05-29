@@ -28,25 +28,12 @@ MEMORY_SIZE = 2000
 def incremental_learning(num):
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle', 
-                                                                             path+'map'+ num +'.pickle', 
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle',
+                                                                             path+'map'+ num +'.pickle',
                                                                              path+'revmap'+ num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    """
-    class_map ={}
-    map_reverse = {}
-
-
-    for i in range(100):
-        class_map[i] = i
-        map_reverse[i] = i
-
-
-    classes_groups = np.split(np.arange(100), 10)
-    """
     net = iCaRL(0, class_map)
-    #net.to(DEVICE)
 
     acc_list = []
 
@@ -108,14 +95,9 @@ def incremental_learning(num):
             acc = net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
             acc = net.classify_all(all_classes_dataset, map_reverse)
-  
-            acc_list.append(acc)
+
             print('-'*30)
 
-        elif i == 0:
-            acc_list.append(acc)
-        #if i == 3:
-            #return
-
-    return acc_list 
-
+        acc_list.append(acc)
+        
+    return acc_list
