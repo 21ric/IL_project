@@ -177,9 +177,10 @@ def elaborate_restults(dict_files):
 def create_plot(xs, ys, errs, title):
 
     fig, ax = plt.subplots()
-    ax.errorbar(x[0], y[0], yerr=errs[0], fmt='o')
-    ax.errorbar(x[1], y[1], yerr=errs[1], fmt='o')
-    ax.errorbar(x[2], y[2], yerr=errs[2], fmt='o')
+    ax.errorbar(x[0], y[0], yerr=errs[0], fmt='o', label='fine_tuning')
+    ax.errorbar(x[1], y[1], yerr=errs[1], fmt='o', label='LwF')
+    ax.errorbar(x[2], y[2], yerr=errs[2], fmt='o', label='iCaRL')
+    ax.legend(loc='upper right')
     fig.suptitle(title)
 
     ax.xlabel('Known classes')
