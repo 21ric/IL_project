@@ -72,7 +72,7 @@ def incremental_learning(num):
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m, random_flag=False)
+           net.construct_exemplars_set(train_dataset.dataset.get_class_imgs(y), m, random_flag=True)
 
         net.n_known = net.n_classes
 
