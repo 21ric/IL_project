@@ -178,6 +178,8 @@ def elaborate_results(dict_files):
 
 def create_plot(xs, ys, errs, title):
 
+    print(xs[0], ys[0])
+
     fig, ax = plt.subplots()
     ax.errorbar(xs[0], ys[0], yerr=errs[0], fmt='o', label='fine_tuning')
     ax.errorbar(xs[1], ys[1], yerr=errs[1], fmt='o', label='LwF')
