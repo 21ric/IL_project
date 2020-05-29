@@ -70,8 +70,9 @@ def main():
              }
  
     for i,d in enumerate([dict_1,dict_2]):
+
         print(f"plotting results for classes split {i+1}\n")
-    	plot_accuracy(d)
+        plot_accuracy(d)
 
 
 
