@@ -14,12 +14,13 @@ import copy
 
 import random
 
+import utils
+
 import math
 
-#transform = transforms.Compose([transforms.ToTensor(),
-#                               transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+#transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
 LR = 2
@@ -98,6 +99,7 @@ class iCaRL(nn.Module):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
 
     def update_representation(self, dataset, class_map, map_reverse):
+
         targets = list(set(dataset.targets))
         n = len(targets)
 
