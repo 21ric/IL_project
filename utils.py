@@ -179,9 +179,9 @@ def elaborate_results(dict_files):
 def create_plot(xs, ys, errs, title):
 
     fig, ax = plt.subplots()
-    ax.errorbar(x[0], y[0], yerr=errs[0], fmt='o', label='fine_tuning')
-    ax.errorbar(x[1], y[1], yerr=errs[1], fmt='o', label='LwF')
-    ax.errorbar(x[2], y[2], yerr=errs[2], fmt='o', label='iCaRL')
+    ax.errorbar(xs[0], ys[0], yerr=errs[0], fmt='o', label='fine_tuning')
+    ax.errorbar(xs[1], ys[1], yerr=errs[1], fmt='o', label='LwF')
+    ax.errorbar(xs[2], ys[2], yerr=errs[2], fmt='o', label='iCaRL')
     ax.set_yticks(numpy.arange(0, 1., 0.1))
     ax.ylim(bottom=0.)
     ax.legend(loc='upper right')
