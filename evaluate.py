@@ -64,7 +64,7 @@ def main():
     for key in dict_1:
        plt.plot(dict_1[key], '-ok', markersize=7, label=key)
 
-    plt.style.use('seaborn-whitegrid')
+    #plt.style.use('seaborn-whitegrid')
     plt.legend()
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
