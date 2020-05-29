@@ -181,6 +181,7 @@ def create_plot(xs, ys, errs, title):
     ax.errorbar(x[1], y[1], yerr=errs[1], fmt='o', label='LwF')
     ax.errorbar(x[2], y[2], yerr=errs[2], fmt='o', label='iCaRL')
     ax.set_yticks(numpy.arange(0, 1., 0.1))
+    ax.ylim(bottom=0.)
     ax.legend(loc='upper right')
     fig.suptitle(title)
 
