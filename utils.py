@@ -169,9 +169,9 @@ def elaborate_results(dict_files):
     print(lwf)
     print(icarl)
 
-    ft_mean, ft_std = np.mean(ft, axis=0), np.std(ft, axis=1)
-    lwf_mean, lwf_std = np.mean(lwf, axis=0), np.std(lwf, axis=1)
-    icarl_mean, icarl_std = np.mean(icarl, axis=0), np.std(icarl, axis=1)
+    ft_mean, ft_std = np.mean(ft, axis=1), np.std(ft, axis=0)
+    lwf_mean, lwf_std = np.mean(lwf, axis=1), np.std(lwf, axis=0)
+    icarl_mean, icarl_std = np.mean(icarl, axis=1), np.std(icarl, axis=0)
 
     print(ft_mean)
     print(ft_std)
