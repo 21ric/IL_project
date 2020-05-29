@@ -21,13 +21,14 @@ i = '1'     # This parameter can be set to ['1','2','3'] depending on the random
             # Change this value if you want to perform calculations with other random splits.
 ########################
 
-def plot_accuracy(classes_split):
+def plot_accuracy(classes_split,num):
     
     plt.figure(figsize=(8, 6))
     for key in classes_split:
        plt.plot([i for i in range(10,110,10)],classes_split[key],marker = 'o', markersize=7, label=key)
 
     plt.legend()
+    plt.title("Test accuracy with split: %s" %str(num))
     plt.xlabel('Known classes')
     plt.ylabel('Accuracy')
     plt.show()
@@ -72,9 +73,7 @@ def main():
              }
  
     for i,d in enumerate([dict_1,dict_2]):
-
-        print(f"plotting results for classes split {i+1}\n")
-        plot_accuracy(d)
+        plot_accuracy(d,i+1)
 
 
 
