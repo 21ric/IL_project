@@ -54,15 +54,11 @@ def main():
               'LwF2': [0.158, 0.1165, 0.07366666666666667, 0.04575, 0.0376, 0.029833333333333333, 0.037142857142857144, 0.03325, 0.03133333333333333, 0.0285],
               'iCaRL2': [0.147, 0.09, 0.058333333333333334, 0.043, 0.0344, 0.0315, 0.024428571428571428, 0.024625, 0.02033333333333333, 0.0197]
              }
-    '''
-    acc_ft = dict_1['fine_tuning']
-    acc_lwf = dict_1['LwF2']
-    acc_icarl = dict_1['iCaRL2']'''
     
     # Plot it !
     plt.figure(figsize=(8, 6))
     for key in dict_1:
-       plt.plot(dict_1[key], '-ok', markersize=7, label=key)
+       plt.plot(dict_1[key], markersize=7, label=key)
 
     #plt.style.use('seaborn-whitegrid')
     plt.legend()
