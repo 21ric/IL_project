@@ -50,7 +50,7 @@ def validate(net, val_dataloader, class_map, q_val):
 
         else:
             q_i = q_val[indexes]
-            target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+            target = torch.cat((q_i[:, :net.n_known], labels_hot[:, net.n_known:net.n_classes]), dim=1)
             loss += net.dist_loss(out, target)*inputs.size(0)
 
     loss = loss/len(val_dataloader.dataset)
