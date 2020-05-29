@@ -194,9 +194,9 @@ def create_plot(xs, ys, errs, title):
         ax.errorbar(xs[i], ys[i], yerr=errs[i], fmt='-o', label=label)
     ax.set_yticks(np.arange(0, 1., 0.1))
     ax.set_ylim(bottom=0.)
+    ax.grid(axis='y')
     ax.legend(loc='upper right')
     fig.suptitle(title)
-    fig.grid(True)
 
     ax.set_xlabel('Known classes')
     ax.set_ylabel('Accuracy')
