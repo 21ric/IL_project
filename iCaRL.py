@@ -58,7 +58,7 @@ def incremental_learning(num):
         print('Updating representation ...')
         print('-'*30)
 
-        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse) #val_dataset=val_dataset
+        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse)
 
 
         print('Reducing exemplar sets ...')
