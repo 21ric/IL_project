@@ -44,7 +44,7 @@ def main():
     utils.dumb_dict(i, dict_acc)
     
     '''
-        COMMENT FROM NOW ON IF YOU JUST WANT TO STORE RESULTS TO FILE
+        #COMMENT FROM NOW ON IF YOU JUST WANT TO STORE RESULTS TO FILE
     '''
     # Load accuracy lists from file
     dict_1,dict_2,dict_3 = utils.get_dict_from_file()
