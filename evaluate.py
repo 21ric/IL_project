@@ -56,11 +56,10 @@ def main():
              }
     
     # Plot it !
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(8, 8))
     for key in dict_1:
        plt.plot([i for i in range(10,110,10)],dict_1[key],marker = 'o', markersize=7, label=key)
 
-    #plt.style.use('seaborn-whitegrid')
     plt.title('Results for classes group: 1')
     plt.legend()
     plt.xlabel('Known classes')
