@@ -27,7 +27,6 @@ def plot_accuracy(classes_split):
     for key in classes_split:
        plt.plot([i for i in range(10,110,10)],classes_split[key],marker = 'o', markersize=7, label=key)
 
-    plt.title('Results for classes group: 1')
     plt.legend()
     plt.xlabel('Known classes')
     plt.ylabel('Accuracy')
