@@ -195,8 +195,8 @@ def create_plot(xs, ys, errs, title):
     ax.legend(loc='upper right')
     fig.suptitle(title)
 
-    ax.xlabel('Known classes')
-    ax.ylabel('Accuracy')
+    ax.set_xlabel('Known classes')
+    ax.set_ylabel('Accuracy')
 
     fig.savefig('results.png')
     fig.show()
