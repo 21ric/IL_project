@@ -26,7 +26,7 @@ STEPDOWN_FACTOR = 5
 LR = 2
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.00001
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 ########################
 
 
