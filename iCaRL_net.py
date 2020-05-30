@@ -31,7 +31,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 ########################
 """
@@ -218,7 +218,7 @@ class iCaRL(nn.Module):
 
                     else:
                         #MSE
-                        _, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        #_, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         dist_loss = self.dist_loss(out[:, :self.n_known], targets[:, :self.n_known])
 
 
