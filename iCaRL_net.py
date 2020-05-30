@@ -26,7 +26,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
-LR = 0.1
+LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
@@ -86,8 +86,8 @@ class iCaRL(nn.Module):
             self.dist_loss = nn.CrossEntropyLoss()
 
         else:
-            self.clf_loss = nn.MSELoss()
-            self.dist_loss = nn.MSELoss()
+            self.clf_loss = nn.MSELoss(size_average=False)
+            self.dist_loss = nn.MSELoss(size_average=False)
 
         self.exemplar_means = []
         self.compute_means = True
@@ -149,7 +149,7 @@ class iCaRL(nn.Module):
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=1, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
 
         i = 0
 
