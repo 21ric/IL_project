@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(num):
+def incremental_learning(dict_num,loss_config):
 
     utils.set_seed(0)
 
@@ -35,7 +35,7 @@ def incremental_learning(num):
                                                                              path+'revmap'+ num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, loss_config=0)
+    net = iCaRL(0, class_map, loss_config=loss_config)
 
     acc_list = []
 
