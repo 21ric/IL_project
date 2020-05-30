@@ -35,7 +35,7 @@ def incremental_learning(num):
                                                                              path+'revmap'+ num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map)
+    net = iCaRL(0, class_map, loss_config=0)
 
     acc_list = []
 
