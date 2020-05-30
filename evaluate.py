@@ -41,7 +41,10 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
         print(f"Incremental learning: {learner.__name__}\n")
         print(f"Classes group {i}\n")
         # Call the incremental_learning function to perform train+test on 10 iterations
-        acc_ = learner.incremental_learning(i)
+        if learner == icarl:
+            acc_ = learner.incremental_learning(i, loss_config=0)
+        else:
+            acc_ = learner.incremental_learning(i)
         print(acc_)
         learner_name = learner.__name__
         dict_acc[learner_name] = [accuracy for accuracy in acc_]
