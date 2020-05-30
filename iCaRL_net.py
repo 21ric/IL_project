@@ -18,6 +18,9 @@ import utils
 
 import math
 
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
+
 #transform = transforms.Compose([transforms.ToTensor()], transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -355,6 +358,74 @@ class iCaRL(nn.Module):
 
             return preds
 
+        #KNN
+        elif classifier == 'knn':
+
+            X_train, y_train = [], []
+
+            self.features_extractor.train(False)
+            for i, exemplars in enumerate(self.exemplar_sets):
+                for ex in  exemplars:
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
+                    X_train.append(feature.numpy())
+                    y_train.append(i)
+
+            model = KNeighborsClassifier(n_neighbors=5)
+            model.fit(X_train, y_train)
+
+            x = x.to(DEVICE)
+            self.features_extractor.train(False)
+            feature = self.features_extractor.extract_features(x)
+
+            X = []
+
+            for feat in feature:
+                feat = feat / torch.norm(feat, p=2)
+                X.append(feat.numpy())
+
+            preds = model.predict(X)
+
+            return preds
+
+
+        #SVC
+        elif classifier == 'svc':
+
+            X_train, y_train = [], []
+
+            self.features_extractor.train(False)
+            for i, exemplars in enumerate(self.exemplar_sets):
+                for ex in  exemplars:
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
+                    X_train.append(feature.numpy())
+                    y_train.append(i)
+
+            model = LinearSVC()
+            model.fit(X_train, y_train)
+
+            x = x.to(DEVICE)
+            self.features_extractor.train(False)
+            feature = self.features_extractor.extract_features(x)
+
+            X = []
+
+            for feat in feature:
+                feat = feat / torch.norm(feat, p=2)
+                X.append(feat.numpy())
+
+            preds = model.predict(X)
+
+            return preds
+
+        #cosine similarity
+        else:
+            pass
 
 
     def classify_all(self, test_dataset, map_reverse, classifier):
