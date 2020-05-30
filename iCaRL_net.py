@@ -194,7 +194,8 @@ class iCaRL(nn.Module):
 
                 else:
                     #MSE
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels)
+                    print("qui1")
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
                     q_i = q[indexes]
