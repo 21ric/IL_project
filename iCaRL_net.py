@@ -225,9 +225,19 @@ class iCaRL(nn.Module):
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
 
-                else:
+                else:       
                     q_i = q[indexes]
-                    target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+                    if self.loss_config == 0:
+                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+                    
+                    elif self.loss_config == 1:
+                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+                    
+                    elif self.loss_config == 2:
+                        _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
+
+                    #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
 
                 loss.backward()
