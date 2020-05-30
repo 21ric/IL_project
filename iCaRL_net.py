@@ -253,7 +253,7 @@ class iCaRL(nn.Module):
 
                 '''
                 #vecchio 
-                else:
+                if self.n_known > 0:
                     
                     #out = torch.sigmoid(out)
                     q_i = q[indexes]
