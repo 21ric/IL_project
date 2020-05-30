@@ -56,7 +56,7 @@ def incremental_learning(dict_num,loss_config,classifier):
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
 
         print('-'*30)
-        print(f'Known classes: {net.n_known}\n')
+        print(f'Known classes: {net.n_known}')
         print('-'*30)
         print('Updating representation ...')
         print('-'*30)
