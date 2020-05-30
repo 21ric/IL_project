@@ -194,7 +194,7 @@ class iCaRL(nn.Module):
 
                 else:
                     #MSE
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels[:, self.n_known:self.n_classes])
 
                 
 
@@ -218,7 +218,6 @@ class iCaRL(nn.Module):
 
                     else:
                         #MSE
-                        print("MSE n_known >0")
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
 
@@ -242,9 +241,6 @@ class iCaRL(nn.Module):
                         target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
 
                     elif self.loss_config == 3:
-
-                        print("MSE n_known <= 0")
-                       
                         target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                          
 
