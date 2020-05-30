@@ -75,6 +75,8 @@ class iCaRL(nn.Module):
         self.exemplar_means = []
         self.compute_means = True
 
+        self.new_means = []
+
         self.class_map = class_map
 
 
@@ -212,6 +214,8 @@ class iCaRL(nn.Module):
             class_mean = np.mean(features, axis=0)
             class_mean = class_mean / np.linalg.norm(class_mean)
 
+            self.new_means.append(class_mean)
+
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
@@ -254,7 +258,7 @@ class iCaRL(nn.Module):
             exemplar_means = []
 
             self.features_extractor.train(False)
-            for exemplars in self.exemplar_sets:
+            for exemplars in self.exemplar_sets[:self.n_known]:
                 features = []
                 for ex in  exemplars:
 
@@ -270,6 +274,7 @@ class iCaRL(nn.Module):
                 exemplar_means.append(mu_y)
 
             self.exemplar_means = exemplar_means
+            self.exemplar_means.extend(self.new_means)
             self.compute_means = False
 
         exemplar_means = self.exemplar_means
