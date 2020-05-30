@@ -39,9 +39,7 @@ def incremental_learning(dict_num,loss_config,classifier):
 
     acc_list = []
  
-    ll = []
-
-    for i in range(int(100/CLASSES_BATCH)):
+    for i in range(int(20/CLASSES_BATCH)):
 
         print('-'*30)
         print(f'**** Iteration {i+1} ****')
@@ -61,8 +59,8 @@ def incremental_learning(dict_num,loss_config,classifier):
         print('Updating representation ...')
         print('-'*30)
 
-        l = net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
-        ll.append(l)
+        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
+        
 
         print('Reducing exemplar sets ...')
         print('-'*30)
@@ -101,5 +99,4 @@ def incremental_learning(dict_num,loss_config,classifier):
             print('-'*30)
 
         acc_list.append(acc)
-    print(ll)
     return acc_list
