@@ -31,7 +31,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
-
+"""
 @torch.no_grad()
 def validate(net, val_dataloader, class_map, q_val):
 
@@ -58,10 +58,10 @@ def validate(net, val_dataloader, class_map, q_val):
     loss = loss/len(val_dataloader.dataset)
     net.train(True)
     return loss
-
+"""
 
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map):
+    def __init__(self, n_classes, class_map, loss_config):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -69,14 +69,22 @@ class iCaRL(nn.Module):
         self.n_known = 0
         self.exemplar_sets = []
 
-        self.clf_loss = nn.BCEWithLogitsLoss()
-        self.dist_loss = nn.BCEWithLogitsLoss()
+        if loss_config == 0:
+            self.clf_loss = nn.BCEWithLogitsLoss()
+            self.dist_loss = nn.BCEWithLogitsLoss()
+
+        elif loss_config == 1:
+            pass
+
+        elif loss_config == 2:
+            pass
+
+        else:
+            pass
 
         self.exemplar_means = []
         self.compute_means = True
-
         self.new_means = []
-
         self.class_map = class_map
 
 
@@ -161,13 +169,31 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                if loss_config == 0:
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                elif loss_config == 1:
+                    pass
+                elif loss_config == 2:
+                    pass
+                else:
+                    pass
 
                 if self.n_known > 0:
                     q_i = q[indexes]
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
-                    loss = (1/iter)*loss + ((iter-1)/iter)*dist_loss
+                    if loss_config == 0:
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+
+                    elif loss_config == 1:
+                        pass
+
+                    elif loss_config ==2:
+                        pass
+
+                    else:
+                        pass
+
+                    loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
 
                 """
                 if self.n_known <= 0:
