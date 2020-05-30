@@ -194,8 +194,9 @@ class iCaRL(nn.Module):
 
                 else:
                     #MSE
-                    print("qui1")
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+
+                
 
                 if self.n_known > 0:
                     q_i = q[indexes]
@@ -220,12 +221,13 @@ class iCaRL(nn.Module):
                         _, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         dist_loss = self.dist_loss(out[:, :self.n_known], targets[:, :self.n_known])
 
+
                     loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
                 
-
+                '''
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
-
+                '''
                 else:       
                     q_i = q[indexes]
                     if self.loss_config == 0:
