@@ -42,7 +42,7 @@ def incremental_learning(dict_num,loss_config,classifier):
     for i in range(int(100/CLASSES_BATCH)):
 
         print('-'*30)
-        print(f'**** Iteration {i+1} ****')
+        print(f'**** Iteration {i+1}/ {100/CLASSES_BATCH}+1 ****')
         print('-'*30)
 
         torch.cuda.empty_cache()
@@ -55,6 +55,7 @@ def incremental_learning(dict_num,loss_config,classifier):
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
 
+        print('-'*30)
         print(f'Known classes: {net.n_known}\n')
         print('-'*30)
         print('Updating representation ...')
