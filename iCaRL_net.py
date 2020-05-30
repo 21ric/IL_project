@@ -256,13 +256,13 @@ class iCaRL(nn.Module):
 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
-                l.append(epoch,loss.item)
+                l.append((epoch,loss.item))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
             i+=1
 
-        return
+        return l
 
 
     def reduce_exemplars_set(self, m):
