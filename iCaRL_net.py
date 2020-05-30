@@ -153,6 +153,7 @@ class iCaRL(nn.Module):
 
         i = 0
 
+        l = []
 
         self.features_extractor.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
@@ -177,7 +178,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                
+                '''
                 if self.loss_config == 0:
                     #BCE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -228,7 +229,7 @@ class iCaRL(nn.Module):
                 '''
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
-                '''
+                
                 if self.n_known <= 0:  
      
                     q_i = q[indexes]
@@ -255,6 +256,7 @@ class iCaRL(nn.Module):
 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                l.append(epoch,loss.item)
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
