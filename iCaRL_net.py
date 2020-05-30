@@ -149,7 +149,7 @@ class iCaRL(nn.Module):
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.1, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=1, weight_decay=0.00001, momentum=0.9)
 
         i = 0
 
