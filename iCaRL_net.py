@@ -174,31 +174,39 @@ class iCaRL(nn.Module):
                 out = self(imgs)
 
                 if self.loss_config == 0:
+                    #BCE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 1:
+                    #CE
                     #loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels[self.n_known:self.n_classes])
                     loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels)
 
                 elif self.loss_config == 2:
+                    #CE
                     loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels)
 
                 else:
+                    #MSE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
                     q_i = q[indexes]
 
                     if self.loss_config == 0:
+                        #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 1:
+                        #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config ==2:
-                        dist_loss = sum(self.dist_loss(torch.sigmoid(out[:, y]), q_i[:, y]) for y in range(self.n_known))
+                        #CE
+                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), torch.max(q_i, dim=0)) 
 
                     else:
+                        #MSE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
