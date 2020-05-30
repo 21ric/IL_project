@@ -218,8 +218,7 @@ class iCaRL(nn.Module):
 
                     else:
                         #MSE
-                        print("qui1")
-                        #_, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        print("MSE n_known >0")
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
 
@@ -244,8 +243,8 @@ class iCaRL(nn.Module):
 
                     elif self.loss_config == 3:
 
-                        print("qui")
-                        #_, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        print("MSE n_known <= 0")
+                       
                         target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                          
 
