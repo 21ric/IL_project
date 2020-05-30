@@ -177,13 +177,13 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 1:
-                    pass
+                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 2:
-                    pass
+                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels[:, self.n_known:self.n_classes])
 
                 else:
-                    pass
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
                     q_i = q[indexes]
@@ -192,13 +192,13 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 1:
-                        pass
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config ==2:
-                        pass
+                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), q_i[:, :self.n_known])
 
                     else:
-                        pass
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
 
