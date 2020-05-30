@@ -86,8 +86,8 @@ class iCaRL(nn.Module):
             self.dist_loss = nn.CrossEntropyLoss()
 
         else:
-            self.clf_loss = nn.MSELoss(size_average=False)
-            self.dist_loss = nn.MSELoss(size_average=False)
+            self.clf_loss = nn.MSELoss()
+            self.dist_loss = nn.MSELoss()
 
         self.exemplar_means = []
         self.compute_means = True
