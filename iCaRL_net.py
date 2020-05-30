@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                """
+                
                 if self.loss_config == 0:
                     #BCE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -194,7 +194,7 @@ class iCaRL(nn.Module):
 
                 else:
                     #MSE
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels[:, self.n_known:self.n_classes])
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels)
 
                 if self.n_known > 0:
                     q_i = q[indexes]
@@ -220,7 +220,7 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], targets[:, :self.n_known])
 
                     loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
-                """
+                
 
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
