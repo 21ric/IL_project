@@ -30,9 +30,9 @@ def incremental_learning(dict_num,loss_config):
     utils.set_seed(0)
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+num+'.pickle',
-                                                                             path+'map'+ num +'.pickle',
-                                                                             path+'revmap'+ num +'.pickle')
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+dict_num+'.pickle',
+                                                                             path+'map'+ dict_num +'.pickle',
+                                                                             path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
     net = iCaRL(0, class_map, loss_config=loss_config)
