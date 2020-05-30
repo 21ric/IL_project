@@ -188,7 +188,8 @@ class iCaRL(nn.Module):
 
                 elif self.loss_config == 2:
                     #CE
-                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels)
+                    #loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels) #richi
+                    loss = self.clf_loss(out[:,self.n_known:self.n_classes]), labels) #linda
 
                 else:
                     #MSE
@@ -207,7 +208,10 @@ class iCaRL(nn.Module):
 
                     elif self.loss_config == 2:
                         #CE
-                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), torch.max(q_i, dim=0))
+                        #dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), torch.max(q_i, dim=0)) #richi
+                        _, dist_target = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        dist_loss = self.dist_loss(out[:, :self.n_known]), dist_target[:, :self.n_known]
+
 
                     else:
                         #MSE
