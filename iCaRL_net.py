@@ -31,7 +31,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 ########################
 """
@@ -194,7 +194,7 @@ class iCaRL(nn.Module):
 
                 elif self.loss_config == 3:
                     #MSE
-                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
                     print(out[:, self.n_known:self.n_classes],labels_hot[:, self.n_known:self.n_classes])
                     print("cls_loss",loss)
                 
