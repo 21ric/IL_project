@@ -237,6 +237,12 @@ class iCaRL(nn.Module):
                         _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
 
+                    else:
+
+                        _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
+                        
+
                     #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
 
