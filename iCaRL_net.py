@@ -75,13 +75,16 @@ class iCaRL(nn.Module):
             self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 1:
-            pass
+            self.clf_loss = nn.CrossEntropyLoss()
+            self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 2:
-            pass
+            self.clf_loss = nn.CrossEntropyLoss()
+            self.dist_loss = nn.CrossEntropyLoss()
 
         else:
-            pass
+            self.clf_loss = nn.MSELoss()
+            self.dist_loss = nn.MSELoss()
 
         self.exemplar_means = []
         self.compute_means = True
@@ -185,13 +188,13 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     q_i = q[indexes]
 
-                    if loss_config == 0:
+                    if self.loss_config == 0:
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
-                    elif loss_config == 1:
+                    elif self.loss_config == 1:
                         pass
 
-                    elif loss_config ==2:
+                    elif self.loss_config ==2:
                         pass
 
                     else:
