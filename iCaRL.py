@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config):
+def incremental_learning(dict_num,loss_config,classifier):
 
     utils.set_seed(0)
 
@@ -82,7 +82,7 @@ def incremental_learning(dict_num,loss_config):
         print('-'*30)
 
         print('New classes')
-        acc = net.classify_all(test_dataset, map_reverse)
+        acc = net.classify_all(test_dataset, map_reverse, classifier=classifier)
 
         if i > 0:
 
@@ -93,9 +93,9 @@ def incremental_learning(dict_num,loss_config):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            acc = net.classify_all(prev_classes_dataset, map_reverse)
+            acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
             print('All classes')
-            acc = net.classify_all(all_classes_dataset, map_reverse)
+            acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
 
             print('-'*30)
 

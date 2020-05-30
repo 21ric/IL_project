@@ -42,7 +42,7 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
         print(f"Classes group {i}\n")
         # Call the incremental_learning function to perform train+test on 10 iterations
         if learner == icarl:
-            acc_ = learner.incremental_learning(i, loss_config=0)
+            acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme')
         else:
             acc_ = learner.incremental_learning(i)
         print(acc_)

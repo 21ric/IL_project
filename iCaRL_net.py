@@ -201,9 +201,9 @@ class iCaRL(nn.Module):
                         #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
-                    elif self.loss_config ==2:
+                    elif self.loss_config == 2:
                         #CE
-                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), torch.max(q_i, dim=0)) 
+                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), torch.max(q_i, dim=0))
 
                     else:
                         #MSE
@@ -300,7 +300,7 @@ class iCaRL(nn.Module):
 
 
     @torch.no_grad()
-    def classify(self, x):
+    def classify(self, x, classifier):
 
         batch_size = x.size(0)
 
@@ -354,7 +354,7 @@ class iCaRL(nn.Module):
 
 
 
-    def classify_all(self, test_dataset, map_reverse):
+    def classify_all(self, test_dataset, map_reverse, classifier):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
@@ -362,7 +362,7 @@ class iCaRL(nn.Module):
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs)
+            preds = self.classify(imgs, classifier)
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
