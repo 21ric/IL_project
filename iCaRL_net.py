@@ -154,8 +154,6 @@ class iCaRL(nn.Module):
 
         i = 0
 
-        l = []
-
         self.features_extractor.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
 
@@ -262,7 +260,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-        return l
+        return 
 
 
     def reduce_exemplars_set(self, m):
