@@ -196,7 +196,7 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config ==2:
-                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), q_i[:, :self.n_known])
+                        dist_loss = sum(self.dist_loss(torch.sigmoid(out[:, y]), q_i[:, y]) for y in range(self.n_known))
 
                     else:
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
