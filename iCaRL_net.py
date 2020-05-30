@@ -168,8 +168,8 @@ class iCaRL(nn.Module):
                 indexes = indexes.to(DEVICE)
                 # We need to save labels in this way because classes are randomly shuffled at the beginning
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-                #labels = Variable(seen_labels).to(DEVICE)
-                labels = torch.Tensor(seen_labels).to(DEVICE)
+                labels = Variable(seen_labels).to(DEVICE)
+                #labels = torch.Tensor(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
