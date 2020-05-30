@@ -194,8 +194,8 @@ class iCaRL(nn.Module):
 
                 elif self.loss_config == 3:
                     #MSE
-                    #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                    print(out[:, self.n_known:self.n_classes],labels_hot[:, self.n_known:self.n_classes])
                     print("cls_loss",loss)
                 
                 
