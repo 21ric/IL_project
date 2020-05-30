@@ -68,15 +68,16 @@ class iCaRL(nn.Module):
         self.n_classes = n_classes
         self.n_known = 0
         self.exemplar_sets = []
+        self.loss_config = loss_config
 
-        if loss_config == 0:
+        if self.loss_config == 0:
             self.clf_loss = nn.BCEWithLogitsLoss()
             self.dist_loss = nn.BCEWithLogitsLoss()
 
-        elif loss_config == 1:
+        elif self.loss_config == 1:
             pass
 
-        elif loss_config == 2:
+        elif self.loss_config == 2:
             pass
 
         else:
@@ -169,12 +170,15 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                if loss_config == 0:
+                if self.loss_config == 0:
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                elif loss_config == 1:
+
+                elif self.loss_config == 1:
                     pass
-                elif loss_config == 2:
+
+                elif self.loss_config == 2:
                     pass
+
                 else:
                     pass
 
