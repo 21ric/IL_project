@@ -33,6 +33,7 @@ STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
+MOMENTUM = 0.9 
 ########################
 """
 @torch.no_grad()
@@ -149,7 +150,7 @@ class iCaRL(nn.Module):
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2.0, weight_decay=0.00001, momentum=0.9)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=LR, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
 
