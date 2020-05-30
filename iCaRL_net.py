@@ -218,7 +218,8 @@ class iCaRL(nn.Module):
 
                     else:
                         #MSE
-                        #_, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
+                        print("qui1")
+                        _, targets = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         dist_loss = self.dist_loss(out[:, :self.n_known], targets[:, :self.n_known])
 
 
