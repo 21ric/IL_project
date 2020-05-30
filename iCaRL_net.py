@@ -228,7 +228,7 @@ class iCaRL(nn.Module):
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
                 '''
-                else:  
+                if self.n_known <= 0:  
      
                     q_i = q[indexes]
                     if self.loss_config == 0:
