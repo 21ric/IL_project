@@ -190,7 +190,7 @@ class iCaRL(nn.Module):
                 elif self.loss_config == 2:
                     #CE
                     #loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels) #richi
-                    loss = self.clf_loss(out[:,self.n_known:self.n_classes], labels) #linda
+                    loss = self.clf_loss(out[:,self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes]) #linda
 
                 elif self.loss_config == 3:
                     #MSE
