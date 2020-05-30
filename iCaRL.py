@@ -41,7 +41,7 @@ def incremental_learning(dict_num,loss_config,classifier):
  
     ll = []
 
-    for i in range(int(50/CLASSES_BATCH)):
+    for i in range(int(100/CLASSES_BATCH)):
 
         print('-'*30)
         print(f'**** Iteration {i+1} ****')
