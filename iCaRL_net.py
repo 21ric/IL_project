@@ -224,10 +224,10 @@ class iCaRL(nn.Module):
 
                     loss = (1/iter+1)*loss + (iter/(iter+1))*dist_loss
                 
-                '''
+                
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
-                '''
+                
                 else:       
                     q_i = q[indexes]
                     if self.loss_config == 0:
