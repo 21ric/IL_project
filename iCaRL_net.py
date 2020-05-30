@@ -240,7 +240,7 @@ class iCaRL(nn.Module):
                         _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
 
-                    else:
+                    elif self.loss_config == 3:
 
                         print("qui")
                         _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
