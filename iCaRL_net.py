@@ -26,7 +26,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
-LR = 2
+LR = 0.1
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
@@ -199,6 +199,7 @@ class iCaRL(nn.Module):
                 
 
                 if self.n_known > 0:
+
                     q_i = q[indexes]
 
                     if self.loss_config == 0:
