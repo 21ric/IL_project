@@ -22,10 +22,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
 from sklearn.metrics.pairwise import cosine_similarity
 
-#transform = transforms.Compose([transforms.ToTensor()], transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
-#transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -36,6 +32,8 @@ NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
+
+transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
 losses = {'bce': [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 'mlsm': [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
         'l1': [nn.L1Loss(), nn.L1Loss()], 'mse': [nn.MSELoss(), nn.MSELoss()]}
@@ -141,7 +139,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                if loss_config in ['l1', 'mse']:
+                if self.loss_config in ['l1', 'mse']:
                     out = torch.sigmoid(out)
 
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -343,7 +341,7 @@ class iCaRL(nn.Module):
             return preds
 
         #KNN
-        elif classifier == 'knn':
+    elif classifier in ['knn', 'svc']:
 
             X_train, y_train = [], []
 
