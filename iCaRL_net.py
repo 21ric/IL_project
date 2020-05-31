@@ -204,8 +204,6 @@ class iCaRL(nn.Module):
                     if self.loss_config == 0:
                         #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                        loss2 = self.dist_loss(out, target)
 
                     elif self.loss_config == 1:
                         #BCE
@@ -224,45 +222,10 @@ class iCaRL(nn.Module):
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
-                    print('loss1', loss.item())
-                    print('loss2', loss2.item())
 
-                """
-                if self.n_known <= 0:
-                    loss = self.clf_loss(out, labels_hot)
-
-
-                if self.n_known <= 0:
-
-                    q_i = q[indexes]
-                    if self.loss_config == 0:
-                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-
-                    elif self.loss_config == 1:
-                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-
-                    elif self.loss_config == 2:
-                        _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
-                        target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
-
-                    elif self.loss_config == 3:
-                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-
-
+                    #old method
                     #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                    #loss = self.dist_loss(out, target)
-
-                """
-                '''
-                #vecchio
-                if self.n_known > 0:
-                   q_i = q[indexes]
-                   target = torch.cat((q_i[:,:self.n_known],labels_hot[:,self.n_known:self.n_classes]),dim=1)
-                   loss = self.dist_loss(out,target)
-
-                   #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-
-                '''
+                    #loss2 = self.dist_loss(out, target)
 
                 loss.backward()
                 optimizer.step()
