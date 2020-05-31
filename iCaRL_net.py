@@ -65,7 +65,7 @@ def validate(net, val_dataloader, class_map, q_val):
 """
 
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, loss_config, lr):
+    def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
