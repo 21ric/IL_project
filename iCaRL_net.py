@@ -26,7 +26,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 #transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 ####Hyper-parameters####
-LR = 0.05
+LR = 2
 WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
