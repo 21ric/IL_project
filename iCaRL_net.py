@@ -35,8 +35,12 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-losses = {'bce': [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 'mlsm': [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
-        'l1': [nn.L1Loss(), nn.L1Loss()], 'mse': [nn.MSELoss(), nn.MSELoss()]}
+bce = nn.BCEWithLogitsLoss()
+mlsm = nn.MultiLabelSoftMarginLoss()
+l1 = nn.L1Loss()
+mse = nn.MSELoss()
+
+losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -49,8 +53,8 @@ class iCaRL(nn.Module):
         self.loss_config = loss_config
         self.lr = lr
 
-        self.clf_loss = losses[loss_config][0]
-        self.dist_loss = losses[loss_config][1]
+        self.clf_loss = losses[loss_config]
+        self.dist_loss = losses[loss_config]
 
         self.exemplar_means = []
         self.compute_means = True
@@ -322,7 +326,7 @@ class iCaRL(nn.Module):
 
                 for mean in exemplar_means:
 
-                    if classifer =='nme':
+                    if classifier =='nme':
                         measure.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
                         measure.append(cosine_similarity(feat, mean))
@@ -349,7 +353,7 @@ class iCaRL(nn.Module):
                     X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
-            if classifier ==' knn':
+            if classifier == 'knn':
                 model = KNeighborsClassifier(n_neighbors=3)
             elif classifier == 'svc':
                 model = LinearSVC()
