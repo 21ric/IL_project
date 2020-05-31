@@ -374,7 +374,7 @@ class iCaRL(nn.Module):
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
                     feature.data = feature.data / torch.norm(feature.data, p=2)
-                    X_train.append(feature.numpy())
+                    X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
             model = KNeighborsClassifier(n_neighbors=5)
@@ -407,7 +407,7 @@ class iCaRL(nn.Module):
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
                     feature.data = feature.data / torch.norm(feature.data, p=2)
-                    X_train.append(feature.numpy())
+                    X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
             model = LinearSVC()
