@@ -76,15 +76,15 @@ class iCaRL(nn.Module):
         self.lr = lr
 
         if self.loss_config == 0:
-            self.clf_loss = nn.BCEWithLogitsLoss()
+            self.clf_loss = nn.BCEWithLogitsLoss() #LR =2
             self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 1:
-            self.clf_loss = nn.NLLLoss()
-            self.dist_loss = nn.NLLLoss()
+            self.clf_loss = nn.MultiLabelSoftMarginLoss() #LR =2
+            self.dist_loss = nn.MultiLabelSoftMarginLoss()
 
         elif self.loss_config == 2:
-            self.clf_loss = nn.L1Loss()
+            self.clf_loss = nn.L1Loss() #LR = 0.2
             self.dist_loss = nn.L1Loss()
 
         else:
@@ -184,13 +184,13 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 1:
-                    #NLLL
-                    out = torch.log(torch.softmax(out, dim=1))
+                    #MLSML
+                    #out = torch.log(torch.softmax(out, dim=1))
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes].long())
 
                 elif self.loss_config == 2:
                     #L1
-                    out = torch.softmax(out, dim=0)
+                    out = torch.softmax(out, dim=1)
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 3:
@@ -376,7 +376,7 @@ class iCaRL(nn.Module):
                     X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
-            model = KNeighborsClassifier(n_neighbors=5)
+            model = KNeighborsClassifier(n_neighbors=3)
             model.fit(X_train, y_train)
 
             x = x.to(DEVICE)
@@ -427,7 +427,7 @@ class iCaRL(nn.Module):
             return preds
 
         #cosine similarity
-        else:
+        elif classifier=='nme-cosine':
             pass
 
 
