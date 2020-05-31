@@ -276,20 +276,20 @@ class iCaRL(nn.Module):
             preds = []
 
             for feat in feature:
-                measure = []
+                measures = []
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
 
                     if classifier =='nme':
-                        measure.append((feat - mean).pow(2).sum().squeeze().item())
+                        measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
-                        measure.append(cosine_similarity(feat, mean))
+                        measures.append(cosine_similarity(feat, mean))
 
                 if classifier =='nme':
-                    preds.append(np.argmin(np.array(dists)))
+                    preds.append(np.argmin(np.array(measures)))
                 if classifier =='nme-cosine':
-                    preds.append(np.argmxn(np.array(dists)))
+                    preds.append(np.argmxn(np.array(measures)))
 
             return preds
 
