@@ -36,12 +36,12 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce = nn.BCEWithLogitsLoss()
-mlsm = nn.MultiLabelSoftMarginLoss()
-l1 = nn.L1Loss()
-mse = nn.MSELoss()
+bce1, bce2 = nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()
+mlsm1, mlsm2 = nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()
+l1_1, l1_2= nn.L1Loss(), nn.L1Loss()
+mse1, mse2 = nn.MSELoss(), nn.MSELoss()
 
-losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
+losses = {'bce': [bce1, bce2], 'mlsm': [mlsm1, mlsm2],'l1': [l1_1, l1_2], 'mse': [mse1, mse2]}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -54,8 +54,8 @@ class iCaRL(nn.Module):
         self.loss_config = loss_config
         self.lr = lr
 
-        self.clf_loss = losses[loss_config]
-        self.dist_loss = losses[loss_config]
+        self.clf_loss = losses[loss_config][0]
+        self.dist_loss = losses[loss_config][1]
 
         self.exemplar_means = []
         self.compute_means = True
@@ -103,10 +103,9 @@ class iCaRL(nn.Module):
 
         self.features_extractor.to(DEVICE)
 
-        prev_features_ex = copy.deepcopy(self.features_extractor)
+        f_ex = copy.deepcopy(self.features_extractor)
         #f_ex.to(DEVICE)
 
-        """
         #compute previous output for training
         q = torch.zeros(len(dataset), self.n_classes).cuda()
         for images, labels, indexes in loader:
@@ -119,7 +118,7 @@ class iCaRL(nn.Module):
 
         q = Variable(q).cuda()
         self.features_extractor.train(True)
-        """
+
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
@@ -154,8 +153,9 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    prev_features_ex.to(DEVICE)
-                    q_i = prev_features_ex(imgs)
+                    #prev_features_ex.to(DEVICE)
+                    #q_i = prev_features_ex(imgs)
+                    q_i = q[indexes]
                     q_i = torch.sigmoid(q_i)
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
