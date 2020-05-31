@@ -20,6 +20,7 @@ import math
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
+from sklearn.metrics.pairwise import cosine_similarity
 
 #transform = transforms.Compose([transforms.ToTensor()], transforms.Normalize((0.5071, 0.4867, 0.4408), (0.2675, 0.2565, 0.2761))])
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
@@ -348,16 +349,17 @@ class iCaRL(nn.Module):
             preds = []
 
             for feat in feature:
-                dists = []
+                similarity = []
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
 
-                    dists.append((feat - mean).pow(2).sum().squeeze().item())
+                    #dists.append((feat - mean).pow(2).sum().squeeze().item())
+                    dists.append(cosine_similarity(feat, mean))
 
 
 
-                preds.append(np.argmin(np.array(dists)))
+                preds.append(np.argmax(np.array(dists)))
 
             return preds
 
@@ -428,7 +430,55 @@ class iCaRL(nn.Module):
 
         #cosine similarity
         elif classifier=='nme-cosine':
-            pass
+            batch_size = x.size(0)
+
+            if self.compute_means:
+
+                exemplar_means = []
+
+                self.features_extractor.train(False)
+                for exemplars in self.exemplar_sets[:self.n_known]:
+                    features = []
+                    for ex in  exemplars:
+
+                        ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                        feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                        feature = feature.squeeze()
+                        feature.data = feature.data / torch.norm(feature.data, p=2)
+                        features.append(feature)
+
+                    features = torch.stack(features)
+                    mu_y = features.mean(0).squeeze()
+                    mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
+                    exemplar_means.append(mu_y)
+
+                self.exemplar_means = exemplar_means
+                self.exemplar_means.extend(self.new_means)
+                self.compute_means = False
+
+            exemplar_means = self.exemplar_means
+
+
+            x = x.to(DEVICE)
+            self.features_extractor.train(False)
+            feature = self.features_extractor.extract_features(x)
+
+
+            preds = []
+
+            for feat in feature:
+                dists = []
+                feat = feat / torch.norm(feat, p=2)
+
+                for mean in exemplar_means:
+
+                    dists.append((feat - mean).pow(2).sum().squeeze().item())
+
+
+
+                preds.append(np.argmin(np.array(dists)))
+
+            return preds
 
 
     def classify_all(self, test_dataset, map_reverse, classifier):
