@@ -103,10 +103,9 @@ class iCaRL(nn.Module):
 
         self.features_extractor.to(DEVICE)
 
-        prev_features_ex = copy.deepcopy(self.features_extractor)
+        f_ex = copy.deepcopy(self.features_extractor)
         #f_ex.to(DEVICE)
 
-        """
         #compute previous output for training
         q = torch.zeros(len(dataset), self.n_classes).cuda()
         for images, labels, indexes in loader:
@@ -119,7 +118,7 @@ class iCaRL(nn.Module):
 
         q = Variable(q).cuda()
         self.features_extractor.train(True)
-        """
+
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
@@ -154,8 +153,9 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    prev_features_ex.to(DEVICE)
-                    q_i = prev_features_ex(imgs)
+                    #prev_features_ex.to(DEVICE)
+                    #q_i = prev_features_ex(imgs)
+                    q_i = q[indexes]
                     q_i = torch.sigmoid(q_i)
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
