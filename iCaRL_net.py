@@ -80,8 +80,8 @@ class iCaRL(nn.Module):
             self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 1:
-            self.clf_loss = nn.NLLLoss()
-            self.dist_loss = nn.NLLLoss()
+            self.clf_loss = nn.MultiLabelSoftMarginLoss()
+            self.dist_loss = nn.MultiLabelSoftMarginLoss()
 
         elif self.loss_config == 2:
             self.clf_loss = nn.L1Loss()
@@ -184,8 +184,8 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 1:
-                    #NLLL
-                    out = torch.log(torch.softmax(out, dim=1))
+                    #MLSML
+                    #out = torch.log(torch.softmax(out, dim=1))
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes].long())
 
                 elif self.loss_config == 2:
