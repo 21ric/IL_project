@@ -311,6 +311,7 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def classify(self, x, classifier):
 
+        #NME
         if classifier == 'nme':
 
             batch_size = x.size(0)
