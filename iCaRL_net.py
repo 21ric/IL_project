@@ -103,8 +103,9 @@ class iCaRL(nn.Module):
 
         self.features_extractor.to(DEVICE)
 
-        prev_features_ex = copy.deepcopy(self.features_extractor)
-        #f_ex.to(DEVICE)
+        #prev_features_ex = copy.deepcopy(self.features_extractor)
+        f_ex = copy.deepcopy(self.features_extractor)
+        f_ex.to(DEVICE)
 
 
         #compute previous output for training
