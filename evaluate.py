@@ -45,7 +45,10 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
             new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme')
         else:
             new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i)
-        print(acc_)
+        print('new_acc', new_acc_)
+        print('old_acc', old_acc_)
+        print('all_acc', all_acc_)
+
         learner_name = learner.__name__
         new_dict_acc[learner_name] = new_acc_
         old_dict_acc[learner_name] = old_acc_
