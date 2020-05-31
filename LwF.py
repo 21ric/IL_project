@@ -37,7 +37,9 @@ def incremental_learning(num):
     net = LwF(0, class_map)
     net.to(DEVICE)
 
-    acc_list = []
+    new_acc_list = []
+    old_acc_list = []
+    all_acc_list = []
 
     for i in range(int(100/CLASSES_BATCH)):
 
@@ -62,7 +64,11 @@ def incremental_learning(num):
         print('-'*30)
 
         print('New classes')
-        acc = net.classify_all(test_dataset, map_reverse)
+        new_acc = net.classify_all(test_dataset, map_reverse)
+        new_acc_list.append(new_acc)
+        if i == 0:
+            all_acc_list.append(new_acc)
+            old_acc_list.append([])
 
         if i > 0:
 
@@ -73,14 +79,13 @@ def incremental_learning(num):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            _ = net.classify_all(prev_classes_dataset, map_reverse)
+            old_acc = net.classify_all(prev_classes_dataset, map_reverse)
             print('All classes')
-            acc = net.classify_all(all_classes_dataset, map_reverse)
+            all_acc = net.classify_all(all_classes_dataset, map_reverse)
 
-            acc_list.append(acc)
+            old_acc_list.append(old_acc)
+            all_acc_list.append(all_acc)
+
             print('-'*30)
-
-        elif i == 0:
-            acc_list.append(acc)
 
     return acc_list

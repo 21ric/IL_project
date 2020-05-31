@@ -118,7 +118,10 @@ def incremental_learning(num):
   net = resnet32(num_classes=0)
   #print(net)
 
-  acc_list = []
+  new_acc_list = []
+  old_acc_list = []
+  all_acc_list = []
+
   for i in range(int(100/CLASSES_BATCH)):
 
     print('-'*30)
@@ -148,8 +151,14 @@ def incremental_learning(num):
     print('-'*30)
 
     print('New classes')
-    acc = test(net, test_dataloader, map_reverse)
+    new_acc = test(net, test_dataloader, map_reverse)
     print(acc)
+
+    new_acc_list.append(new_acc)
+
+    if i == 0:
+        old_acc_list.append([])
+        all_acc_list.append(new_acc)
 
     if i > 0:
 
@@ -165,16 +174,15 @@ def incremental_learning(num):
       test_all_dataloader = DataLoader(all_classes_dataset, batch_size=BATCH_SIZE, shuffle=False, drop_last=False, num_workers=4)
 
       print('Old classes')
-      acc = test(net, test_prev_dataloader, map_reverse)
+      old_acc = test(net, test_prev_dataloader, map_reverse)
       print(acc)
       print('All classes')
-      acc = test(net, test_all_dataloader, map_reverse)
+      all_acc = test(net, test_all_dataloader, map_reverse)
       print(acc)
 
-      acc_list.append(acc)
+      old_acc_list.append(old_acc)
+      all_acc_list.append(all_acc)
       print('-'*30)
 
-    elif i == 0:
-      acc_list.append(acc)
 
-  return acc_list
+  return new_acc_list, old_acc_list, all_acc_list
