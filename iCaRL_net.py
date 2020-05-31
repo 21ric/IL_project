@@ -227,6 +227,7 @@ class iCaRL(nn.Module):
                     #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     #loss2 = self.dist_loss(out, target)
                     #print
+                    
                 loss.backward()
                 optimizer.step()
 
