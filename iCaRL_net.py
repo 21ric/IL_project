@@ -185,7 +185,7 @@ class iCaRL(nn.Module):
 
                 elif self.loss_config == 1:
                     #NLLL
-                    out = np.log(torch.softmax(out))
+                    out = np.log(torch.softmax(out, dim=1))
                     loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 2:
@@ -207,7 +207,7 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 1:
-                        #NLL
+                        #NLLL
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 2:
