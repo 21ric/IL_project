@@ -152,7 +152,7 @@ def incremental_learning(num):
 
     print('New classes')
     new_acc = test(net, test_dataloader, map_reverse)
-    print(acc)
+    print(new_acc)
 
     new_acc_list.append(new_acc)
 
