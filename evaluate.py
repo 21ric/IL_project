@@ -44,7 +44,7 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
         print(f"Classes group {i}\n")
         # Call the incremental_learning function to perform train+test on 10 iterations
         if learner == icarl:
-            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme')
+            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme',lr=2.0)
         else:
             new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i)
         print('new_acc', new_acc_)

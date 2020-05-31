@@ -65,7 +65,7 @@ def validate(net, val_dataloader, class_map, q_val):
 """
 
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, loss_config):
+    def __init__(self, n_classes, class_map, loss_config, lr):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -73,6 +73,7 @@ class iCaRL(nn.Module):
         self.n_known = 0
         self.exemplar_sets = []
         self.loss_config = loss_config
+        self.lr = lr
 
         if self.loss_config == 0:
             self.clf_loss = nn.BCEWithLogitsLoss()
@@ -150,7 +151,7 @@ class iCaRL(nn.Module):
         q = Variable(q).cuda()
         self.features_extractor.train(True)
 
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=LR, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
 
