@@ -76,15 +76,15 @@ class iCaRL(nn.Module):
         self.lr = lr
 
         if self.loss_config == 0:
-            self.clf_loss = nn.BCEWithLogitsLoss()
+            self.clf_loss = nn.BCEWithLogitsLoss() #LR =2
             self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 1:
-            self.clf_loss = nn.MultiLabelSoftMarginLoss()
+            self.clf_loss = nn.MultiLabelSoftMarginLoss() #LR =2
             self.dist_loss = nn.MultiLabelSoftMarginLoss()
 
         elif self.loss_config == 2:
-            self.clf_loss = nn.L1Loss()
+            self.clf_loss = nn.L1Loss() #LR = 0.2
             self.dist_loss = nn.L1Loss()
 
         else:
