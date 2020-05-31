@@ -68,7 +68,7 @@ def incremental_learning(num):
         new_acc_list.append(new_acc)
         if i == 0:
             all_acc_list.append(new_acc)
-            old_acc_list.append([])
+
 
         if i > 0:
 
