@@ -376,7 +376,7 @@ class iCaRL(nn.Module):
                     X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
-            model = KNeighborsClassifier(n_neighbors=5)
+            model = KNeighborsClassifier(n_neighbors=3)
             model.fit(X_train, y_train)
 
             x = x.to(DEVICE)
