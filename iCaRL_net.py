@@ -38,7 +38,7 @@ MOMENTUM = 0.9
 ########################
 
 losses = {'bce': [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 'mlsm': [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
-        2: [nn.L1Loss(), nn.L1Loss()], 3: [nn.MSELoss(), nn.MSELoss()]}
+        'l1': [nn.L1Loss(), nn.L1Loss()], 'mse': [nn.MSELoss(), nn.MSELoss()]}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -167,7 +167,7 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(torch.softmax(out[:, self.n_known:self.n_classes],dim=1), labels_hot[:, self.n_known:self.n_classes])
                 """
 
-                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
+                loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
 
 
 
