@@ -141,6 +141,9 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
+                if loss_config in ['l1', 'mse']:
+                    out = torch.sigmoid(out)
+
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
                 """
 
@@ -284,10 +287,9 @@ class iCaRL(nn.Module):
     def classify(self, x, classifier):
 
         #NME
-        if classifier == 'nme':
+        if classifier in ['nme', 'nme-cosine']:
 
             batch_size = x.size(0)
-
             if self.compute_means:
 
                 exemplar_means = []
@@ -323,17 +325,20 @@ class iCaRL(nn.Module):
             preds = []
 
             for feat in feature:
-                similarity = []
+                measure = []
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
 
-                    #dists.append((feat - mean).pow(2).sum().squeeze().item())
-                    dist.append(cosine_similarity(feat, mean))
+                    if classifer =='nme':
+                        measure.append((feat - mean).pow(2).sum().squeeze().item())
+                    elif classifier =='nme-cosine':
+                        measure.append(cosine_similarity(feat, mean))
 
-
-
-                preds.append(np.argmax(np.array(dists)))
+                if classifier =='nme':
+                    preds.append(np.argmin(np.array(dists)))
+                if classifier =='nme-cosine':
+                    preds.append(np.argmxn(np.array(dists)))
 
             return preds
 
