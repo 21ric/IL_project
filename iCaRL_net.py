@@ -41,7 +41,7 @@ mlsm1, mlsm2 = nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()
 l1_1, l1_2= nn.L1Loss(), nn.L1Loss()
 mse1, mse2 = nn.MSELoss(), nn.MSELoss()
 
-losses = {'bce': [bce1, bce2], 'mlsm': [mlsm1, mslm2],'l1': [l1_1, l1_2], 'mse': [mse1, mse2]}
+losses = {'bce': [bce1, bce2], 'mlsm': [mlsm1, mlsm2],'l1': [l1_1, l1_2], 'mse': [mse1, mse2]}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
