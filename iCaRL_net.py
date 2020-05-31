@@ -148,16 +148,16 @@ class iCaRL(nn.Module):
                 out = self(imgs)
 
                 if self.loss_config == 'l1' or self.loss_config== 'mse':
-                    out = torch.sigmoid(out)
+                    out1 = torch.sigmoid(out)
 
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                loss = self.clf_loss(torch.softmax(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
                     #prev_features_ex.to(DEVICE)
                     #q_i = prev_features_ex(imgs)
                     q_i = q[indexes]
                     q_i = torch.sigmoid(q_i)
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                    dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known]), q_i[:, :self.n_known])
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
