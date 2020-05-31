@@ -37,8 +37,10 @@ def incremental_learning(dict_num,loss_config,classifier):
 
     net = iCaRL(0, class_map, loss_config=loss_config)
 
-    acc_list = []
- 
+    new_acc_list = []
+    old_acc_list = []
+    all_acc_list = []
+
     for i in range(int(100/CLASSES_BATCH)):
 
         print('-'*30)
@@ -62,7 +64,7 @@ def incremental_learning(dict_num,loss_config,classifier):
         print('-'*30)
 
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
-        
+
 
         print('Reducing exemplar sets ...')
         print('-'*30)
@@ -83,7 +85,11 @@ def incremental_learning(dict_num,loss_config,classifier):
         print('-'*30)
 
         print('New classes')
-        acc = net.classify_all(test_dataset, map_reverse, classifier=classifier)
+        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier)
+
+        new_acc_list.append(new_acc)
+        if i == 0:
+            all_acc_list.append(new_acc)
 
         if i > 0:
 
@@ -94,11 +100,15 @@ def incremental_learning(dict_num,loss_config,classifier):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
+            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
             print('All classes')
-            acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
+            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
+
+
+            old_acc_list.append(old_acc)
+            all_acc_list.append(all_acc)
 
             print('-'*30)
 
-        acc_list.append(acc)
-    return acc_list
+
+    return new_acc_list, old_acc_list, all_acc_list
