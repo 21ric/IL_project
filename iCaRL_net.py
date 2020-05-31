@@ -65,6 +65,9 @@ def validate(net, val_dataloader, class_map, q_val):
     return loss
 """
 
+losses ={0: [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 1: [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
+        2: [nn.L1Loss(), nn.L1Loss()], 3: [nn.MSELoss(), nn.MSELoss()]}
+
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
@@ -76,21 +79,8 @@ class iCaRL(nn.Module):
         self.loss_config = loss_config
         self.lr = lr
 
-        if self.loss_config == 0:
-            self.clf_loss = nn.BCEWithLogitsLoss() #LR =2
-            self.dist_loss = nn.BCEWithLogitsLoss()
-
-        elif self.loss_config == 1:
-            self.clf_loss = nn.MultiLabelSoftMarginLoss() #LR =2
-            self.dist_loss = nn.MultiLabelSoftMarginLoss()
-
-        elif self.loss_config == 2:
-            self.clf_loss = nn.L1Loss() #LR = 0.2
-            self.dist_loss = nn.L1Loss()
-
-        else:
-            self.clf_loss = nn.MSELoss()
-            self.dist_loss = nn.MSELoss()
+        self.clf_loss = losses[loss_config][0]
+        self.dist_loss = losses[loss_config][1]
 
         self.exemplar_means = []
         self.compute_means = True
@@ -179,6 +169,11 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
+                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                """
+
+                if loss config
+
 
                 if self.loss_config == 0:
                     #BCE
@@ -187,7 +182,7 @@ class iCaRL(nn.Module):
                 elif self.loss_config == 1:
                     #MLSML
                     #out = torch.log(torch.softmax(out, dim=1))
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes].long())
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 2:
                     #L1
@@ -197,12 +192,15 @@ class iCaRL(nn.Module):
                 elif self.loss_config == 3:
                     #MSE
                     loss = self.clf_loss(torch.softmax(out[:, self.n_known:self.n_classes],dim=1), labels_hot[:, self.n_known:self.n_classes])
-
+                """
 
                 if self.n_known > 0:
 
                     q_i = q[indexes]
 
+                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+
+                    """
                     if self.loss_config == 0:
                         #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
@@ -218,6 +216,7 @@ class iCaRL(nn.Module):
                     elif self.loss_config == 3:
                         #MSE
                         dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known],dim=1), q_i[:, :self.n_known])
+                    """
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
@@ -355,7 +354,7 @@ class iCaRL(nn.Module):
                 for mean in exemplar_means:
 
                     #dists.append((feat - mean).pow(2).sum().squeeze().item())
-                    dists.append(cosine_similarity(feat, mean))
+                    similarty.append(cosine_similarity(feat, mean))
 
 
 
@@ -429,7 +428,7 @@ class iCaRL(nn.Module):
             return preds
 
         #cosine similarity
-        elif classifier=='nme-cosine':
+        elif classifier == 'nme-cosine':
             batch_size = x.size(0)
 
             if self.compute_means:
@@ -472,7 +471,7 @@ class iCaRL(nn.Module):
 
                 for mean in exemplar_means:
 
-                    dists.append((feat - mean).pow(2).sum().squeeze().item())
+                    similarty.append((feat - mean).pow(2).sum().squeeze().item())
 
 
 
