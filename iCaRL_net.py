@@ -195,7 +195,7 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known],dim=1), q_i[:, :self.n_known])
                     """
 
-#
+
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
                 loss.backward()
