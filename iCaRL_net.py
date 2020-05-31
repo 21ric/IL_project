@@ -36,37 +36,8 @@ NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
-"""
-@torch.no_grad()
-def validate(net, val_dataloader, class_map, q_val):
 
-    net.train(False)
-    loss = 0
-    for inputs, labels, indexes in val_dataloader:
-        inputs = inputs.to(DEVICE)
-        indexes = indexes.to(DEVICE)
-        seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-        labels = Variable(seen_labels).to(DEVICE)
-        labels_hot=torch.eye(net.n_classes)[labels]
-        labels_hot = labels_hot.to(DEVICE)
-
-        out = net(inputs)
-
-        if net.n_known <= 0:
-            loss += net.clf_loss(out, labels_hot)*inputs.size(0)
-
-        else:
-            q_i = q_val[indexes]
-            target = torch.cat((q_i[:, :net.n_known], labels_hot[:, net.n_known:net.n_classes]), dim=1)
-            loss += net.dist_loss(out, target)*inputs.size(0)
-
-    loss = loss/len(val_dataloader.dataset)
-    net.train(True)
-    return loss
-"""
-#
-
-losses ={0: [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 1: [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
+losses = {'bce': [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 'mlsm': [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
         2: [nn.L1Loss(), nn.L1Loss()], 3: [nn.MSELoss(), nn.MSELoss()]}
 
 class iCaRL(nn.Module):
@@ -225,16 +196,10 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known],dim=1), q_i[:, :self.n_known])
                     """
 
-                        dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), q_i[:, :self.n_known])
+                    dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), q_i[:, :self.n_known])
 
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-
-
-                    #old method
-                    #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                    #loss2 = self.dist_loss(out, target)
-                    #print
 
                 loss.backward()
                 optimizer.step()
