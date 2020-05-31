@@ -194,8 +194,6 @@ class iCaRL(nn.Module):
 
                         dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known],dim=1), q_i[:, :self.n_known])
                     """
-
-#
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
                 loss.backward()
@@ -337,7 +335,7 @@ class iCaRL(nn.Module):
             return preds
 
         #KNN
-    elif classifier in ['knn', 'svc']:
+        elif classifier in ['knn', 'svc']:
 
             X_train, y_train = [], []
 
@@ -370,7 +368,7 @@ class iCaRL(nn.Module):
 
 
         #SVC
-        elif classifier == 'svc':
+        elif classifier == ['svc','knn']:
 
             X_train, y_train = [], []
 
