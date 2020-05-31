@@ -80,8 +80,8 @@ class iCaRL(nn.Module):
             self.dist_loss = nn.BCEWithLogitsLoss()
 
         elif self.loss_config == 1:
-            self.clf_loss = nn.CrossEntropyLoss()
-            self.dist_loss = nn.BCEWithLogitsLoss()
+            self.clf_loss = nn.NLLLoss()
+            self.dist_loss = nn.NLLLoss()
 
         elif self.loss_config == 2:
             self.clf_loss = nn.L1Loss()
@@ -184,9 +184,9 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 1:
-                    #CE
-                    #loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels[self.n_known:self.n_classes])
-                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels)
+                    #NLLL
+                    out = np.log(torch.softmax(out))
+                    loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
 
                 elif self.loss_config == 2:
                     #L1
@@ -207,7 +207,7 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 1:
-                        #BCE
+                        #NLL
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     elif self.loss_config == 2:
