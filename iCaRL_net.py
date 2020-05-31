@@ -139,7 +139,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                if self.loss_config in ['l1', 'mse']:
+                if self.loss_config == 'l1' or self.loss_config== 'mse']:
                     out = torch.sigmoid(out)
 
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -279,7 +279,7 @@ class iCaRL(nn.Module):
     def classify(self, x, classifier):
 
         #NME
-        if classifier in ['nme', 'nme-cosine']:
+        if classifier == 'nme' or classifier == 'nme-cosine':
 
             batch_size = x.size(0)
             if self.compute_means:
@@ -335,7 +335,7 @@ class iCaRL(nn.Module):
             return preds
 
         #KNN
-        elif classifier in ['knn', 'svc']:
+        elif classifier =='knn' or classifier ==  'svc':
 
             X_train, y_train = [], []
 
