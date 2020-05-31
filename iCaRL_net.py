@@ -31,9 +31,9 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
-MOMENTUM = 0.9 
+MOMENTUM = 0.9
 ########################
 """
 @torch.no_grad()
@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                
+
                 if self.loss_config == 0:
                     #BCE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -195,7 +195,7 @@ class iCaRL(nn.Module):
                 elif self.loss_config == 3:
                     #MSE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                                 
+
                 '''
                 if self.n_known > 0:
 
@@ -221,35 +221,35 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                
+
                 '''
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
-                
+
                 '''
-                if self.n_known <= 0:  
-     
+                if self.n_known <= 0:
+
                     q_i = q[indexes]
                     if self.loss_config == 0:
                         target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                    
+
                     elif self.loss_config == 1:
                         target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                    
+
                     elif self.loss_config == 2:
                         _, q_i = torch.max(torch.softmax(q_i, dim=1), dim=1, keepdim=False)
                         target = torch.cat((q_i[:, :self.n_known], labels[:, self.n_known:self.n_classes]), dim=1)
 
                     elif self.loss_config == 3:
                         target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
-                         
+
 
                     #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     loss = self.dist_loss(out, target)
 
-                
+
                 '''
-                #vecchio 
+                #vecchio
                 if self.n_known > 0:
                    q_i = q[indexes]
                    target = torch.cat((q_i[:,:self.n_known],labels_hot[:,self.n_known:self.n_classes]),dim=1)
@@ -268,7 +268,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-        return 
+        return
 
 
     def reduce_exemplars_set(self, m):
