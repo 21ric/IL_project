@@ -31,7 +31,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -177,7 +177,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                '''                
+
                 if self.loss_config == 0:
                     #BCE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -196,11 +196,7 @@ class iCaRL(nn.Module):
                     #MSE
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
-<<<<<<< HEAD
 
-=======
-                
->>>>>>> 5fc84b606c185d625a6a6805431956faf6ea7f4a
                 if self.n_known > 0:
 
                     q_i = q[indexes]
@@ -208,6 +204,8 @@ class iCaRL(nn.Module):
                     if self.loss_config == 0:
                         #BCE
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
+                        loss2 = self.dist_loss(out, target)
 
                     elif self.loss_config == 1:
                         #BCE
@@ -226,7 +224,10 @@ class iCaRL(nn.Module):
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
+                    print('loss1', loss.item())
+                    print('loss2', loss2.item())
 
+                """
                 if self.n_known <= 0:
                     loss = self.clf_loss(out, labels_hot)
 
@@ -251,7 +252,7 @@ class iCaRL(nn.Module):
                     #target = torch.cat((q_i[:, :self.n_known], labels_hot[:, self.n_known:self.n_classes]), dim=1)
                     #loss = self.dist_loss(out, target)
 
-
+                """
                 '''
                 #vecchio
                 if self.n_known > 0:
