@@ -5,11 +5,12 @@ import torch.optim as optim
 from torchvision import transforms
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
+
 import numpy as np
+
 from PIL import Image
 
 from resnet import resnet32
-
 import copy
 
 import random
@@ -155,7 +156,7 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     prev_features_ex.to(DEVICE)
                     q_i = prev_features_ex(imgs)
-                    q_i = torch.sigmoid(qi)
+                    q_i = torch.sigmoid(q_i)
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
