@@ -36,10 +36,10 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce1, bce2 = nn.BCEWithLogitsLoss()
-mlsm1, mlsm2 = nn.MultiLabelSoftMarginLoss()
-l1_1, l1_2= nn.L1Loss()
-mse1, mse2 = nn.MSELoss()
+bce1, bce2 = nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()
+mlsm1, mlsm2 = nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()
+l1_1, l1_2= nn.L1Loss(), nn.L1Loss()
+mse1, mse2 = nn.MSELoss(), nn.MSELoss()
 
 losses = {'bce': [bce1, bce2], 'mlsm': [mlsm1, mslm2],'l1': [l1_1, l1_2], 'mse': [mse1, mse2]}
 
