@@ -349,7 +349,11 @@ class iCaRL(nn.Module):
                     X_train.append(feature.cpu().numpy())
                     y_train.append(i)
 
-            model = KNeighborsClassifier(n_neighbors=3)
+            if classifier ==' knn':
+                model = KNeighborsClassifier(n_neighbors=3)
+            elif classifier == 'svc':
+                model = LinearSVC()
+
             model.fit(X_train, y_train)
 
             x = x.to(DEVICE)
@@ -363,91 +367,6 @@ class iCaRL(nn.Module):
                 X.append(feat.cpu().numpy())
 
             preds = model.predict(X)
-
-            return preds
-
-
-        #SVC
-        elif classifier == ['svc','knn']:
-
-            X_train, y_train = [], []
-
-            self.features_extractor.train(False)
-            for i, exemplars in enumerate(self.exemplar_sets):
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / torch.norm(feature.data, p=2)
-                    X_train.append(feature.cpu().numpy())
-                    y_train.append(i)
-
-            model = LinearSVC()
-            model.fit(X_train, y_train)
-
-            x = x.to(DEVICE)
-            self.features_extractor.train(False)
-            feature = self.features_extractor.extract_features(x)
-
-            X = []
-
-            for feat in feature:
-                feat = feat / torch.norm(feat, p=2)
-                X.append(feat.cpu().numpy())
-
-            preds = model.predict(X)
-
-            return preds
-
-        #cosine similarity
-        elif classifier == 'nme-cosine':
-            batch_size = x.size(0)
-
-            if self.compute_means:
-
-                exemplar_means = []
-
-                self.features_extractor.train(False)
-                for exemplars in self.exemplar_sets[:self.n_known]:
-                    features = []
-                    for ex in  exemplars:
-
-                        ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                        feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                        feature = feature.squeeze()
-                        feature.data = feature.data / torch.norm(feature.data, p=2)
-                        features.append(feature)
-
-                    features = torch.stack(features)
-                    mu_y = features.mean(0).squeeze()
-                    mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
-                    exemplar_means.append(mu_y)
-
-                self.exemplar_means = exemplar_means
-                self.exemplar_means.extend(self.new_means)
-                self.compute_means = False
-
-            exemplar_means = self.exemplar_means
-
-
-            x = x.to(DEVICE)
-            self.features_extractor.train(False)
-            feature = self.features_extractor.extract_features(x)
-
-
-            preds = []
-
-            for feat in feature:
-                dists = []
-                feat = feat / torch.norm(feat, p=2)
-
-                for mean in exemplar_means:
-
-                    dists.append((feat - mean).pow(2).sum().squeeze().item())
-
-
-
-                preds.append(np.argmin(np.array(dists)))
 
             return preds
 
