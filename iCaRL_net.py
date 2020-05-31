@@ -388,7 +388,7 @@ class iCaRL(nn.Module):
 
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
-                X.append(feat.numpy())
+                X.append(feat.cpu().numpy())
 
             preds = model.predict(X)
 
@@ -421,7 +421,7 @@ class iCaRL(nn.Module):
 
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
-                X.append(feat.numpy())
+                X.append(feat.cpu().numpy())
 
             preds = model.predict(X)
 
