@@ -32,7 +32,6 @@ BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 2
-#
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
