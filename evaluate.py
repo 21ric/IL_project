@@ -42,15 +42,20 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
         print(f"Classes group {i}\n")
         # Call the incremental_learning function to perform train+test on 10 iterations
         if learner == icarl:
-            acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme')
+            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme')
         else:
-            acc_ = learner.incremental_learning(i)
-        print(acc_)
+            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i)
+        print('new_acc', new_acc_)
+        print('old_acc', old_acc_)
+        print('all_acc', all_acc_)
+
         learner_name = learner.__name__
-        dict_acc[learner_name] = [accuracy for accuracy in acc_]
+        new_dict_acc[learner_name] = new_acc_
+        old_dict_acc[learner_name] = old_acc_
+        all_dict_acc[learner_name] = all_acc_
         #print(dict_acc)
 
-    return dict_acc
+    return new_dict_acc, old_dict_acc, all_dict_acc
 
     '''
     # Write accuracy lists on file

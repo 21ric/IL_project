@@ -26,7 +26,7 @@ STEPDOWN_FACTOR = 5
 LR = 2
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.00001
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 ########################
 
 
@@ -152,7 +152,7 @@ def incremental_learning(num):
 
     print('New classes')
     new_acc = test(net, test_dataloader, map_reverse)
-    print(acc)
+    print(new_acc)
 
     new_acc_list.append(new_acc)
 
@@ -174,10 +174,10 @@ def incremental_learning(num):
 
       print('Old classes')
       old_acc = test(net, test_prev_dataloader, map_reverse)
-      print(acc)
+      print(old_acc)
       print('All classes')
       all_acc = test(net, test_all_dataloader, map_reverse)
-      print(acc)
+      print(all_acc)
 
       old_acc_list.append(old_acc)
       all_acc_list.append(all_acc)
