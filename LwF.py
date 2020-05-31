@@ -88,4 +88,4 @@ def incremental_learning(num):
 
             print('-'*30)
 
-    return acc_list
+    return new_acc_list, old_acc_list, all_acc_list
