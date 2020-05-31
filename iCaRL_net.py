@@ -36,12 +36,12 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce = nn.BCEWithLogitsLoss()
-mlsm = nn.MultiLabelSoftMarginLoss()
-l1 = nn.L1Loss()
-mse = nn.MSELoss()
+bce1, bce2 = nn.BCEWithLogitsLoss()
+mlsm1, mlsm2 = nn.MultiLabelSoftMarginLoss()
+l1_1, l1_2= nn.L1Loss()
+mse1, mse2 = nn.MSELoss()
 
-losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
+losses = {'bce': [bce1, bce2], 'mlsm': [mlsm1, mslm2],'l1': [l1_1, l1_2], 'mse': [mse1, mse2]}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -54,8 +54,8 @@ class iCaRL(nn.Module):
         self.loss_config = loss_config
         self.lr = lr
 
-        self.clf_loss = losses[loss_config]
-        self.dist_loss = losses[loss_config]
+        self.clf_loss = losses[loss_config][0]
+        self.dist_loss = losses[loss_config][1]
 
         self.exemplar_means = []
         self.compute_means = True
