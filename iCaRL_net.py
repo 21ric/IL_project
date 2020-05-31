@@ -154,7 +154,7 @@ class iCaRL(nn.Module):
 
                 if self.n_known > 0:
                     prev_features_ex.to(DEVICE)
-                    q_i = prev_features_ex(img)
+                    q_i = prev_features_ex(imgs)
                     q_i = torch.sigmoid(qi)
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
