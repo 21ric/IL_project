@@ -115,11 +115,10 @@ class iCaRL(nn.Module):
             indexes = indexes.cuda()
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
-        """
 
         q = Variable(q).cuda()
         self.features_extractor.train(True)
-
+        """
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
