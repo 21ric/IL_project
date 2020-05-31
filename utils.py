@@ -83,9 +83,9 @@ def get_class_maps_from_file(map_filename, revmap_filename):
     return class_map, map_reverse
 
 
-def dump_dict(num,dictionary):
+def dump_dict(num,dictionary,title):
 
-    with open('accuracy'+num+'.pickle', 'wb') as handle:
+    with open(title+'_accuracy'+num+'.pickle', 'wb') as handle:
         pickle.dump(dictionary, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
