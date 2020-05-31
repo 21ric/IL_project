@@ -354,7 +354,7 @@ class iCaRL(nn.Module):
                 for mean in exemplar_means:
 
                     #dists.append((feat - mean).pow(2).sum().squeeze().item())
-                    similarty.append(cosine_similarity(feat, mean))
+                    dist.append(cosine_similarity(feat, mean))
 
 
 
@@ -471,7 +471,7 @@ class iCaRL(nn.Module):
 
                 for mean in exemplar_means:
 
-                    similarty.append((feat - mean).pow(2).sum().squeeze().item())
+                    dists.append((feat - mean).pow(2).sum().squeeze().item())
 
 
 
