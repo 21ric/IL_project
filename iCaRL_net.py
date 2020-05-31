@@ -64,6 +64,7 @@ def validate(net, val_dataloader, class_map, q_val):
     net.train(True)
     return loss
 """
+#
 
 losses ={0: [nn.BCEWithLogitsLoss(), nn.BCEWithLogitsLoss()], 1: [nn.MultiLabelSoftMarginLoss(), nn.MultiLabelSoftMarginLoss()],
         2: [nn.L1Loss(), nn.L1Loss()], 3: [nn.MSELoss(), nn.MSELoss()]}
@@ -191,13 +192,13 @@ class iCaRL(nn.Module):
 
                 elif self.loss_config == 3:
                     #MSE
-<<<<<<< HEAD
+
                     loss = self.clf_loss(torch.softmax(out[:, self.n_known:self.n_classes],dim=1), labels_hot[:, self.n_known:self.n_classes])
                 """
-=======
+
                     loss = self.clf_loss(torch.sigmoid(out[:, self.n_known:self.n_classes]), labels_hot[:, self.n_known:self.n_classes])
 
->>>>>>> c37c3ebbf1535d822fefdac9aae58108e0eb5577
+
 
                 if self.n_known > 0:
 
@@ -220,12 +221,12 @@ class iCaRL(nn.Module):
 
                     elif self.loss_config == 3:
                         #MSE
-<<<<<<< HEAD
+
                         dist_loss = self.dist_loss(torch.softmax(out[:, :self.n_known],dim=1), q_i[:, :self.n_known])
                     """
-=======
+
                         dist_loss = self.dist_loss(torch.sigmoid(out[:, :self.n_known]), q_i[:, :self.n_known])
->>>>>>> c37c3ebbf1535d822fefdac9aae58108e0eb5577
+
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
