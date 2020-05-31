@@ -174,10 +174,10 @@ def incremental_learning(num):
 
       print('Old classes')
       old_acc = test(net, test_prev_dataloader, map_reverse)
-      print(acc)
+      print(old_acc)
       print('All classes')
       all_acc = test(net, test_all_dataloader, map_reverse)
-      print(acc)
+      print(all_acc)
 
       old_acc_list.append(old_acc)
       all_acc_list.append(all_acc)
