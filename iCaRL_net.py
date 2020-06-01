@@ -294,7 +294,7 @@ class iCaRL(nn.Module):
                     elif classifier =='nme-cosine':
                         print('here')
                         if cond:
-                            print('mean', mean.cpu.numpy())
+                            print('mean', mean.cpu().numpy())
                             print('feat', feat.cpu().numpy())
                         measures.append(cosine_similarity(feat.cpu().numpy(), mean.cpu().numpy()))
 
