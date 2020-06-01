@@ -290,11 +290,13 @@ class iCaRL(nn.Module):
                     if classifier =='nme':
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
+                        print('here')
                         measures.append(cosine_similarity(feat.cpu().numpy(), mean))
 
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
                 if classifier =='nme-cosine':
+                    print('here2')
                     preds.append(np.argmxn(np.array(measures)))
 
             return preds
