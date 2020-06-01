@@ -242,6 +242,8 @@ class iCaRL(nn.Module):
 
     @torch.no_grad()
     def classify(self, x, classifier):
+        
+        cond = True
 
         #NME
         if classifier == 'nme' or classifier == 'nme-cosine':
@@ -291,6 +293,9 @@ class iCaRL(nn.Module):
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
                         print('here')
+                        if cond:
+                            print('mean', mean)
+                            print('feat', feat)
                         measures.append(cosine_similarity(feat.cpu().numpy(), mean.cpu().numpy()))
 
                 if classifier =='nme':
