@@ -207,7 +207,7 @@ def create_plot(xs, ys, errs, title):
     ax.set_yticks(np.arange(0, 1., 0.1))
     ax.set_ylim(bottom=0.)
     ax.grid(axis='y')
-    ax.legend(loc='upper right')
+    ax.legend(loc='bottom right')
     fig.suptitle(title)
 
     ax.set_xlabel('Known classes')
