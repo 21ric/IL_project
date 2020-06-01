@@ -162,7 +162,7 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
     return class_groups, class_map, map_reverse
 
 
-def elaborate_results(dict_files):
+def elaborate_results(dict_files, title):
     ft = []
     lwf = []
     icarl = []
@@ -194,7 +194,7 @@ def elaborate_results(dict_files):
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
 
-    create_plot(xs, ys, errs, 'Mean accuracies over 3 different splits')
+    create_plot(xs, ys, errs, tile)
 
 
 def create_plot(xs, ys, errs, title):
