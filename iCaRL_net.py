@@ -296,7 +296,7 @@ class iCaRL(nn.Module):
                         if cond:
                             print('mean', mean.cpu().numpy())
                             print('feat', feat.cpu().numpy())
-                        measures.append(cosine_similarity(feat.cpu().numpy(), mean.cpu().numpy()))
+                        measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
