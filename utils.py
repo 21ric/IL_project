@@ -194,7 +194,7 @@ def elaborate_results(dict_files, title):
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
 
-    create_plot(xs, ys, errs, tile)
+    create_plot(xs, ys, errs, title)
 
 
 def create_plot(xs, ys, errs, title):
