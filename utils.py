@@ -187,7 +187,7 @@ def elaborate_results(dict_files, title, old=False):
 
     #print(ft_mean)
     #print(ft_std)
-    if !old:
+    if not old:
       x = list(map(str,list(range(10,110,10))))
     else:
       x = list(map(str,list(range(20,110,10))))
