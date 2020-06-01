@@ -162,7 +162,7 @@ def get_class_maps_from_files(classgroup_filename, map_filename, revmap_filename
     return class_groups, class_map, map_reverse
 
 
-def elaborate_results(dict_files, title):
+def elaborate_results(dict_files, title, old=False):
     ft = []
     lwf = []
     icarl = []
@@ -187,17 +187,19 @@ def elaborate_results(dict_files, title):
 
     #print(ft_mean)
     #print(ft_std)
-
-    x = list(map(str,list(range(10,110,10))))
+    if !old:
+      x = list(map(str,list(range(10,110,10))))
+    else:
+      x = list(map(str,list(range(20,110,10))))
 
     xs = [x, x, x]
     ys = [ft_mean, lwf_mean, icarl_mean]
     errs = [ft_std, lwf_std, icarl_std]
 
-    create_plot(xs, ys, errs, title)
+    create_plot(xs, ys, errs, title, old)
 
 
-def create_plot(xs, ys, errs, title):
+def create_plot(xs, ys, errs, title, old=False):
 
     #print(xs[0], ys[0])
 
