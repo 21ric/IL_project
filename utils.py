@@ -205,9 +205,9 @@ def create_plot(xs, ys, errs, title, old=False):
 
     fig, ax = plt.subplots()
     for i, label in zip([0,1,2], ['fine_tuning', 'LwF', 'iCaRL']):
-        ax.errorbar(xs[i], ys[i], yerr=errs[i], fmt='-o', label=label, markersize=2, linewidth=3)
+        ax.errorbar(xs[i], ys[i], yerr=errs[i], fmt='-o', label=label, markersize=2)
     ax.set_yticks(np.arange(0, 1., 0.1))
-    ax.set_ylim(bottom=0.)
+    ax.set_ylim(bottom=-0.03)
     ax.grid(axis='y')
     ax.legend(loc='bottom right')
     fig.suptitle(title)
