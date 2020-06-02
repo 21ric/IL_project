@@ -163,9 +163,10 @@ class iCaRL(nn.Module):
                     features = self.features_extractor.extract_features(imgs)
                     prev_features = f_ex.extract_features(imgs)
                     
-                    mse_loss = mse(features, prev_features)
+                    mse_loss = mse(features/torch.norm(features.data, p=2), prev_features/torch.norm(prev_features.data, p=2))
 
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss + mse_loss
+                    #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss + mse_loss
+                    loss = 1/3*loss + 1/3*dist_loss + 1/3*mse_loss
 
                 loss.backward()
                 optimizer.step()
