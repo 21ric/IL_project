@@ -150,6 +150,7 @@ class iCaRL(nn.Module):
                 out = self(imgs)
 
                 if self.loss_config == 'l1' or self.loss_config == 'mse':
+                    print(out)
                     #out = torch.softmax(out,dim=1)
                     out = torch.norm(out, p=2)
 
