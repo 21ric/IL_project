@@ -61,6 +61,13 @@ class ourModel(nn.Module):
         self.compute_means = True
         self.new_means = []
         self.class_map = class_map
+        
+        # Add a new attribute: self.prev_logits stores the outputs of the net at iteration i, where i is the position index.
+        # According to the 2nd rule in the iCaRL paper:
+        # "its computational requirements and memory footprint should remain bounded, or at least grow very slowly, 
+        # with respect to the number of classes seen so far."
+        # A list of matrices (with float elements) does not need much memory to store.
+        self.prev_logits = []
 
 
     def forward(self, x):
@@ -117,6 +124,9 @@ class ourModel(nn.Module):
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
+        
+        #append last model's outputs to self.prev_logits attribute
+        self.prev_logits.append(q)
 
 
         self.features_extractor.train(True)
@@ -159,15 +169,12 @@ class ourModel(nn.Module):
 
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    f_ex.train(False)
-                    self.features_extractor.train(False)
-                    features = self.features_extractor.extract_features(imgs)
-                    prev_features = f_ex.extract_features(imgs)
-                    self.features_extractor.train(True)
-                    mse_loss = mse(features/torch.norm(features.data, p=2), prev_features/torch.norm(prev_features.data, p=2))
+                    
+                    
+                    print(f'clf loss:{loss.item()}')
+                    print(f'dist loss:{loss.item()}')
 
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss + mse_loss
-                    loss = 3/4*loss + 1/4*mse_loss
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
                 loss.backward()
                 optimizer.step()
