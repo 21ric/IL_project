@@ -168,7 +168,7 @@ class iCaRL(nn.Module):
                     mse_loss = mse(features/torch.norm(features.data, p=2), prev_features/torch.norm(prev_features.data, p=2))
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss + mse_loss
-                    loss = 2/3*loss + 1/3*mse_loss
+                    loss = 3/4*loss + 1/4*mse_loss
 
                 loss.backward()
                 optimizer.step()
