@@ -43,7 +43,7 @@ mse = nn.MSELoss()
 
 losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
 
-class iCaRL(nn.Module):
+class ourModel(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
