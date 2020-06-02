@@ -301,7 +301,7 @@ class iCaRL(nn.Module):
 
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
-                if classifier =='nme-cosine':
+                elif classifier =='nme-cosine':
                     preds.append(np.argmax(np.array(measures)))
 
             return preds
