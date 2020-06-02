@@ -1,4 +1,4 @@
-from iCaRL_net import iCaRL
+from ourmodel_net import ourModel
 
 from torchvision import transforms
 from torch.utils.data import DataLoader, Subset
@@ -35,7 +35,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
                                                                              path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, loss_config=loss_config,lr=lr)
+    net = ourModel(0, class_map, loss_config=loss_config,lr=lr)
 
     new_acc_list = []
     old_acc_list = []
