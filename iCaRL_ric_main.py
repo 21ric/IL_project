@@ -1,4 +1,4 @@
-from iCaRL_net import iCaRL
+from iCaRL_ric import iCaRL
 
 from torchvision import transforms
 from torch.utils.data import DataLoader, Subset
@@ -72,6 +72,8 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         m = MEMORY_SIZE // net.n_classes
 
         net.reduce_exemplars_set(m)
+        
+        net.train_on_exemplars(net.exemplars)
 
         print('Constructing exemplar sets ...')
         print('-'*30)
