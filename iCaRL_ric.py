@@ -279,7 +279,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = imgs.to(DEVICE)
-                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                seen_labels = torch.LongTensor([class_map[label] for label in labels])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
