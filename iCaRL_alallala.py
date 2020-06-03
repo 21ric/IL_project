@@ -69,7 +69,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         print('Reducing exemplar sets ...')
         print('-'*30)
 
-        m = MEMORY_SIZE / (net.n_classes)
+        m = MEMORY_SIZE // (net.n_classes)
         
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
