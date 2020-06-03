@@ -163,34 +163,30 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             self.exemplar_sets[y] = exemplars[:m]
     
+   
+        
     @torch.no_grad()
     def compute_new_means(self, images):
+        features = []
+
+            self.features_extractor.to(DEVICE)
+
+
+            self.features_extractor.train(False)
+            for img in images:
+                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                feature = feature / np.linalg.norm(feature)
+                features.append(feature[0])
+
+            class_mean = np.mean(features, axis=0)
+            class_mean = class_mean / np.linalg.norm(class_mean)
+
+            self.new_means.append(class_mean)
         
-        features=[]
-        
-        self.features_extractor.to(DEVICE)
-
-
-        self.features_extractor.train(False)
-        for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
-
-        class_mean = np.mean(features, axis=0)
-        class_mean = class_mean / np.linalg.norm(class_mean)
-
-        self.new_means.append(class_mean)
-        
-        return features, class_mean
-        
-
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
-        
-        features, class_mean = self.compute_new_means(images)
 
         if random:
             exemplar_set = []
@@ -200,6 +196,23 @@ class iCaRL(nn.Module):
             self.exemplar_sets.append(exemplar_set)
 
         else:
+            features = []
+
+            self.features_extractor.to(DEVICE)
+
+
+            self.features_extractor.train(False)
+            for img in images:
+                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                feature = feature / np.linalg.norm(feature)
+                features.append(feature[0])
+
+            class_mean = np.mean(features, axis=0)
+            class_mean = class_mean / np.linalg.norm(class_mean)
+
+            self.new_means.append(class_mean)
+
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
@@ -212,6 +225,7 @@ class iCaRL(nn.Module):
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
+
                 if i == 0:
                     images = images[1:]
                     features = features[1:]
@@ -282,7 +296,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-    @torch.no_grad()
+     @torch.no_grad()
     def classify(self, x, classifier):
 
         #NME
@@ -315,7 +329,6 @@ class iCaRL(nn.Module):
 
             exemplar_means = self.exemplar_means
 
-            print('here')
 
             x = x.to(DEVICE)
             self.features_extractor.train(False)
@@ -329,24 +342,17 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
-                    
-                    print('ab')
 
                     if classifier =='nme':
-                        print('qua')
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
-                        print('qui')
-                        measures.append(cosine_similarity(feat, mean))
+                        measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
                 if classifier =='nme':
-                    print('qua')
                     preds.append(np.argmin(np.array(measures)))
-                if classifier =='nme-cosine':
-                    print('qui')
-                    preds.append(np.argmxn(np.array(measures)))
-                    
-            print('finit')
+                elif classifier =='nme-cosine':
+                    preds.append(np.argmax(np.array(measures)))
+
             return preds
 
         #KNN
@@ -376,8 +382,6 @@ class iCaRL(nn.Module):
             feature = self.features_extractor.extract_features(x)
 
             X = []
-            
-            print('nono')
 
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
@@ -397,9 +401,8 @@ class iCaRL(nn.Module):
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
             preds = self.classify(imgs, classifier)
-            print('qui')
             preds = [map_reverse[pred] for pred in preds]
-            running_corrects += (preds == labels.cpu().numpy()).sum()
+            running_corrects += (preds == labels.numpy()).sum()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
 
