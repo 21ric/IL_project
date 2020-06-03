@@ -152,7 +152,7 @@ class iCaRL(nn.Module):
                     #print(out)
                     out = torch.softmax(out,dim=1)
 
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 if self.n_known > 0:
 
