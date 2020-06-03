@@ -287,7 +287,7 @@ class iCaRL(nn.Module):
                 for mean in exemplar_means:
 
                     if classifier =='nme':
-                        measures.append((feat - mean).pow(2).sum().squeeze().item())
+                        measures.append((feat - mean).pow(2).sum().squeeze().item().cpu().numpy())
                     elif classifier =='nme-cosine':
                         measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
