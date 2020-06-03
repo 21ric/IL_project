@@ -255,10 +255,13 @@ class iCaRL(nn.Module):
                           
         exemplars = torch.Tensor(exemplars) # transform to torch tensor
         labels = torch.Tensor(labels)
+        
+        print('creo dataloader')
 
         dataset = TensorDataset(exemplars,labels) # create your datset
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
+        print('finito')
         
         self.features_extractor.train(True)
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
