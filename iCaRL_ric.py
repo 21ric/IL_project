@@ -369,6 +369,8 @@ class iCaRL(nn.Module):
             feature = self.features_extractor.extract_features(x)
 
             X = []
+            
+            print('nono')
 
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
@@ -389,7 +391,7 @@ class iCaRL(nn.Module):
             imgs = Variable(imgs).cuda()
             preds = self.classify(imgs, classifier)
             preds = [map_reverse[pred] for pred in preds]
-            running_corrects += (preds == labels.numpy()).sum()
+            running_corrects += (preds == labels.cpu().numpy()).sum()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
         print('Test Accuracy: {}'.format(accuracy))
 
