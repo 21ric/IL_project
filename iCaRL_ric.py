@@ -341,7 +341,8 @@ class iCaRL(nn.Module):
                     preds.append(np.argmin(np.array(measures)))
                 if classifier =='nme-cosine':
                     preds.append(np.argmxn(np.array(measures)))
-
+                    
+            print('finit')
             return preds
 
         #KNN
