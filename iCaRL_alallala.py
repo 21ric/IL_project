@@ -75,9 +75,14 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         index_list = np.arange(i+1)
         print(f"index list is {index_list}")
         print(f"m list is {m_list}")
-        for elem in index_list:
+        if i <= 5:
+          for elem in index_list:
             m_list[elem] = m_list[elem] - (elem)*2
             m_list[elem] = m_list[elem] + (i - elem)*2
+        elif i>5:
+            m_list[elem] = m_list[elem] - (elem)
+            m_list[elem] = m_list[elem] + (i - elem)
+
 
         net.reduce_exemplars_set(m_list[:-1])
 
