@@ -245,13 +245,13 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
     
     
-    def train_on_exemplars(self, class_map):
+    def train_on_exemplars(self, class_map, map_reverse):
         exemplars_list = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
             for ex in exemplars:
                 exemplars_list.append(np.array(ex))
-                labels.append(y)
+                labels.append(map_reverse[y])
                           
         exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
         labels = torch.Tensor(labels)
