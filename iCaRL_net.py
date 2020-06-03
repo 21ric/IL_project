@@ -98,8 +98,6 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
-        self.add_classes(n)
-
 
         self.features_extractor.to(DEVICE)
 
@@ -118,7 +116,8 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
-
+        self.add_classes(n)
+        
         self.features_extractor.train(True)
 
 
