@@ -166,6 +166,8 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def compute_new_means(self, images):
         
+        features=[]
+        
         self.features_extractor.to(DEVICE)
 
 
