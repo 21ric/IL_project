@@ -272,7 +272,8 @@ class iCaRL(nn.Module):
 
             exemplar_means = self.exemplar_means
 
-
+            print('numero medie', len(exemplar_means))
+            
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
