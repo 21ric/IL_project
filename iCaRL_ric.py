@@ -230,7 +230,7 @@ class iCaRL(nn.Module):
             self.exemplar_sets.append(np.array(exemplar_set))
             self.features_extractor.train(True)
     
-    def train_on_exemplar():
+    def train_on_exemplars():
         exemplars = []
         labels = []
         for y, exemplars in (self.exemplar_sets):
