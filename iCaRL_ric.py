@@ -315,6 +315,7 @@ class iCaRL(nn.Module):
 
             exemplar_means = self.exemplar_means
 
+            print('here')
 
             x = x.to(DEVICE)
             self.features_extractor.train(False)
