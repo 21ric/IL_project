@@ -107,7 +107,7 @@ class iCaRL(nn.Module):
 
 
         #compute previous output for training
-        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_known).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
