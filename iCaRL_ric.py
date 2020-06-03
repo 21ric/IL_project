@@ -181,14 +181,14 @@ class iCaRL(nn.Module):
 
         self.new_means.append(class_mean)
         
+        return features, class_mean
+        
 
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
         
-        features = []
-
-        self.compute_new_means()
+        features, class_mean = self.compute_new_means()
 
         if random:
             exemplar_set = []
