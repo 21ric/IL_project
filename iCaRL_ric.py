@@ -251,7 +251,7 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             for ex in exemplars:
                 exemplars_list.append(np.array(ex))
-                labels.append(np.array([y]))
+                labels.append(y)
                           
         exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
         labels = torch.Tensor(labels)
@@ -279,7 +279,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = imgs.to(DEVICE)
-                seen_labels = torch.LongTensor([class_map[label] for label in labels])
+                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
