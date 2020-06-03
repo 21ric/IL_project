@@ -81,7 +81,9 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         if i !=0:
             print('Training on exemplars...')
             print('-'*30)
-            net.train_on_exemplars(net.exemplars)
+            
+            net.new_means=[]
+            net.train_on_exemplars(net.exemplar_sets)
 
             print('Recomputing new means ...')
             print('-'*30)
