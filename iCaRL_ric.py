@@ -296,7 +296,7 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-     @torch.no_grad()
+    @torch.no_grad()
     def classify(self, x, classifier):
 
         #NME
