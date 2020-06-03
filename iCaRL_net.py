@@ -48,7 +48,7 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=0)
 
-        self.n_classes = -1
+        self.n_classes = 0
         self.n_known = 0
         self.exemplar_sets = []
         self.loss_config = loss_config
@@ -141,7 +141,7 @@ class iCaRL(nn.Module):
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 #labels = torch.Tensor(seen_labels).to(DEVICE)
-                labels_hot=torch.eye(self.n_classes+1)[labels]
+                labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
 
