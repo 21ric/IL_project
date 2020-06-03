@@ -30,7 +30,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
     utils.set_seed(0)
 
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+dict_num+'.pickle',
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+ dict_num +'.pickle',
                                                                              path+'map'+ dict_num +'.pickle',
                                                                              path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
@@ -70,14 +70,22 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         print('-'*30)
 
         m = MEMORY_SIZE // (net.n_classes)
+        
+        m_list = [m]*(i+1)
+        index_list = np.arange(i+1)
+        print(f"index list is {index_list}")
+        print(f"m list is {m_list}")
+        for elem in index_list:
+            m_list[elem] = m_list[elem] - (elem)
+            m_list[elem] = m_list[elem] + (i - elem)
 
-        net.reduce_exemplars_set(m)
+        net.reduce_exemplars_set(m_list[:-1])
 
         print('Constructing exemplar sets ...')
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m_list[-1], random_flag=False)
 
         net.n_known = net.n_classes 
 
