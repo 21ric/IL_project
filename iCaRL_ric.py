@@ -250,7 +250,7 @@ class iCaRL(nn.Module):
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
             for ex in exemplars:
-                exemplars_list.append(np.array(ex))
+                exemplars_list.append(np.array(transform(Image.fromarray(ex))))
                 labels.append(map_reverse[y])
                           
         exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
@@ -275,7 +275,7 @@ class iCaRL(nn.Module):
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-
+                
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = imgs.to(DEVICE)
