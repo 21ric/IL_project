@@ -69,7 +69,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         print('Reducing exemplar sets ...')
         print('-'*30)
 
-        m = MEMORY_SIZE // (net.n_classes + 1)
+        m = MEMORY_SIZE // (net.n_classes)
 
         net.reduce_exemplars_set(m)
 
@@ -79,7 +79,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
 
-        net.n_known = net.n_classes + 1
+        net.n_known = net.n_classes 
 
         print('Testing ...')
         print('-'*30)
