@@ -333,8 +333,10 @@ class iCaRL(nn.Module):
                     print('ab')
 
                     if classifier =='nme':
+                        print('qua')
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
+                        print('qui')
                         measures.append(cosine_similarity(feat, mean))
 
                 if classifier =='nme':
