@@ -247,7 +247,7 @@ class iCaRL(nn.Module):
     def train_on_exemplars(self):
         exemplars = []
         labels = []
-        for y, exemplars in (self.exemplar_sets):
+        for y, exemplars in enumerate(self.exemplar_sets):
             exemplars.append(np.array(exemplars))
             labels.append(np.array([y]*len(exemplars)))
                           
