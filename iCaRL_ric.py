@@ -188,7 +188,7 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
         
-        features, class_mean = self.compute_new_means()
+        features, class_mean = self.compute_new_means(images)
 
         if random:
             exemplar_set = []
