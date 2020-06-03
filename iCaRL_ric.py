@@ -233,7 +233,7 @@ class iCaRL(nn.Module):
         labels = []
         for y, exemplars in (self.exemplar_sets):
             exemplars.append(np.array(exemplars))
-            labels.append(np.array([y]*len(exemplars))
+            labels.append(np.array([y]*len(exemplars)))
                           
         exemplars = torch.Tensor(exemplars) # transform to torch tensor
         labels = torch.Tensor(labels)
