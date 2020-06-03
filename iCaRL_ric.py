@@ -338,7 +338,8 @@ class iCaRL(nn.Module):
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
-
+            
+            print('numero medie', len(exemplar_means))
 
             preds = []
 
@@ -351,15 +352,10 @@ class iCaRL(nn.Module):
                     if classifier =='nme':
                         print('here')
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
-                    #elif classifier =='nme-cosine':
-                        #measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
-
+                  
                 if classifier =='nme':
                     print('errr1')
                     preds.append(np.argmin(np.array(measures)))
-                elif classifier =='nme-cosine':
-                    print('errr2')
-                    preds.append(np.argmax(np.array(measures)))
 
             return preds
 
