@@ -245,7 +245,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
     
     
-    def train_on_exemplars(self):
+    def train_on_exemplars(self, class_map):
         exemplars_list = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
