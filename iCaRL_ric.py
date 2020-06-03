@@ -330,6 +330,7 @@ class iCaRL(nn.Module):
 
                 self.exemplar_means = exemplar_means
                 self.exemplar_means.extend(self.new_means)
+                print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
