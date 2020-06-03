@@ -159,15 +159,7 @@ class iCaRL(nn.Module):
 
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    f_ex.train(False)
-                    self.features_extractor.train(False)
-                    features = self.features_extractor.extract_features(imgs)
-                    prev_features = f_ex.extract_features(imgs)
-                    self.features_extractor.train(True)
-                    mse_loss = mse(features/torch.norm(features.data, p=2), prev_features/torch.norm(prev_features.data, p=2))
-
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss + mse_loss
-                    loss = 3/4*loss + 1/4*mse_loss
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss    
 
                 loss.backward()
                 optimizer.step()
