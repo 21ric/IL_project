@@ -36,13 +36,6 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce = nn.BCEWithLogitsLoss()
-mlsm = nn.MultiLabelSoftMarginLoss()
-l1 = nn.L1Loss()
-mse = nn.MSELoss()
-
-losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
-
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
@@ -54,8 +47,8 @@ class iCaRL(nn.Module):
         self.loss_config = loss_config
         self.lr = lr
 
-        self.clf_loss = losses[loss_config]
-        self.dist_loss = losses[loss_config]
+        self.clf_loss = nn.BCEWithLogitsLoss()
+        self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
@@ -66,61 +59,9 @@ class iCaRL(nn.Module):
     def forward(self, x):
         x = self.features_extractor(x)
         return x
-
-    def add_classes(self, n):
-        in_features = self.features_extractor.fc.in_features
-        out_features = self.features_extractor.fc.out_features
-
-        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
-        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
-
-        self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
-        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
-
-        self.n_classes += n
-
-    def add_exemplars(self, dataset, map_reverse):
-        for y, exemplars in enumerate(self.exemplar_sets):
-            dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
-
-    def update_representation(self, dataset, class_map, map_reverse, iter):
-
-        targets = list(set(dataset.targets))
-        n = len(targets)
-
-        print('New classes:{}'.format(n))
-        print('-'*30)
-
-        self.add_exemplars(dataset, map_reverse)
-
-        print('Datset extended to {} elements'.format(len(dataset)))
-
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-
-        self.add_classes(n)
-
-
-        self.features_extractor.to(DEVICE)
-
-        prev_features_ex = copy.deepcopy(self.features_extractor)
-        #f_ex.to(DEVICE)
-
-
-        #compute previous output for training
-        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
-        for images, labels, indexes in loader:
-            f_ex.train(False)
-            images = Variable(images).to(DEVICE)
-            indexes = indexes.to(DEVICE)
-            g = torch.sigmoid(f_ex.forward(images))
-            q[indexes] = g.data
-        q = Variable(q).to(DEVICE)
-
-
+    
+    def train(self, loader):
         self.features_extractor.train(True)
-
-
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
@@ -171,8 +112,55 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
 
-        return
+    def add_classes(self, n):
+        in_features = self.features_extractor.fc.in_features
+        out_features = self.features_extractor.fc.out_features
 
+        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
+        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
+
+        self.features_extractor.fc = nn.Linear(in_features, out_features+n)
+        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
+
+        self.n_classes += n
+
+    def add_exemplars(self, dataset, map_reverse):
+        for y, exemplars in enumerate(self.exemplar_sets):
+            dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
+
+    def update_representation(self, dataset, class_map, map_reverse, iter):
+
+        targets = list(set(dataset.targets))
+        n = len(targets)
+
+        print('New classes:{}'.format(n))
+        print('-'*30)
+
+        #self.add_exemplars(dataset, map_reverse)
+
+        print('Datset extended to {} elements'.format(len(dataset)))
+
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+
+        self.features_extractor.to(DEVICE)
+
+        f_ex = copy.deepcopy(self.features_extractor)
+        f_ex.to(DEVICE)
+        #compute previous output for training
+        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
+        for images, labels, indexes in loader:
+            f_ex.train(False)
+            images = Variable(images).to(DEVICE)
+            indexes = indexes.to(DEVICE)
+            g = torch.sigmoid(f_ex.forward(images))
+            q[indexes] = g.data
+        q = Variable(q).to(DEVICE)
+
+        self.add_classes(n)
+        
+        self.train(loader)
+        
 
     def reduce_exemplars_set(self, m):
         for y, exemplars in enumerate(self.exemplar_sets):
