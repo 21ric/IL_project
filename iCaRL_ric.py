@@ -188,7 +188,7 @@ class iCaRL(nn.Module):
         
         features = []
 
-         self.compute_new_means()
+        self.compute_new_means()
 
         if random:
             exemplar_set = []
