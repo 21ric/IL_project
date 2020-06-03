@@ -329,6 +329,8 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
+                    
+                    print('ab')
 
                     if classifier =='nme':
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
@@ -390,6 +392,7 @@ class iCaRL(nn.Module):
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
             preds = self.classify(imgs, classifier)
+            print('qui')
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.cpu().numpy()).sum()
         accuracy = running_corrects / float(len(test_dataloader.dataset))
