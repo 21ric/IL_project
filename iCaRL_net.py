@@ -48,7 +48,7 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
-        self.n_classes = n_classes
+        self.n_classes = -1
         self.n_known = 0
         self.exemplar_sets = []
         self.loss_config = loss_config
