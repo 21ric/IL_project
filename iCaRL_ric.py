@@ -244,12 +244,13 @@ class iCaRL(nn.Module):
             self.exemplar_sets.append(np.array(exemplar_set))
             self.features_extractor.train(True)
     
+    
     def train_on_exemplars(self):
         exemplars = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
-            exemplars.append(np.array(exemplars))
-            labels.append(np.array([y]*len(exemplars)))
+            exemplars.extend(np.array(exemplars))
+            labels.extend(np.array([y]*len(exemplars)))
                           
         exemplars = torch.Tensor(exemplars) # transform to torch tensor
         labels = torch.Tensor(labels)
