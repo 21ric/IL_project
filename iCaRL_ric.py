@@ -211,7 +211,7 @@ class iCaRL(nn.Module):
             class_mean = np.mean(features, axis=0)
             class_mean = class_mean / np.linalg.norm(class_mean)
 
-            self.new_means.append(class_mean)
+            #self.new_means.append(class_mean)
 
             exemplar_set = []
             exemplar_features = []
@@ -348,13 +348,10 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
-                    print('before')
                     if classifier =='nme':
-                        print('here')
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
                   
                 if classifier =='nme':
-                    print('errr1')
                     preds.append(np.argmin(np.array(measures)))
 
             return preds
