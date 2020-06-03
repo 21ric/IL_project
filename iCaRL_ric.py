@@ -249,8 +249,9 @@ class iCaRL(nn.Module):
         exemplars = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
-            exemplars.extend(np.array(exemplars))
-            labels.extend(np.array([y]*len(exemplars)))
+            for ex in exemplars:
+                exemplars.append(np.array(ex))
+                labels.append(np.array([y]))
                           
         exemplars = torch.Tensor(exemplars) # transform to torch tensor
         labels = torch.Tensor(labels)
