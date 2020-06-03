@@ -78,15 +78,16 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
         
-        print('Training on exemplars...')
-        print('-'*30)
-        net.train_on_exemplars(net.exemplars)
+        if i !=0:
+            print('Training on exemplars...')
+            print('-'*30)
+            net.train_on_exemplars(net.exemplars)
 
-        print('Recomputing new means ...')
-        print('-'*30)
+            print('Recomputing new means ...')
+            print('-'*30)
 
-        for y in classes_groups[i]:
-           net.compute_new_means(train_dataset.get_class_imgs(y))
+            for y in classes_groups[i]:
+               net.compute_new_means(train_dataset.get_class_imgs(y))
 
         net.n_known = net.n_classes
 
