@@ -347,11 +347,12 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
-
+                    print('before')
                     if classifier =='nme':
+                        print('here')
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
-                    elif classifier =='nme-cosine':
-                        measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
+                    #elif classifier =='nme-cosine':
+                        #measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
