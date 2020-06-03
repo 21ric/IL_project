@@ -246,19 +246,19 @@ class iCaRL(nn.Module):
     
     
     def train_on_exemplars(self):
-        exemplars = []
+        exemplars_list = None
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
             for ex in exemplars:
-                exemplars.append(np.array(ex))
+                exemplars_list.append(np.array(ex))
                 labels.append(np.array([y]))
                           
-        exemplars = torch.Tensor(exemplars) # transform to torch tensor
+        exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
         labels = torch.Tensor(labels)
         
         print('creo dataloader')
 
-        dataset = TensorDataset(exemplars,labels) # create your datset
+        dataset = TensorDataset(exemplars_list,labels) # create your datset
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
         print('finito')
