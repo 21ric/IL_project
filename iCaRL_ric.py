@@ -338,8 +338,10 @@ class iCaRL(nn.Module):
                         measures.append(cosine_similarity(feat, mean))
 
                 if classifier =='nme':
+                    print('qua')
                     preds.append(np.argmin(np.array(measures)))
                 if classifier =='nme-cosine':
+                    print('qui')
                     preds.append(np.argmxn(np.array(measures)))
                     
             print('finit')
