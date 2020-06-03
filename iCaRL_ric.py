@@ -355,8 +355,10 @@ class iCaRL(nn.Module):
                         #measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
                 if classifier =='nme':
+                    print('errr1')
                     preds.append(np.argmin(np.array(measures)))
                 elif classifier =='nme-cosine':
+                    print('errr2')
                     preds.append(np.argmax(np.array(measures)))
 
             return preds
