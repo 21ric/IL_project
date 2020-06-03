@@ -181,6 +181,7 @@ class iCaRL(nn.Module):
             m_total.extend(m)
         for y, exemplars in enumerate(self.exemplar_sets):
             self.exemplar_sets[y] = exemplars[:m_total[y]]
+            print(len(self.exemplar_sets[y]))
 
 
     @torch.no_grad()
