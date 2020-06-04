@@ -287,8 +287,10 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 out = self(imgs)
-
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                
+                # Use it only with BCE
+                loss = self.clf_loss(out[:,:], labels_hot[:, :])
+                #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 loss.backward()
                 optimizer.step()
