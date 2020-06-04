@@ -36,10 +36,12 @@ MOMENTUM = 0.9
 ########################
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+'''
 transform_ex_train = transforms.Compose([transforms.RandomCrop(32, padding=4),
                                     transforms.RandomHorizontalFlip(),
                                     transforms.ToTensor(),
                                     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+'''
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -257,7 +259,7 @@ class iCaRL(nn.Module):
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
             for ex in exemplars:
-                exemplars_list.append(np.array(transform_ex_train(Image.fromarray(ex))))
+                exemplars_list.append(np.array(transform(Image.fromarray(ex))))
                 labels.append(map_reverse[y])
 
         exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
