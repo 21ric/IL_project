@@ -357,7 +357,7 @@ class iCaRL(nn.Module):
 
                 for mean in exemplar_means:
                     if classifier =='nme':
-                        measures.append((feat - mean).pow(2).sum().squeeze().item())
+                        measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
 
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
