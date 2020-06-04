@@ -98,7 +98,6 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
-        # RICHI
         self.add_classes(n)
 
         self.features_extractor.to(DEVICE)

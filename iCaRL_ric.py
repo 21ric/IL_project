@@ -58,7 +58,7 @@ class iCaRL(nn.Module):
 
     def forward(self, x):
         x = self.features_extractor(x)
-        return x    
+        return x
 
     def add_classes(self, n):
         in_features = self.features_extractor.fc.in_features
@@ -104,11 +104,11 @@ class iCaRL(nn.Module):
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
-        
+
         self.features_extractor.train(True)
-        
+
         self.add_classes(n)
-        
+
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
@@ -158,14 +158,14 @@ class iCaRL(nn.Module):
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
             i+=1
-        
+
 
     def reduce_exemplars_set(self, m):
         for y, exemplars in enumerate(self.exemplar_sets):
             self.exemplar_sets[y] = exemplars[:m]
-    
-   
-        
+
+
+
     @torch.no_grad()
     def compute_new_means(self, images):
         features = []
@@ -184,7 +184,7 @@ class iCaRL(nn.Module):
         class_mean = class_mean / np.linalg.norm(class_mean)
 
         self.new_means.append(class_mean)
-        
+
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
@@ -244,8 +244,8 @@ class iCaRL(nn.Module):
 
             self.exemplar_sets.append(np.array(exemplar_set))
             self.features_extractor.train(True)
-    
-    
+
+
     def train_on_exemplars(self, class_map, map_reverse):
         exemplars_list = []
         labels = []
@@ -253,17 +253,17 @@ class iCaRL(nn.Module):
             for ex in exemplars:
                 exemplars_list.append(np.array(transform(Image.fromarray(ex))))
                 labels.append(map_reverse[y])
-                          
+
         exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
         labels = torch.Tensor(labels)
-        
+
         print('creo dataloader')
 
         dataset = TensorDataset(exemplars_list,labels) # create your datset
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-        
+
         print('finito')
-        
+
         self.features_extractor.train(True)
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
@@ -276,7 +276,7 @@ class iCaRL(nn.Module):
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-                
+
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = imgs.to(DEVICE)
@@ -288,7 +288,7 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 out = self(imgs)
-                
+
                 # Use it only with BCE
                 loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
@@ -334,7 +334,7 @@ class iCaRL(nn.Module):
                 self.exemplar_means = exemplar_means
                 #print(f'Exemplar means is {self.exemplar_means}')
                 #print(f'Exemplar new means is {self.new_means}')
-                ###### UNCOMMENTED self.exemplar_means.extend(self.new_means)
+                elf.exemplar_means.extend(self.new_means)
                 #print(f'Exemplar means extended is {self.exemplar_means}')
                 print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
@@ -345,7 +345,7 @@ class iCaRL(nn.Module):
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
-            
+
             print('numero medie', len(exemplar_means))
 
             preds = []
@@ -357,7 +357,7 @@ class iCaRL(nn.Module):
                 for mean in exemplar_means:
                     if classifier =='nme':
                         measures.append((feat - mean).pow(2).sum().squeeze().item())
-                  
+
                 if classifier =='nme':
                     preds.append(np.argmin(np.array(measures)))
 
