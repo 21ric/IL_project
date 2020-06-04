@@ -93,7 +93,7 @@ class iCaRL(nn.Module):
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         self.features_extractor.to(DEVICE)
-        
+
         self.add_classes(n)
 
         f_ex = copy.deepcopy(self.features_extractor)
@@ -249,7 +249,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
 
 
-    def train_on_exemplars(self, class_map, map_reverse):
+    def train_on_exemplars(self, class_map, map_reverse, iter):
         exemplars_list = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
@@ -261,13 +261,13 @@ class iCaRL(nn.Module):
         labels = torch.Tensor(labels)
 
         print('creo dataloader')
-        
+
         # Create Dataloaders
         dataset = TensorDataset(exemplars_list,labels) # create your datset
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         # Check loader length
         print(len(loader.dataset))
-        
+
         # Save an instance of the last model (the one trained with distillation)
         f_ex = copy.deepcopy(self.features_extractor)
 
@@ -288,7 +288,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = Variable(imgs).to(DEVICE)
-                
+
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
@@ -301,15 +301,15 @@ class iCaRL(nn.Module):
                 # Compute classification loss
                 loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                
+
                 # Compute distillation loss (based on old outputs)
                 f_ex.to(DEVICE)
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs))
                 dist_loss = self.dist_loss(out[:, :], q_i[:, :])
 
-                loss = (1/3)*loss + (2/3)*dist_loss
-                
+                loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+
 
                 loss.backward()
                 optimizer.step()
