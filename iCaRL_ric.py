@@ -189,7 +189,24 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
-        if random:
+        features = []
+
+        self.features_extractor.to(DEVICE)
+
+
+        self.features_extractor.train(False)
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0])
+
+        class_mean = np.mean(features, axis=0)
+        class_mean = class_mean / np.linalg.norm(class_mean)
+
+        self.new_means.append(class_mean)
+
+        if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
@@ -197,22 +214,6 @@ class iCaRL(nn.Module):
             self.exemplar_sets.append(exemplar_set)
 
         else:
-            features = []
-
-            self.features_extractor.to(DEVICE)
-
-
-            self.features_extractor.train(False)
-            for img in images:
-                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-                feature = feature / np.linalg.norm(feature)
-                features.append(feature[0])
-
-            class_mean = np.mean(features, axis=0)
-            class_mean = class_mean / np.linalg.norm(class_mean)
-
-            #self.new_means.append(class_mean)
 
             exemplar_set = []
             exemplar_features = []
@@ -231,7 +232,7 @@ class iCaRL(nn.Module):
                     images = images[1:]
                     features = features[1:]
 
-                elif i == len(features):
+                elif i == (len(features)-1):
                     images = images[:-1]
                     features = features[:-1]
                 else:
@@ -329,7 +330,7 @@ class iCaRL(nn.Module):
                     features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
                     mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
-                    exemplar_means.append(mu_y)
+                    exemplar_means.append(mu_y.cpu())
 
                 self.exemplar_means = exemplar_means
                 #print(f'Exemplar means is {self.exemplar_means}')
