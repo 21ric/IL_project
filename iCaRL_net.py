@@ -267,7 +267,9 @@ class iCaRL(nn.Module):
                     exemplar_means.append(mu_y)
 
                 self.exemplar_means = exemplar_means
+                print('len new_means', len(self.new_means))
                 self.exemplar_means.extend(self.new_means)
+                print('len all_means', len(self.exemplar_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
