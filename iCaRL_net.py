@@ -98,7 +98,8 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
-        self.add_classes(n)
+        # RICHI
+        #self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
 
@@ -118,9 +119,10 @@ class iCaRL(nn.Module):
         q = Variable(q).to(DEVICE)
 
         
-        
         self.features_extractor.train(True)
 
+        #LINDA
+        self.add_classes(n)
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
