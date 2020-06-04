@@ -174,7 +174,7 @@ class iCaRL(nn.Module):
         return
 
 
-    def reduce_exemplars_set(self, m):
+    def reduce_exemplars_set(self, m_list):
         m_total = []
         for elem in m_list:
             m = [elem]*10
