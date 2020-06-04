@@ -227,6 +227,8 @@ class iCaRL(nn.Module):
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
+                
+                print(f'len features is: {len(features)}')
 
                 if i == 0:
                     images = images[1:]
