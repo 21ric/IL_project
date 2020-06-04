@@ -30,6 +30,7 @@ BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
+NUM_EPOCHS_RETRAIN = 30
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -276,7 +277,7 @@ class iCaRL(nn.Module):
         i = 0
 
         self.features_extractor.to(DEVICE)
-        for epoch in range(NUM_EPOCHS):
+        for epoch in range(NUM_EPOCHS_RETRAIN):
 
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
@@ -313,7 +314,7 @@ class iCaRL(nn.Module):
                 optimizer.step()
 
 
-            if i % 10 == 0 or i == (NUM_EPOCHS-1):
+            if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
