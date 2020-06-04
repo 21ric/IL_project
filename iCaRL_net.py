@@ -182,7 +182,7 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
-        if random:
+        if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
