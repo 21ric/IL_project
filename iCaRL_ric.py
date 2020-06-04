@@ -332,7 +332,7 @@ class iCaRL(nn.Module):
 
                 self.exemplar_means = exemplar_means
                 new_means = self.new_means #convert to CPU?
-                new_means = Variable(new_means).cpu()
+                new_means = new_means.cpu()
                 self.exemplar_means.extend(new_means)
                 print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
