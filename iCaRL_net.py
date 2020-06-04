@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -265,7 +265,7 @@ class iCaRL(nn.Module):
                     features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
                     mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
-                    exemplar_means.append(mu_y)
+                    exemplar_means.append(mu_y.cpu())
 
                 self.exemplar_means = exemplar_means
                 print('len new_means', len(self.new_means))
