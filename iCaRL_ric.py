@@ -30,7 +30,7 @@ BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
-NUM_EPOCHS_RETRAIN = 100
+NUM_EPOCHS_RETRAIN = 30
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -278,7 +278,7 @@ class iCaRL(nn.Module):
 
         self.features_extractor.train(True)
 
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.2, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
 
