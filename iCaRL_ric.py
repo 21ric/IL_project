@@ -207,6 +207,7 @@ class iCaRL(nn.Module):
         self.new_means.append(class_mean)
 
         if random_flag:
+            print('random')
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
@@ -337,7 +338,7 @@ class iCaRL(nn.Module):
                 #print(f'Exemplar new means is {self.new_means}')
                 self.exemplar_means.extend(self.new_means)
                 #print(f'Exemplar means extended is {self.exemplar_means}')
-                print('lunghezza nuove medie', len(self.new_means))
+                #print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
@@ -347,7 +348,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
 
-            print('numero medie', len(exemplar_means))
+            #print('numero medie', len(exemplar_means))
 
             preds = []
 
