@@ -234,7 +234,7 @@ class iCaRL(nn.Module):
                     images = images[1:]
                     features = features[1:]
 
-                elif i == len(features):
+                elif i == (len(features)-1):
                     images = images[:-1]
                     features = features[:-1]
                 else:
