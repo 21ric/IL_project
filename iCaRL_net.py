@@ -181,7 +181,8 @@ class iCaRL(nn.Module):
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
-
+        
+        print("inizio construct exemplar set")
         if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
@@ -211,6 +212,7 @@ class iCaRL(nn.Module):
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
+                print(k)
                 S = np.sum(exemplar_features, axis=0)
                 phi = features
                 mu = class_mean
