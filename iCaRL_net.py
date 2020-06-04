@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -206,7 +206,7 @@ class iCaRL(nn.Module):
             class_mean = class_mean / np.linalg.norm(class_mean)
 
             self.new_means.append(class_mean)
-            print('aggiungo a nuove medie', len(self.new_means))
+            #print('aggiungo a nuove medie', len(self.new_means))
 
             exemplar_set = []
             exemplar_features = []
