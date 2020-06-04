@@ -30,7 +30,7 @@ BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
-NUM_EPOCHS_RETRAIN = 70
+NUM_EPOCHS_RETRAIN = 100
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -208,7 +208,6 @@ class iCaRL(nn.Module):
         self.new_means.append(class_mean)
 
         if random_flag:
-            print('random')
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
@@ -307,7 +306,7 @@ class iCaRL(nn.Module):
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs))
                 dist_loss = self.dist_loss(out[:, :], q_i[:, :])
-                
+
                 loss = (1/10)*loss + (9/10)*dist_loss
                 #loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*loss
 
