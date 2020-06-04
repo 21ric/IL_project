@@ -184,7 +184,6 @@ class iCaRL(nn.Module):
             print(len(self.exemplar_sets[y]))
 
 
-
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
