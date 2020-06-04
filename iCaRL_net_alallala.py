@@ -46,7 +46,7 @@ losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=n_classes)
+        self.features_extractor = resnet32(num_classes=0)
 
         self.n_classes = 0
         self.n_known = 0
@@ -98,7 +98,6 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
-        self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
 
@@ -108,7 +107,7 @@ class iCaRL(nn.Module):
 
 
         #compute previous output for training
-        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_known).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
@@ -117,7 +116,8 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
-
+        self.add_classes(n)
+        
         self.features_extractor.train(True)
 
 
@@ -152,13 +152,13 @@ class iCaRL(nn.Module):
                     #print(out)
                     out = torch.softmax(out,dim=1)
 
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 if self.n_known > 0:
 
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss    
 
                 loss.backward()
                 optimizer.step()
@@ -187,59 +187,49 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
-
-        features = []
-        self.features_extractor.to(DEVICE)
-        self.features_extractor.train(False)
-        for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
-
-        class_mean = np.mean(features, axis=0)
-        class_mean = class_mean / np.linalg.norm(class_mean)
-
-        self.new_means.append(class_mean)
-
-
-
-        print("inizio construct exemplar set")
-
-        if random_flag:
+        if random:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
                 exemplar_set.append(images[i])
             self.exemplar_sets.append(exemplar_set)
 
-
-
         else:
-            #print('aggiungo a nuove medie', len(self.new_means))
+            features = []
+
+            self.features_extractor.to(DEVICE)
+
+
+            self.features_extractor.train(False)
+            for img in images:
+                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                feature = feature / np.linalg.norm(feature)
+                features.append(feature[0])
+
+            class_mean = np.mean(features, axis=0)
+            class_mean = class_mean / np.linalg.norm(class_mean)
+
+            self.new_means.append(class_mean)
 
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
-                print(k)
                 S = np.sum(exemplar_features, axis=0)
                 phi = features
                 mu = class_mean
                 mu_p = 1.0 / (k+1)*(phi+S)
                 mu_p = mu_p / np.linalg.norm(mu_p)
                 i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
-                print(f"np argmin i= {i}")
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
-                
-                print(f'len features is: {len(features)}')
 
                 if i == 0:
                     images = images[1:]
                     features = features[1:]
 
-                elif i == (len(features)-1):
+                elif i == len(features):
                     images = images[:-1]
                     features = features[:-1]
                 else:
@@ -279,20 +269,16 @@ class iCaRL(nn.Module):
                     features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
                     mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
-                    exemplar_means.append(mu_y.cpu())
+                    exemplar_means.append(mu_y)
 
                 self.exemplar_means = exemplar_means
-                #print('len new_means', len(self.new_means))
-                #print(f'exemplar means is {self.exemplar_means}')
-                #print(f'new means is {self.new_means}')
                 self.exemplar_means.extend(self.new_means)
-                #print('len all_means', len(self.exemplar_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
 
-            #print('numero medie', len(exemplar_means))
-
+            print('numero medie', len(exemplar_means))
+            
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
@@ -307,7 +293,7 @@ class iCaRL(nn.Module):
                 for mean in exemplar_means:
 
                     if classifier =='nme':
-                        measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
+                        measures.append((feat - mean).pow(2).sum().squeeze().item())
                     elif classifier =='nme-cosine':
                         measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
 
@@ -370,4 +356,3 @@ class iCaRL(nn.Module):
         print('Test Accuracy: {}'.format(accuracy))
 
         return accuracy
-
