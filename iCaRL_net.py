@@ -46,7 +46,7 @@ losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=0)
+        self.features_extractor = resnet32(num_classes=n_classes)
 
         self.n_classes = 0
         self.n_known = 0
@@ -97,7 +97,8 @@ class iCaRL(nn.Module):
         print('Datset extended to {} elements'.format(len(dataset)))
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-
+        
+        self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
 
@@ -107,7 +108,7 @@ class iCaRL(nn.Module):
 
 
         #compute previous output for training
-        q = torch.zeros(len(dataset), self.n_known).to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
@@ -116,7 +117,7 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
-        self.add_classes(n)
+        
         
         self.features_extractor.train(True)
 
@@ -152,7 +153,7 @@ class iCaRL(nn.Module):
                     #print(out)
                     out = torch.softmax(out,dim=1)
 
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
 
