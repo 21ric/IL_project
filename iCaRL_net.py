@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -268,16 +268,16 @@ class iCaRL(nn.Module):
                     exemplar_means.append(mu_y.cpu())
 
                 self.exemplar_means = exemplar_means
-                print('len new_means', len(self.new_means))
-                print(f'exemplar means is {self.exemplar_means}')
-                print(f'new means is {self.new_means}')
+                #print('len new_means', len(self.new_means))
+                #print(f'exemplar means is {self.exemplar_means}')
+                #print(f'new means is {self.new_means}')
                 self.exemplar_means.extend(self.new_means)
-                print('len all_means', len(self.exemplar_means))
+                #print('len all_means', len(self.exemplar_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
 
-            print('numero medie', len(exemplar_means))
+            #print('numero medie', len(exemplar_means))
 
             x = x.to(DEVICE)
             self.features_extractor.train(False)
