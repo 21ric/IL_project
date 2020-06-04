@@ -49,6 +49,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
 
         torch.cuda.empty_cache()
 
+        net.new_means = []
         net.compute_means = True
 
         print('Loading the Datasets ...')
@@ -79,7 +80,6 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
 
-        net.n_known = net.n_classes 
 
         print('Testing ...')
         print('-'*30)
@@ -109,6 +109,11 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
             all_acc_list.append(all_acc)
 
             print('-'*30)
+
+        print('lunghezza medie', len(net.exemplar_means))
+        print('lunghezza nuove medie', len(net.new_means))
+
+        net.n_known = net.n_classes
 
 
     return new_acc_list, old_acc_list, all_acc_list

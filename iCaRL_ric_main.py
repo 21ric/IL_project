@@ -74,14 +74,14 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         net.reduce_exemplars_set(m)
         print('Constructing exemplar sets ...')
         print('-'*30)
-        
+
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
-        
+
         if i !=0:
             print('Training on exemplars...')
             print('-'*30)
-            
+
             net.new_means=[]
             net.train_on_exemplars(class_map, map_reverse)
             net.new_means=[]
@@ -91,7 +91,6 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
             for y in classes_groups[i]:
                net.compute_new_means(train_dataset.get_class_imgs(y))
 
-        net.n_known = net.n_classes
 
         print('Testing ...')
         print('-'*30)
@@ -121,6 +120,8 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
             all_acc_list.append(all_acc)
 
             print('-'*30)
+
+        net.n_known = net.n_classes
 
 
     return new_acc_list, old_acc_list, all_acc_list
