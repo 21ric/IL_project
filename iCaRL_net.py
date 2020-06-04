@@ -181,7 +181,7 @@ class iCaRL(nn.Module):
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
-<<<<<<< HEAD
+
 
         features = []
         self.features_extractor.to(DEVICE)
@@ -197,10 +197,10 @@ class iCaRL(nn.Module):
 
         self.new_means.append(class_mean)
 
-=======
-        
+
+
         print("inizio construct exemplar set")
->>>>>>> 9cbaf1db953b21dfcb3c7e1a581f0a97e5059e7a
+
         if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
