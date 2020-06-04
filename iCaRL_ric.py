@@ -104,10 +104,11 @@ class iCaRL(nn.Module):
             g = torch.sigmoid(f_ex.forward(images))
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
-
-        self.add_classes(n)
         
         self.features_extractor.train(True)
+        
+        self.add_classes(n)
+        
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
         i = 0
@@ -136,7 +137,7 @@ class iCaRL(nn.Module):
                 out = self(imgs)
 
                 if self.loss_config == 'l1' or self.loss_config== 'mse':
-                    out = torch.sigmoid(out)
+                    out = torch.softmax(out, dim=1)
 
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
