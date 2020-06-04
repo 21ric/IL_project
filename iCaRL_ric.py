@@ -93,7 +93,7 @@ class iCaRL(nn.Module):
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
         self.features_extractor.to(DEVICE)
-        
+
         self.add_classes(n)
 
         f_ex = copy.deepcopy(self.features_extractor)
@@ -208,6 +208,7 @@ class iCaRL(nn.Module):
         self.new_means.append(class_mean)
 
         if random_flag:
+            print('random')
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
@@ -248,7 +249,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
 
 
-    def train_on_exemplars(self, class_map, map_reverse):
+    def train_on_exemplars(self, class_map, map_reverse, iter):
         exemplars_list = []
         labels = []
         for y, exemplars in enumerate(self.exemplar_sets):
@@ -260,13 +261,13 @@ class iCaRL(nn.Module):
         labels = torch.Tensor(labels)
 
         print('creo dataloader')
-        
+
         # Create Dataloaders
         dataset = TensorDataset(exemplars_list,labels) # create your datset
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         # Check loader length
         print(len(loader.dataset))
-        
+
         # Save an instance of the last model (the one trained with distillation)
         f_ex = copy.deepcopy(self.features_extractor)
 
@@ -287,7 +288,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(True)
             for imgs, labels in loader:
                 imgs = Variable(imgs).to(DEVICE)
-                
+
                 seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 labels_hot=torch.eye(self.n_classes)[labels]
@@ -300,15 +301,15 @@ class iCaRL(nn.Module):
                 # Compute classification loss
                 loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
-                
+
                 # Compute distillation loss (based on old outputs)
                 f_ex.to(DEVICE)
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs))
                 dist_loss = self.dist_loss(out[:, :], q_i[:, :])
 
-                loss = (1/3)*loss + (2/3)*dist_loss
-                
+                loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+
 
                 loss.backward()
                 optimizer.step()
@@ -353,7 +354,7 @@ class iCaRL(nn.Module):
                 #print(f'Exemplar new means is {self.new_means}')
                 self.exemplar_means.extend(self.new_means)
                 #print(f'Exemplar means extended is {self.exemplar_means}')
-                print('lunghezza nuove medie', len(self.new_means))
+                #print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
@@ -363,7 +364,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
 
-            print('numero medie', len(exemplar_means))
+            #print('numero medie', len(exemplar_means))
 
             preds = []
 
