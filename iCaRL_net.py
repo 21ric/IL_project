@@ -97,9 +97,9 @@ class iCaRL(nn.Module):
         print('Datset extended to {} elements'.format(len(dataset)))
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-        
+
         # RICHI
-        #self.add_classes(n)
+        self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
 
@@ -118,11 +118,9 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
-        
+
         self.features_extractor.train(True)
 
-        #LINDA
-        self.add_classes(n)
 
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
@@ -161,7 +159,7 @@ class iCaRL(nn.Module):
 
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss    
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
                 loss.backward()
                 optimizer.step()
@@ -276,7 +274,7 @@ class iCaRL(nn.Module):
             exemplar_means = self.exemplar_means
 
             print('numero medie', len(exemplar_means))
-            
+
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
