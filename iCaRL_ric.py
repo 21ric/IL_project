@@ -314,7 +314,7 @@ class iCaRL(nn.Module):
                 dist_loss = self.dist_loss(out[:, :], q_i[:, :])
 
                 
-                #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
 
                 loss.backward()
