@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -335,7 +335,7 @@ class iCaRL(nn.Module):
                 self.exemplar_means = exemplar_means
                 #print(f'Exemplar means is {self.exemplar_means}')
                 #print(f'Exemplar new means is {self.new_means}')
-                elf.exemplar_means.extend(self.new_means)
+                self.exemplar_means.extend(self.new_means)
                 #print(f'Exemplar means extended is {self.exemplar_means}')
                 print('lunghezza nuove medie', len(self.new_means))
                 self.compute_means = False
