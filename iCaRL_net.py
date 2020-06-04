@@ -182,6 +182,20 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
+        features = []
+        self.features_extractor.to(DEVICE)
+        self.features_extractor.train(False)
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0])
+
+        class_mean = np.mean(features, axis=0)
+        class_mean = class_mean / np.linalg.norm(class_mean)
+
+        self.new_means.append(class_mean)
+
         if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
@@ -189,23 +203,9 @@ class iCaRL(nn.Module):
                 exemplar_set.append(images[i])
             self.exemplar_sets.append(exemplar_set)
 
+
+
         else:
-            features = []
-
-            self.features_extractor.to(DEVICE)
-
-
-            self.features_extractor.train(False)
-            for img in images:
-                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-                feature = feature / np.linalg.norm(feature)
-                features.append(feature[0])
-
-            class_mean = np.mean(features, axis=0)
-            class_mean = class_mean / np.linalg.norm(class_mean)
-
-            self.new_means.append(class_mean)
             #print('aggiungo a nuove medie', len(self.new_means))
 
             exemplar_set = []
