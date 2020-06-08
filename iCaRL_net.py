@@ -88,7 +88,24 @@ class iCaRL(nn.Module):
     def add_exemplars(self, dataset, map_reverse):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
+         
+        
+    def modify_output_for_loss(loss_name, output):
+        
+        #BCEWithLogits doesn't need to apply sigmoid func
+        if loss_name == "bce":
+            return output
+       
+        # L1 loss and MSE loss need input to be softmax
+        if loss_name in ["mse", "l1"]:
+            return F.softmax(output, dim=1)
+        
+        # KL loss needs input to be log-softmax
+        if loss_name == "kl":
+            return F.log_softmax(output, dim=1)
+        
 
+        
     def update_representation(self, dataset, class_map, map_reverse, iter):
 
         targets = list(set(dataset.targets))
@@ -149,21 +166,13 @@ class iCaRL(nn.Module):
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
-
                 optimizer.zero_grad()
                 out = self(imgs)
-
 
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    # L1 loss or MSE loss need input to be softmax
-                    if self.loss_config == 'l1' or self.loss_config == 'mse':
-                        out = F.softmax(out,dim=1)
-                    # KL loss needs input to be log-softmax
-                    elif self.loss_config == 'kl':
-                        out = F.log_softmax(out,dim=1)
-
+                    out = self.modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
