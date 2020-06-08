@@ -40,8 +40,9 @@ bce = nn.BCEWithLogitsLoss()
 ce = nn.CrossEntropyLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
+kl = nn.KLDivLoss()
 
-losses = {'bce': bce, 'ce': ce,'l1': l1, 'mse': mse}
+losses = {'bce': bce, 'kl': kl,'l1': l1, 'mse': mse}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -57,13 +58,9 @@ class iCaRL(nn.Module):
         self.clf_loss = losses[loss_config]
         self.dist_loss = losses[loss_config]
 
-        # Change clf loss for L1 and MSE
-        if loss_config == 'l1' or loss_config == 'mse':
+        # Change clf loss for L1 , MSE and KL
+        if loss_config == 'l1' or loss_config == 'mse' or loss_config == 'kl':
             self.clf_loss = nn.BCEWithLogitsLoss()
-
-        # Change dist loss for CE
-        if loss_config == 'ce':
-            self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
