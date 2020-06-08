@@ -159,10 +159,10 @@ class iCaRL(nn.Module):
                 if self.n_known > 0:
                     # L1 loss or MSE loss need input to be softmax
                     if self.loss_config == 'l1' or self.loss_config == 'mse':
-                        out = torch.softmax(out,dim=1)
+                        out = F.softmax(out,dim=1)
                     # KL loss needs input to be log-softmax
                     elif self.loss_config == 'kl':
-                        out = torch.log(torch.softmax(out,dim=1))
+                        out = F.log_softmax(out,dim=1)
 
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
