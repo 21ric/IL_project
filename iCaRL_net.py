@@ -92,7 +92,7 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
 
-        self.add_exemplars(dataset, map_reverse)
+        #self.add_exemplars(dataset, map_reverse)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
@@ -227,7 +227,7 @@ class iCaRL(nn.Module):
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
-                
+
                 print(f'len features is: {len(features)}')
 
                 if i == 0:
