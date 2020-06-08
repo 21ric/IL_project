@@ -53,14 +53,14 @@ class iCaRL(nn.Module):
         self.exemplar_sets = []
         self.loss_config = loss_config
         self.lr = lr
-          
+
         self.clf_loss = losses[loss_config]
         self.dist_loss = losses[loss_config]
-        
+
         # Change clf loss for L1 and MSE
         if loss_config == 'l1' or loss_config == 'mse':
             self.clf_loss = nn.BCEWithLogitsLoss()
-        
+
         # Change dist loss for CE
         if loss_config == 'ce':
             self.dist_loss = nn.BCEWithLogitsLoss()
@@ -155,20 +155,20 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 out = self(imgs)
-                
-                
+
+
                 if self.loss_config == 'ce':
-                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels)               
-                
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels)
+
                 else:
                     loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    
+
                     if self.loss_config == 'l1' or self.loss_config == 'mse':
                         #print(out)
                         out = torch.softmax(out,dim=1)
-                        
+
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
@@ -266,7 +266,7 @@ class iCaRL(nn.Module):
     def classify(self, x, classifier):
 
         #NME
-        if classifier == 'nme' or classifier == 'nme-cosine':
+        if classifier == 'nme':
 
             batch_size = x.size(0)
             if self.compute_means:
@@ -313,16 +313,10 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
+                    measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
+                    
+                preds.append(np.argmin(np.array(measures)))
 
-                    if classifier =='nme':
-                        measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
-                    elif classifier =='nme-cosine':
-                        measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
-
-                if classifier =='nme':
-                    preds.append(np.argmin(np.array(measures)))
-                elif classifier =='nme-cosine':
-                    preds.append(np.argmax(np.array(measures)))
 
             return preds
 
