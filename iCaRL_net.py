@@ -37,11 +37,11 @@ MOMENTUM = 0.9
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
 bce = nn.BCEWithLogitsLoss()
-mlsm = nn.MultiLabelSoftMarginLoss()
+ce = nn.CrossEntropyLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
 
-losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
+losses = {'bce': bce, 'ce': ce,'l1': l1, 'mse': mse}
 
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
@@ -60,6 +60,10 @@ class iCaRL(nn.Module):
         # Change clf loss for L1 and MSE
         if loss_config == 'l1' or loss_config == 'mse':
             self.clf_loss = nn.BCEWithLogitsLoss()
+        
+        # Change dist loss for CE
+        if loss_config == 'ce':
+            self.dist_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
@@ -152,13 +156,12 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
                 
-                '''
-                if self.loss_config == 'l1' or self.loss_config == 'mse':
-                    #print(out)
-                    out = torch.softmax(out,dim=1)
-                '''
                 
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                if self.loss_config == 'ce':
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels)               
+                
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
                     
