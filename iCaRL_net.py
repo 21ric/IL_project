@@ -44,6 +44,20 @@ kl = nn.KLDivLoss()
 
 losses = {'bce': bce, 'kl': kl,'l1': l1, 'mse': mse}
 
+def modify_output_for_loss(loss_name, output):        
+    #BCEWithLogits doesn't need to apply sigmoid func
+    if loss_name == "bce":
+        return output
+
+    # L1 loss and MSE loss need input to be softmax
+    if loss_name in ["mse", "l1"]:
+        return F.softmax(output, dim=1)
+
+    # KL loss needs input to be log-softmax
+    if loss_name == "kl":
+        return F.log_softmax(output, dim=1)
+
+    
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
@@ -89,23 +103,7 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
          
-        
-    def modify_output_for_loss(loss_name, output):
-        
-        #BCEWithLogits doesn't need to apply sigmoid func
-        if loss_name == "bce":
-            return output
-       
-        # L1 loss and MSE loss need input to be softmax
-        if loss_name in ["mse", "l1"]:
-            return F.softmax(output, dim=1)
-        
-        # KL loss needs input to be log-softmax
-        if loss_name == "kl":
-            return F.log_softmax(output, dim=1)
-        
-
-        
+               
     def update_representation(self, dataset, class_map, map_reverse, iter):
 
         targets = list(set(dataset.targets))
@@ -172,7 +170,7 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    out = self.modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
