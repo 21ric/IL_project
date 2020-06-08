@@ -133,7 +133,11 @@ class iCaRL(nn.Module):
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
             indexes = indexes.to(DEVICE)
-            g = torch.sigmoid(f_ex.forward(images))
+            g = f_ex.forward(images)
+            if self.loss_config == 'bce':
+                g = torch.sigmoid(g)
+            else: 
+                g = F.softmax(g,dim=1)
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
