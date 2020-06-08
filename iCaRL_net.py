@@ -53,8 +53,9 @@ class iCaRL(nn.Module):
         self.exemplar_sets = []
         self.loss_config = loss_config
         self.lr = lr
-
-        self.clf_loss = losses[loss_config]
+        
+        self.clf_loss = nn.BCEWithLogitsLoss()
+        #self.clf_loss = losses[loss_config]
         self.dist_loss = losses[loss_config]
 
         self.exemplar_means = []
@@ -92,7 +93,7 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
 
-        #self.add_exemplars(dataset, map_reverse)
+        self.add_exemplars(dataset, map_reverse)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
@@ -147,15 +148,21 @@ class iCaRL(nn.Module):
 
                 optimizer.zero_grad()
                 out = self(imgs)
-
+                
+                '''
                 if self.loss_config == 'l1' or self.loss_config == 'mse':
                     #print(out)
                     out = torch.softmax(out,dim=1)
-
+                '''
+                
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-
+                    
+                    if self.loss_config == 'l1' or self.loss_config == 'mse':
+                        #print(out)
+                        out = torch.softmax(out,dim=1)
+                        
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
