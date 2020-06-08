@@ -221,19 +221,19 @@ class iCaRL(nn.Module):
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
-                print(k)
+                #print(k)
                 S = np.sum(exemplar_features, axis=0)
                 phi = features
                 mu = class_mean
                 mu_p = 1.0 / (k+1)*(phi+S)
                 mu_p = mu_p / np.linalg.norm(mu_p)
                 i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
-                print(f"np argmin i= {i}")
+                #print(f"np argmin i= {i}")
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
 
-                print(f'len features is: {len(features)}')
+                #print(f'len features is: {len(features)}')
 
                 if i == 0:
                     images = images[1:]
