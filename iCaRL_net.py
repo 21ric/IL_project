@@ -211,9 +211,6 @@ class iCaRL(nn.Module):
         self.new_means.append(class_mean)
 
 
-
-        print("inizio construct exemplar set")
-
         if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
@@ -314,7 +311,7 @@ class iCaRL(nn.Module):
 
                 for mean in exemplar_means:
                     measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
-                    
+
                 preds.append(np.argmin(np.array(measures)))
 
 
