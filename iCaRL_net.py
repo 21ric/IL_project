@@ -53,10 +53,13 @@ class iCaRL(nn.Module):
         self.exemplar_sets = []
         self.loss_config = loss_config
         self.lr = lr
-        
-        self.clf_loss = nn.BCEWithLogitsLoss()
-        #self.clf_loss = losses[loss_config]
+          
+        self.clf_loss = losses[loss_config]
         self.dist_loss = losses[loss_config]
+        
+        # Change clf loss for L1 and MSE
+        if loss_config == 'l1' or loss_config == 'mse':
+            self.clf_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
