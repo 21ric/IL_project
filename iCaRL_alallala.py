@@ -120,5 +120,6 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
 
             print('-'*30)
 
+        net.n_known = net.n_classes
 
     return new_acc_list, old_acc_list, all_acc_list
