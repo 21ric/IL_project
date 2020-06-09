@@ -218,10 +218,10 @@ def elaborate_noex(dict_file,no_ex, title):
       
     fig, ax = plt.subplots()
     
-    ax.plot(x, ft,label='fine tuning', markersize=2)
-    ax.plot(x, lwf,label='LwF', markersize=2)
-    ax.plot(x, icarl,label='iCaRL', markersize=2)
-    ax.plot(x, noex,label='iCaRL no ex', markersize=2)
+    ax.plot(x, ft,label='fine tuning', markersize=2, fmt='-o')
+    ax.plot(x, lwf,label='LwF', markersize=2, fmt='-o')
+    ax.plot(x, icarl,label='iCaRL', markersize=2, fmt='-o')
+    ax.plot(x, noex,label='iCaRL no ex', markersize=2, fmt='-o')
     
     ax.set_yticks(np.arange(0, 1., 0.1))
     ax.set_ylim(bottom=-0.03)
