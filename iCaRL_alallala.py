@@ -49,6 +49,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
 
         torch.cuda.empty_cache()
 
+        net.new_means = []
         net.compute_means = True
 
         print('Loading the Datasets ...')
