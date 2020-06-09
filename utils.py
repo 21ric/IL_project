@@ -227,7 +227,7 @@ def elaborate_noex(dict_file,no_ex, title):
     ax.set_ylim(bottom=-0.03)
     ax.grid(axis='y')
     ax.legend(loc='bottom right')
-    fig.suptitle(tilte)
+    fig.suptitle(title)
 
     ax.set_xlabel('Known classes')
     ax.set_ylabel('Accuracy')
