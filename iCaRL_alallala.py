@@ -88,7 +88,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m_list[-1], random_flag=False)
 
-        net.n_known = net.n_classes 
+        
 
         print('Testing ...')
         print('-'*30)
