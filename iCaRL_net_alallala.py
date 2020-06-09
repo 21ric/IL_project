@@ -37,16 +37,31 @@ MOMENTUM = 0.9
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
 bce = nn.BCEWithLogitsLoss()
-mlsm = nn.MultiLabelSoftMarginLoss()
+#ce = nn.CrossEntropyLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
+kl = nn.KLDivLoss()
 
-losses = {'bce': bce, 'mlsm': mlsm,'l1': l1, 'mse': mse}
+losses = {'bce': bce, 'kl': kl,'l1': l1, 'mse': mse}
 
+def modify_output_for_loss(loss_name, output):        
+    #BCEWithLogits doesn't need to apply sigmoid func
+    if loss_name == "bce":
+        return output
+
+    # L1 loss and MSE loss need input to be softmax
+    if loss_name in ["mse", "l1"]:
+        return F.softmax(output, dim=1)
+
+    # KL loss needs input to be log-softmax
+    if loss_name == "kl":
+        return F.log_softmax(output, dim=1)
+
+    
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config,lr):
         super(iCaRL, self).__init__()
-        self.features_extractor = resnet32(num_classes=0)
+        self.features_extractor = resnet32(num_classes=n_classes)
 
         self.n_classes = 0
         self.n_known = 0
@@ -56,6 +71,10 @@ class iCaRL(nn.Module):
 
         self.clf_loss = losses[loss_config]
         self.dist_loss = losses[loss_config]
+
+        # Change clf loss for L1 , MSE and KL
+        if loss_config in ['l1', 'mse', 'kl']:
+            self.clf_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
@@ -83,7 +102,8 @@ class iCaRL(nn.Module):
     def add_exemplars(self, dataset, map_reverse):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
-
+         
+               
     def update_representation(self, dataset, class_map, map_reverse, iter):
 
         targets = list(set(dataset.targets))
@@ -98,6 +118,7 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
 
+        self.add_classes(n)
 
         self.features_extractor.to(DEVICE)
 
@@ -107,17 +128,20 @@ class iCaRL(nn.Module):
 
 
         #compute previous output for training
-        q = torch.zeros(len(dataset), self.n_known).to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
             indexes = indexes.to(DEVICE)
-            g = torch.sigmoid(f_ex.forward(images))
+            g = f_ex.forward(images)
+            if self.loss_config == 'bce':
+                g = torch.sigmoid(g)
+            else: 
+                g = F.softmax(g,dim=1)
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
 
-        self.add_classes(n)
-        
+
         self.features_extractor.train(True)
 
 
@@ -144,21 +168,16 @@ class iCaRL(nn.Module):
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
 
-
                 optimizer.zero_grad()
                 out = self(imgs)
 
-                if self.loss_config == 'l1' or self.loss_config == 'mse':
-                    #print(out)
-                    out = torch.softmax(out,dim=1)
-
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss    
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
                 loss.backward()
                 optimizer.step()
@@ -183,53 +202,59 @@ class iCaRL(nn.Module):
             self.exemplar_sets[y] = exemplars[:m_total[y]]
             print(len(self.exemplar_sets[y]))
 
-
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
 
-        if random:
+
+        features = []
+        self.features_extractor.to(DEVICE)
+        self.features_extractor.train(False)
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0])
+
+        class_mean = np.mean(features, axis=0)
+        class_mean = class_mean / np.linalg.norm(class_mean)
+
+        self.new_means.append(class_mean)
+
+
+        if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
             for i in indexes:
                 exemplar_set.append(images[i])
             self.exemplar_sets.append(exemplar_set)
 
+
+
         else:
-            features = []
-
-            self.features_extractor.to(DEVICE)
-
-
-            self.features_extractor.train(False)
-            for img in images:
-                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-                feature = feature / np.linalg.norm(feature)
-                features.append(feature[0])
-
-            class_mean = np.mean(features, axis=0)
-            class_mean = class_mean / np.linalg.norm(class_mean)
-
-            self.new_means.append(class_mean)
+            #print('aggiungo a nuove medie', len(self.new_means))
 
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
+                #print(k)
                 S = np.sum(exemplar_features, axis=0)
                 phi = features
                 mu = class_mean
                 mu_p = 1.0 / (k+1)*(phi+S)
                 mu_p = mu_p / np.linalg.norm(mu_p)
                 i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+                #print(f"np argmin i= {i}")
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
+
+                #print(f'len features is: {len(features)}')
 
                 if i == 0:
                     images = images[1:]
                     features = features[1:]
 
-                elif i == len(features):
+                elif i == (len(features)-1):
                     images = images[:-1]
                     features = features[:-1]
                 else:
@@ -247,8 +272,8 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def classify(self, x, classifier):
 
-        #NME
-        if classifier == 'nme' or classifier == 'nme-cosine':
+        # NME
+        if classifier == 'nme':
 
             batch_size = x.size(0)
             if self.compute_means:
@@ -269,16 +294,20 @@ class iCaRL(nn.Module):
                     features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
                     mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2)
-                    exemplar_means.append(mu_y)
+                    exemplar_means.append(mu_y.cpu())
 
                 self.exemplar_means = exemplar_means
+                #print('len new_means', len(self.new_means))
+                #print(f'exemplar means is {self.exemplar_means}')
+                #print(f'new means is {self.new_means}')
                 self.exemplar_means.extend(self.new_means)
+                #print('len all_means', len(self.exemplar_means))
                 self.compute_means = False
 
             exemplar_means = self.exemplar_means
 
-            print('numero medie', len(exemplar_means))
-            
+            #print('numero medie', len(exemplar_means))
+
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
@@ -291,21 +320,15 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 for mean in exemplar_means:
+                    measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
 
-                    if classifier =='nme':
-                        measures.append((feat - mean).pow(2).sum().squeeze().item())
-                    elif classifier =='nme-cosine':
-                        measures.append(cosine_similarity(feat.unsqueeze(0).cpu().numpy(), mean.unsqueeze(0).cpu().numpy()))
+                preds.append(np.argmin(np.array(measures)))
 
-                if classifier =='nme':
-                    preds.append(np.argmin(np.array(measures)))
-                elif classifier =='nme-cosine':
-                    preds.append(np.argmax(np.array(measures)))
 
             return preds
 
-        #KNN
-        elif classifier =='knn' or classifier ==  'svc':
+        # KNN, SVC, Random Forest
+        elif classifier in ['knn','svc','randforest']:
 
             X_train, y_train = [], []
 
@@ -323,6 +346,8 @@ class iCaRL(nn.Module):
                 model = KNeighborsClassifier(n_neighbors=3)
             elif classifier == 'svc':
                 model = LinearSVC()
+            elif classifier == 'randforest':
+                pass
 
             model.fit(X_train, y_train)
 
