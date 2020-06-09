@@ -75,11 +75,12 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
         print(f"index list is {index_list}")
-        print(f"m list is {m_list}")
+        print(f"m list before changes is {m_list}")
         for elem in index_list:
             m_list[elem] = m_list[elem] - (elem)
             m_list[elem] = m_list[elem] + (i - elem)
-
+        print(f"m list after changes is {m_list}")
+        
         net.reduce_exemplars_set(m_list[:-1])
 
         print('Constructing exemplar sets ...')
