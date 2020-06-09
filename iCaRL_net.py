@@ -343,7 +343,7 @@ class iCaRL(nn.Module):
             elif classifier == 'svc':
                 model = LinearSVC()
             elif classifier == 'mlp':
-                model = MLPClassifier(hidden_layer_sizes=(150,100,50), max_iter=300,activation = 'relu',solver='adam',random_state=1)
+                model = MLPClassifier(hidden_layer_sizes=(100,50,25), random_state=1)
 
             model.fit(X_train, y_train)
 
