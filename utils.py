@@ -197,6 +197,43 @@ def elaborate_results(dict_files, title, old=False):
     errs = [ft_std, lwf_std, icarl_std]
 
     create_plot(xs, ys, errs, title, old)
+    
+
+def elaborate_noex(dict_file,no_ex, title):
+    ft = []
+    lwf = []
+    icarl = []
+
+    
+    ft=dict['fine_tuning']
+    lwf=dict['LwF']
+    icarl=dict['iCaRL']
+    
+    noex = no_ex['all']
+    
+    x = list(map(str,list(range(10,110,10))))
+      
+    fig, ax = plt.subplots()
+    
+    ax.plot(x, ft,label='fine tuning', markersize=2)
+    ax.plot(x, lwf,label='LwF', markersize=2)
+    ax.plot(x, icarl,label='iCaRL', markersize=2)
+    ax.plot(x, noex,label='iCaRL no ex', markersize=2)
+    
+    ax.set_yticks(np.arange(0, 1., 0.1))
+    ax.set_ylim(bottom=-0.03)
+    ax.grid(axis='y')
+    ax.legend(loc='bottom right')
+    fig.suptitle(tilte)
+
+    ax.set_xlabel('Known classes')
+    ax.set_ylabel('Accuracy')
+
+    fig.savefig('results.png')
+    fig.show()
+
+    return
+  
 
 
 def create_plot(xs, ys, errs, title, old=False):
