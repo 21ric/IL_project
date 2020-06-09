@@ -211,6 +211,7 @@ def elaborate_noex(dict_file,no_ex, title):
         lwf.append(dict['LwF'])
         icarl.append(dict['iCaRL'])
     
+    no_ex = get_dict_from_file(no_ex)
     noex = no_ex['all']
     
     x = list(map(str,list(range(10,110,10))))
