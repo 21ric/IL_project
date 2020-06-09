@@ -268,7 +268,7 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def classify(self, x, classifier):
 
-        #NME
+        # NME
         if classifier == 'nme':
 
             batch_size = x.size(0)
@@ -323,8 +323,8 @@ class iCaRL(nn.Module):
 
             return preds
 
-        #KNN
-        elif classifier =='knn' or classifier ==  'svc':
+        # KNN, SVC, Random Forest
+        elif classifier in ['knn','svc','randforest']:
 
             X_train, y_train = [], []
 
@@ -342,6 +342,8 @@ class iCaRL(nn.Module):
                 model = KNeighborsClassifier(n_neighbors=3)
             elif classifier == 'svc':
                 model = LinearSVC()
+            elif classifier == 'randforest':
+                pass
 
             model.fit(X_train, y_train)
 
