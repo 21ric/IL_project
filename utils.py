@@ -207,9 +207,9 @@ def elaborate_noex(dict_file,no_ex, title):
     
     for file in dict_file:
         dict = get_dict_from_file(file)
-        ft.append(dict['fine_tuning'])
-        lwf.append(dict['LwF'])
-        icarl.append(dict['iCaRL'])
+        ft=dict['fine_tuning']
+        lwf=dict['LwF']
+        icarl=dict['iCaRL']
     
     no_ex = get_dict_from_file(no_ex)
     noex = no_ex['all']
