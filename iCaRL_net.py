@@ -21,7 +21,7 @@ import math
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
-from sklearn.metrics.pairwise import cosine_similarity
+ftom sklearn.neural_network import MLPClassifier
 
 ####Hyper-parameters####
 LR = 2
@@ -323,8 +323,8 @@ class iCaRL(nn.Module):
 
             return preds
 
-        # KNN, SVC, Random Forest
-        elif classifier in ['knn','svc','randforest']:
+        # KNN, SVC, 3-layers MLP
+        elif classifier == 'knn' or classifier == 'svc' or classifier == 'mlp':
 
             X_train, y_train = [], []
 
@@ -342,8 +342,8 @@ class iCaRL(nn.Module):
                 model = KNeighborsClassifier(n_neighbors=3)
             elif classifier == 'svc':
                 model = LinearSVC()
-            elif classifier == 'randforest':
-                pass
+            elif classifier == 'mlp':
+                model = MLPClassifier(hidden_layer_sizes=(150,100,50), max_iter=300,activation = 'relu',solver='adam',random_state=1)
 
             model.fit(X_train, y_train)
 
