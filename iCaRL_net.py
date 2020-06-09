@@ -21,7 +21,7 @@ import math
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
-ftom sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPClassifier
 
 ####Hyper-parameters####
 LR = 2
