@@ -77,8 +77,8 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         print(f"index list is {index_list}")
         print(f"m list before changes is {m_list}")
         for elem in index_list:
-            m_list[elem] = m_list[elem] - (elem)
-            m_list[elem] = m_list[elem] + (i - elem)
+            m_list[elem] = m_list[elem] - (elem)*2
+            m_list[elem] = m_list[elem] + (i - elem)*2
         print(f"m list after changes is {m_list}")
         
         net.reduce_exemplars_set(m_list[:-1])
