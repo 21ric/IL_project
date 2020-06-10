@@ -387,7 +387,8 @@ class iCaRL(nn.Module):
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()
             for key in list(groups.keys()):
-                  if labels in groups[key][0]:
+                 for l in labels:
+                  if l in groups[key][0]:
                         print('qui\n')
                         groups[key][1] += (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
                         print('groups[key][1]',groups[key][1])
