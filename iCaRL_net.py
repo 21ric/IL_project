@@ -321,7 +321,7 @@ class iCaRL(nn.Module):
                     print('chosen i:{}'.format(i))
 
         #adding or replacing an exemplars set
-        self.exemplar_sets[label] = np.array(exemplar_set)
+        self.exemplar_sets.append(np.array(exemplar_set))
         self.features_extractor.train(True)
             
             
