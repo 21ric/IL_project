@@ -219,23 +219,64 @@ class iCaRL(nn.Module):
 
     
     #reduce exemplars lists
-    def reduce_exemplars_set(self, m):
-        for y, exemplars in enumerate(self.exemplar_sets):
-            self.exemplar_sets[y] = exemplars[:m]
+    def reduce_exemplars_set(self, m, recompute=False):
+        
+        #reducing by discarding last elements
+        if not recompute:
+            for y, exemplars in enumerate(self.exemplar_sets):
+                self.exemplar_sets[y] = exemplars[:m]
+                
+        #reducing by taking the most relevant at time t
+        else:
+            for i, exemplars in enumerate(self.exemplar_sets):
+                
+                feature, class_mean = self.get_features_and_mean(self, exemplars)
+                
+                exemplar_set = []
+                exemplar_features = []
+                
+                for k in range(m):
+                    S = np.sum(exemplar_features, axis=0)
+                    phi = features
+                    mu = class_mean
+                    mu_p = 1.0 / (k+1)*(phi+S)
+                    mu_p = mu_p / np.linalg.norm(mu_p) #l2 norm
+                    i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+
+                    exemplar_set.append(images[i])
+                    exemplar_features.append(features[i])
+
+                    #removing chosen image from candidates, avoiding duplicates
+                    if i == 0:
+                        images = images[1:]
+                        features = features[1:]
+
+                    elif i == (len(features)-1):
+                        images = images[:-1]
+                        features = features[:-1]
+                    else:
+                        try:
+                            images = np.concatenate((images[:i], images[i+1:]))
+                            features = np.concatenate((features[:i], features[i+1:]))
+                        except:
+                            print('chosen i:{}'.format(i))
+
+                #adding or replacing an exemplars set
+                self.exemplar_sets[i] = np.array(exemplar_set)
+                self.features_extractor.train(True)
             
             
             
 
      #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
-    def construct_exemplars_set(self, images, m, random_flag=False, recompute=False, label=None):
+    def construct_exemplars_set(self, images, m, random_flag=False):
         
         #computing features from images and computing mean of features
         features, class_mean = self.get_features_and_mean(images)
         
         #facing new classes, use as class mean, mean on all data
-        if not recompute:           
-            self.new_means.append(class_mean)
+        self.new_means.append(class_mean)
         
         #construct exemeplars by random selection
         if random_flag:
@@ -243,13 +284,13 @@ class iCaRL(nn.Module):
         
         #construct exemplar set
         else:
-            self.construct_exemplars(images, m, features, class_mean, recompute, label)
+            self.construct_exemplars(images, m, features, class_mean)
             
             
            
             
     #method for constructin exemplars with herding       
-    def construct_exemplars(self, images, m, features, class_mean, recompute=False, label=None):
+    def construct_exemplars(self, images, m, features, class_mean):
             
         exemplar_set = []
         exemplar_features = []
@@ -280,10 +321,7 @@ class iCaRL(nn.Module):
                     print('chosen i:{}'.format(i))
 
         #adding or replacing an exemplars set
-        if not recompute:
-            self.exemplar_sets.append(np.array(exemplar_set))
-        else:
-            self.exemplar_sets[label] = np.array(exemplar_set)
+        self.exemplar_sets[label] = np.array(exemplar_set)
         self.features_extractor.train(True)
             
             
