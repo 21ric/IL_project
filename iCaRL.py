@@ -76,7 +76,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
             net.reduce_exemplars_set(m)
         else:
             for i in range(len(net.exemplar_sets)):
-                net.construct_exemplars_set(net.exemplar_sets[i], m, random_flag=False, inplace=True, index=i)
+                net.construct_exemplars_set(np.array(net.exemplar_sets[i]), m, random_flag=False, inplace=True, index=i)
 
         print('Constructing exemplar sets ...')
         print('-'*30)
