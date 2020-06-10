@@ -42,7 +42,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
     all_acc_list = []
     acc_per_group_list = []
 
-    for i in range(int(30/CLASSES_BATCH)):
+    for i in range(int(100/CLASSES_BATCH)):
 
         print('-'*30)
         print(f'**** Iteration {i+1} / {int(100/CLASSES_BATCH)} ****')
