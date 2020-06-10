@@ -285,22 +285,22 @@ def elaborate_different_ex():
   
   fig, ax = plt.subplots()
     
-    ax.plot(x, ex2000['all'],label='2000 ex', markersize=2, marker='o')
-    ax.plot(x, ex1000['all'],label='1000 ex', markersize=2, marker='o')
-    ax.plot(x, ex3000['all'],label='3000 ex', markersize=2, marker='o')
-    #ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
-    
-    ax.set_yticks(np.arange(0, 1., 0.1))
-    ax.set_ylim(bottom=-0.03)
-    ax.grid(axis='y')
-    ax.legend(loc='top right')
-    fig.suptitle('Accuracy on all classes')
+  ax.plot(x, ex2000['all'],label='2000 ex', markersize=2, marker='o')
+  ax.plot(x, ex1000['all'],label='1000 ex', markersize=2, marker='o')
+  ax.plot(x, ex3000['all'],label='3000 ex', markersize=2, marker='o')
+  #ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
 
-    ax.set_xlabel('Known classes')
-    ax.set_ylabel('Accuracy')
+  ax.set_yticks(np.arange(0, 1., 0.1))
+  ax.set_ylim(bottom=-0.03)
+  ax.grid(axis='y')
+  ax.legend(loc='top right')
+  fig.suptitle('Accuracy on all classes')
 
-    fig.savefig('exemplar_all.png')
-    fig.show()
+  ax.set_xlabel('Known classes')
+  ax.set_ylabel('Accuracy')
+
+  fig.savefig('exemplar_all.png')
+  fig.show()
   
   
   
