@@ -396,7 +396,7 @@ class iCaRL(nn.Module):
                   groups[i/10] = [[labels_set[i-10:i]],0]        #storing labels of group i and running corrects for that group 
                                                              #groups[10] = [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
                   acc_per_group[i/10] = 0                    #storing accuracy per group 
-
+          print(groups,acc_per_group)
           running_corrects = 0                                              
           for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
