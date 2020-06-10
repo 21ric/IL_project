@@ -267,6 +267,7 @@ class iCaRL(nn.Module):
 
 
             self.exemplar_sets.append(np.array(exemplar_set))
+            print(len(exemplar_set))
             self.features_extractor.train(True)
 
 
