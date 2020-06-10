@@ -230,7 +230,7 @@ class iCaRL(nn.Module):
         else:
             for i, images in enumerate(self.exemplar_sets):
                 
-                features, class_mean = self.get_features_and_mean(exemplars)
+                features, class_mean = self.get_features_and_mean(images)
                 
                 exemplar_set = []
                 exemplar_features = []
