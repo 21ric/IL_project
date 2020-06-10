@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -367,7 +367,7 @@ class iCaRL(nn.Module):
 
             return preds
 
-    def classify_all(self, test_dataset, map_reverse, classifier):
+    def classify_all(self, test_dataset, map_reverse, classifier,prnt):
 
           test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         
@@ -378,7 +378,7 @@ class iCaRL(nn.Module):
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()            
           accuracy = running_corrects / float(len(test_dataloader.dataset))
-
-          print('Test Accuracy: {}'.format(accuracy))
+          if prnt:
+            print('Test Accuracy: {}'.format(accuracy))
           return accuracy
 

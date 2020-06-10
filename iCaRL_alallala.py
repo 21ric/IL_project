@@ -114,7 +114,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         print('-'*30)
 
         print('New classes')
-        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier)
+        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier,prnt=True)
 
         new_acc_list.append(new_acc)
         if i == 0:
@@ -135,14 +135,14 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
 
             for c in range(i):
                   _, test_prev_dataset = utils.get_train_test(prevs[c])
-                  old_acc_per_group[c] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier)
+                  old_acc_per_group[c] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier,prnt=False)
             
             acc_per_group_list.append(old_acc_per_group)
             
             print('Old classes')  
-            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
+            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier,prnt=True)
             print('All classes')
-            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
+            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier,prnt=True)
 
 
             old_acc_list.append(old_acc)
