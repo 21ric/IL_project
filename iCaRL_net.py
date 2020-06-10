@@ -205,11 +205,7 @@ class iCaRL(nn.Module):
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
-        cond = True
         for img in images:
-            if cond:
-                print('img',img)
-                cond=False
             x = Variable(transform(Image.fromarray(img))).to(DEVICE)
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature)
@@ -220,7 +216,6 @@ class iCaRL(nn.Module):
         if not inplace:
             self.new_means.append(class_mean)
 
-        print('mean', class_mean)
         if random_flag:
             exemplar_set = []
             indexes = random.sample(range(len(images)), m)
@@ -241,7 +236,9 @@ class iCaRL(nn.Module):
                 mu = class_mean
                 mu_p = 1.0 / (k+1)*(phi+S)
                 mu_p = mu_p / np.linalg.norm(mu_p)
+                print('mu', mu_p)
                 i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+                print('ok')
                 #print(f"np argmin i= {i}")
 
                 exemplar_set.append(images[i])
