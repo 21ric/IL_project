@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -249,7 +249,7 @@ class iCaRL(nn.Module):
            
             
     #method for constructin exemplars with herding       
-    def construct_exemplars(images, m, recompute=False, label=None):
+    def construct_exemplars(self, images, m, recompute=False, label=None):
         print('len fearues', len(features))
             
         exemplar_set = []
@@ -290,7 +290,7 @@ class iCaRL(nn.Module):
             
     
     #method to construct random exemplars
-    def construct_random_exemplars(images, m):
+    def construct_random_exemplars(self, images, m):
         exemplar_set = []
         indexes = random.sample(range(len(images)), m)
         for i in indexes:
@@ -301,7 +301,7 @@ class iCaRL(nn.Module):
     
     #method to extract features from images and computing mean on feature
     @torch.no_grad()
-    def get_features_and_mean(images):
+    def get_features_and_mean(self, images):
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
