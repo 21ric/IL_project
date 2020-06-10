@@ -135,7 +135,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
 
             for c in range(i):
                   _, test_prev_dataset = utils.get_train_test(prevs[c])
-                  old_acc_per_group[c] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier,prnt=False)
+                  old_acc_per_group[c+1] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier,prnt=False)
             
             acc_per_group_list.append(old_acc_per_group)
             
