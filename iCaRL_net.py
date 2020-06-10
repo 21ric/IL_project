@@ -243,14 +243,13 @@ class iCaRL(nn.Module):
         
         #construct exemplar set
         else:
-            self.construct_exemplars(images, m, recompute, label)
+            self.construct_exemplars(images, m, features, class_mean, recompute, label)
             
             
            
             
     #method for constructin exemplars with herding       
-    def construct_exemplars(self, images, m, recompute=False, label=None):
-        print('len fearues', len(features))
+    def construct_exemplars(self, images, m, features, class_mean, recompute=False, label=None):
             
         exemplar_set = []
         exemplar_features = []
