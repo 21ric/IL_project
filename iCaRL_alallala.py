@@ -134,7 +134,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
             old_acc_per_group = {}
 
             for c in range(i):
-                  test_prev_dataset = CIFAR100(root='data/', classes=prevs[c],  train=False, download=True, transform=test_transform)
+                  _, test_prev_dataset = utils.get_train_test(prevs[c])
                   old_acc_per_group[c] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier)
             
             acc_per_group_list.append(old_acc_per_group)
