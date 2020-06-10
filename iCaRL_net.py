@@ -200,7 +200,7 @@ class iCaRL(nn.Module):
 
 
     @torch.no_grad()
-    def construct_exemplars_set(self, images, m, random_flag=False):
+    def construct_exemplars_set(self, images, m, random_flag=False, inplace=False, index=None):
 
 
         features = []
@@ -214,8 +214,9 @@ class iCaRL(nn.Module):
 
         class_mean = np.mean(features, axis=0)
         class_mean = class_mean / np.linalg.norm(class_mean)
-
-        self.new_means.append(class_mean)
+        
+        if not inplace:
+            self.new_means.append(class_mean)
 
 
         if random_flag:
@@ -261,8 +262,10 @@ class iCaRL(nn.Module):
                     except:
                         print('chosen i:{}'.format(i))
 
-
-            self.exemplar_sets.append(np.array(exemplar_set))
+            if not inplace:
+                self.exemplar_sets.append(np.array(exemplar_set))
+            else:
+                self.exemplar_sets[index] = np.array(exemplar_set)
             self.features_extractor.train(True)
 
 
