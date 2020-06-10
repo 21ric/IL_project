@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -202,7 +202,7 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False, inplace=False, index=None):
 
-
+        print('conmputing means')
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
 
         class_mean = np.mean(features, axis=0)
         class_mean = class_mean / np.linalg.norm(class_mean)
-        
+        print('done')
         if not inplace:
             self.new_means.append(class_mean)
 
@@ -230,7 +230,7 @@ class iCaRL(nn.Module):
 
         else:
             #print('aggiungo a nuove medie', len(self.new_means))
-
+            print('calcoli . . .')
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
@@ -245,7 +245,7 @@ class iCaRL(nn.Module):
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
-
+                print('done')
                 #print(f'len features is: {len(features)}')
 
                 if i == 0:
