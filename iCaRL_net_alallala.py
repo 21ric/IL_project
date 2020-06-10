@@ -375,7 +375,8 @@ class iCaRL(nn.Module):
        
           groups = {}
           acc_per_group = {}
-          labels_set = set([labels for _, labels, _ in test_dataloader])        #collecting all distinct labels of old images
+          labels_set = set([labels for _, labels, _ in test_dataloader])       #collecting all distinct labels of old images
+          labels_set = list(labels_set)
           for i in range(10,len(test_dataloader.dataset)//100,10):                   
                   print(i)
                   groups[i] = [[labels_set[i-10:i]],0]        #storing labels of group i and running corrects for that group 
@@ -389,8 +390,8 @@ class iCaRL(nn.Module):
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()
             for key in list(groups.keys()):
-                 for l in labels:
-                  if l in groups[key][0]:
+                 #for l in labels:
+                  #if l in groups[key][0]:
                         print('qui\n')
                         groups[key][1] += (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
                         print('groups[key][1]',groups[key][1])
