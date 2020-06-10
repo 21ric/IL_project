@@ -40,7 +40,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
     new_acc_list = []
     old_acc_list = []
     all_acc_list = []
-    acc_per_class_list = []
+    acc_per_group_list = []
 
     for i in range(int(100/CLASSES_BATCH)):
 
@@ -128,17 +128,24 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
 
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
-            print('Old classes')
-            old_acc,acc_per_class = net.classify_all2(prev_classes_dataset, map_reverse, classifier=classifier)
+            print('computing separately the accuracy for each old group of 10 classes')
+            acc_per_group = {}
+            for c in range(0,len(prev_classes_dataset)/1000)):
+                 acc_per_group[c+1] = net.classify_all(prev_classes_dataset[c*1000:c*1000+1000], map_reverse, classifier=classifier)
+            
+            acc_per_group_list.append(acc_per_group)
+            
+            print('Old classes')  
+            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
             print('All classes')
             all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
 
 
             old_acc_list.append(old_acc)
             all_acc_list.append(all_acc)
-            acc_per_class_list.append(acc_per_class)
+    
             print('-'*30)
 
         net.n_known = net.n_classes
 
-    return new_acc_list, old_acc_list, all_acc_list,acc_per_class_list
+    return new_acc_list, old_acc_list, all_acc_list,acc_per_group_list

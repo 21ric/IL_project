@@ -381,7 +381,7 @@ class iCaRL(nn.Module):
 
           print('Test Accuracy: {}'.format(accuracy))
           return accuracy
-
+'''
     def classify_all2(self, test_dataset, map_reverse, classifier):
 
           test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
@@ -415,3 +415,4 @@ class iCaRL(nn.Module):
 
           print('Test Accuracy: {}'.format(accuracy))
           return accuracy,acc_per_group 
+'''
