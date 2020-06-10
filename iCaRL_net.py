@@ -226,9 +226,8 @@ class iCaRL(nn.Module):
             
             
 
-
+     #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
-    #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     def construct_exemplars_set(self, images, m, random_flag=False, recompute=False, class=None):
         
         #computing features from images and computing mean of features
