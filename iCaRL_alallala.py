@@ -129,7 +129,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            old_acc,acc_per_class = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
+            old_acc,acc_per_class = net.classify_all2(prev_classes_dataset, map_reverse, classifier=classifier)
             print('All classes')
             all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
 
