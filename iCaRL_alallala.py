@@ -42,7 +42,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
     all_acc_list = []
     acc_per_group_list = []
 
-    for i in range(int(100/CLASSES_BATCH)):
+    for i in range(int(30/CLASSES_BATCH)):
 
         print('-'*30)
         print(f'**** Iteration {i+1} / {int(100/CLASSES_BATCH)} ****')
@@ -126,7 +126,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
             prevs = []
             for j in range(i):
                 previous_classes = np.concatenate((previous_classes, classes_groups[j]))
-                prevs.append(classes_groups[j])
+                prevs.append(classes_groups[j])  
                 
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
             
