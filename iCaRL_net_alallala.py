@@ -390,10 +390,9 @@ class iCaRL(nn.Module):
             preds = [map_reverse[pred] for pred in preds]
             running_corrects += (preds == labels.numpy()).sum()
             for key in list(groups.keys()):
-                 #for l in labels:
-                  #if l in groups[key][0]:
+                  if labels in groups[key][0]:
                         print('qui\n')
-                        groups[key][1] += (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
+                        groups[key][1] = groups[key][1] + (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
                         print('groups[key][1]',groups[key][1])
           for key in list(groups.keys()):
                   acc_per_group[key] = groups[key][1]/1000                #for each 10-classes group there are 10*100 = 1000 images             
