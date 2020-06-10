@@ -228,7 +228,7 @@ class iCaRL(nn.Module):
 
      #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
-    def construct_exemplars_set(self, images, m, random_flag=False, recompute=False, class=None):
+    def construct_exemplars_set(self, images, m, random_flag=False, recompute=False, label=None):
         
         #computing features from images and computing mean of features
         features, class_mean = self.get_features_and_mean(images)
@@ -243,13 +243,13 @@ class iCaRL(nn.Module):
         
         #construct exemplar set
         else:
-            self.construct_exemplars(images, m, recompute, class)
+            self.construct_exemplars(images, m, recompute, label)
             
             
            
             
     #method for constructin exemplars with herding       
-    def construct_exemplars(images, m, recompute=False, class=None):
+    def construct_exemplars(images, m, recompute=False, label=None):
         print('len fearues', len(features))
             
             exemplar_set = []
@@ -284,7 +284,7 @@ class iCaRL(nn.Module):
             if not inplace:
                 self.exemplar_sets.append(np.array(exemplar_set))
             else:
-                self.exemplar_sets[class] = np.array(exemplar_set)
+                self.exemplar_sets[label] = np.array(exemplar_set)
             self.features_extractor.train(True)
             
             
