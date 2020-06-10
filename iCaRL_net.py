@@ -317,7 +317,7 @@ class iCaRL(nn.Module):
     
     #method to compute means of exemplars
     @torch.no_grad()
-    def compute_exemplars_mean():
+    def compute_exemplars_mean(self):
         
         exemplar_means = []
         self.features_extractor.train(False)
