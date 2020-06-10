@@ -395,8 +395,9 @@ class iCaRL(nn.Module):
           labels_set = list(labels_set)
           print("len(labels_set)",len(labels_set))
           for i in range(10,len(test_dataloader.dataset)//100,10):                   
-                  groups[i] = [[labels_set[i-10:i]],0]        #storing labels of group i and running corrects for that group 
-                  print('groups[i]',groups[i])                       #groups[10] [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
+                  print(i)
+                  groups[i] = [[labels_set[i-10:i]],0]       #storing labels of group i and running corrects for that group 
+                  print('groups[i]',groups[i])               #groups[10] [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
                   acc_per_group[i] = 0                       #storing accuracy per group 
           print(groups,acc_per_group)
           running_corrects = 0                                              
