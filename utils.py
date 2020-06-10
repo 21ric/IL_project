@@ -291,7 +291,6 @@ def elaborate_different_ex():
   #ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
 
   ax.set_yticks(np.arange(0, 1., 0.1))
-  ax.set_ylim(bottom=-0.03)
   ax.grid(axis='y')
   ax.legend(loc='top right')
   fig.suptitle('Accuracy on all classes')
@@ -302,5 +301,29 @@ def elaborate_different_ex():
   fig.savefig('exemplar_all.png')
   fig.show()
   
+    
+def plot_rand_ex():
+  standard = {}
+  dict = get_dict_from_file('results/all_accuracy3.pickle')
+  standard['all'] = dict['iCaRL']
   
+  rand = get_dict_from_file('results/rand_exemplars_accuracy3.pickle')
   
+  x = list(map(str,list(range(10,110,10))))
+  
+  fig, ax = plt.subplots()
+    
+  ax.plot(x, standard['all'],label='herding', markersize=2, marker='o')
+  ax.plot(x, rand['all'],label='random', markersize=2, marker='o')
+
+  ax.set_yticks(np.arange(0, 1., 0.1))
+  ax.set_ylim(bottom=-0.03)
+  ax.grid(axis='y')
+  ax.legend(loc='top right')
+  fig.suptitle('Accuracy on all classes')
+
+  ax.set_xlabel('Known classes')
+  ax.set_ylabel('Accuracy')
+
+  fig.savefig('exemplar_rand.png')
+  fig.show()
