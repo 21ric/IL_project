@@ -68,7 +68,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
 
 
-        print('Reducing exemplar sets ...')
+        #print('Reducing exemplar sets ...')
         print('-'*30)
 
         #m = MEMORY_SIZE // (net.n_classes)
@@ -102,6 +102,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         #net.reduce_exemplars_set(m_list[:-1])
 
         print('Constructing exemplar sets ...')
+        print(f'chosen configuration: {ex_config}')
         print('-'*30)
 
         for y in classes_groups[i]:
