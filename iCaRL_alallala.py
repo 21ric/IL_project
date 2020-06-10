@@ -123,18 +123,21 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         if i > 0:
 
             previous_classes = np.array([])
+            prevs = []
             for j in range(i):
                 previous_classes = np.concatenate((previous_classes, classes_groups[j]))
-
+                prevs.append(classes_groups[j])
+                
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
-
-            print('computing separately the accuracy for each old group of 10 classes')
-            acc_per_group = {}
-            print('len prev_dataset',len(prev_classes_dataset))
-            for c in range(0,(len(prev_classes_dataset))//1000):
-                 acc_per_group[c+1] = net.classify_all(prev_classes_dataset[c*1000:c*1000+1000], map_reverse, classifier=classifier)
             
-            acc_per_group_list.append(acc_per_group)
+            print('computing separately the accuracy for each old group of 10 classes')
+            old_acc_per_group = {}
+
+            for c in range(i):
+                  test_prev_dataset = CIFAR100(root='data/', classes=prevs[c],  train=False, download=True, transform=test_transform)
+                  old_acc_per_group[c] = net.classify_all(test_prev_dataset, map_reverse, classifier=classifier)
+            
+            acc_per_group_list.append(old_acc_per_group)
             
             print('Old classes')  
             old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
