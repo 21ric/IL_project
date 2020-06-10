@@ -65,12 +65,12 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
         print('-'*30)
 
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
-
+        
+        m = MEMORY_SIZE // (net.n_classes)
+        
         if i != 0:
             print('Reducing exemplar sets ...')
             print('-'*30)
-
-            m = MEMORY_SIZE // (net.n_classes)
 
             if not new_herding:
                 net.reduce_exemplars_set(m)
