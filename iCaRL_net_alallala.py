@@ -381,38 +381,4 @@ class iCaRL(nn.Module):
 
           print('Test Accuracy: {}'.format(accuracy))
           return accuracy
-'''
-    def classify_all2(self, test_dataset, map_reverse, classifier):
 
-          test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
-        
-       
-          groups = {}
-          acc_per_group = {}
-          labels_set = set([labels for _, labels, _ in test_dataloader])       #collecting all distinct labels of old images
-          labels_set = list(labels_set)
-          print(len(test_dataloader.dataset))
-          for i in range(10,len(test_dataloader.dataset)//100,10):                   
-                  print(i)
-                  groups[i] = [[labels_set[i-10:i]],0]        #storing labels of group i and running corrects for that group 
-                                                              #groups[10] = [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
-                  acc_per_group[i] = 0                        #storing accuracy per group 
-
-          running_corrects = 0                                              
-          for imgs, labels, _ in  test_dataloader:
-            imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier)
-            preds = [map_reverse[pred] for pred in preds]
-            running_corrects += (preds == labels.numpy()).sum()
-            for key in list(groups.keys()):
-                  if labels in groups[key][0]:
-                        print('qui\n')
-                        groups[key][1] = groups[key][1] + (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
-                        print('groups[key][1]',groups[key][1])
-          for key in list(groups.keys()):
-                  acc_per_group[key] = groups[key][1]/1000                #for each 10-classes group there are 10*100 = 1000 images             
-          accuracy = running_corrects / float(len(test_dataloader.dataset))
-
-          print('Test Accuracy: {}'.format(accuracy))
-          return accuracy,acc_per_group 
-'''
