@@ -202,7 +202,6 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False, inplace=False, index=None):
 
-        print('conmputing means')
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
@@ -214,10 +213,8 @@ class iCaRL(nn.Module):
 
         class_mean = np.mean(features, axis=0)
         class_mean = class_mean / np.linalg.norm(class_mean)
-        print('done')
         if not inplace:
             self.new_means.append(class_mean)
-
 
         if random_flag:
             exemplar_set = []
@@ -229,8 +226,8 @@ class iCaRL(nn.Module):
 
 
         else:
+            print('len fearues', len(features))
             #print('aggiungo a nuove medie', len(self.new_means))
-            print('calcoli . . .')
             exemplar_set = []
             exemplar_features = []
             for k in range(m):
@@ -240,12 +237,13 @@ class iCaRL(nn.Module):
                 mu = class_mean
                 mu_p = 1.0 / (k+1)*(phi+S)
                 mu_p = mu_p / np.linalg.norm(mu_p)
+                print('mu', mu_p)
                 i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+                print('ok')
                 #print(f"np argmin i= {i}")
 
                 exemplar_set.append(images[i])
                 exemplar_features.append(features[i])
-                print('done')
                 #print(f'len features is: {len(features)}')
 
                 if i == 0:
