@@ -4,8 +4,6 @@
     - Learning without Forgetting (implementation described in iCaRL paper)
     - iCaRL
 
-    The training phase is commented because it implies the serialization of the accuracy results which are stored
-    in a praticular file. Uncomment that section if you want to perform the training and see the results
 '''
 
 import fine_tuning as ft
@@ -17,7 +15,7 @@ import matplotlib.pyplot as plt
 import utils
 
 
-
+'''
 def plot_accuracy(classes_split,num):
 
     plt.figure(figsize=(8, 6))
@@ -31,6 +29,7 @@ def plot_accuracy(classes_split,num):
     plt.show()
 
     return
+'''
 
 def main(i):   # The parameter i can be set to ['1','2','3'] depending on the random split of the dataset you want to load.
                # Change this value if you want to perform calculations with other random splits
@@ -38,13 +37,23 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
     new_dict_acc = {}
     old_dict_acc = {}
     all_dict_acc = {}
+    
+    # Iterate over different methods in order to calculate the different accuracies
     for learner in [ft, lwf, icarl]:
 
         print(f"Incremental learning: {learner.__name__}\n")
         print(f"Classes group {i}\n")
+        
         # Call the incremental_learning function to perform train+test on 10 iterations
         if learner == icarl:
-            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config=0, classifier='nme',lr=2.0)
+            # iCaRL's incremental learning function has additional parameters: 
+            # loss_config = ['bce', 'mse', 'l1', 'kl']  is the distillation loss function we want to use. 
+            #                                           classification loss is always bce.
+            # classifier = ['nme', 'knn', 'svc']        is the classifier we want to use.
+            # lr = int                                  is the learning rate.
+            # new_herding = [True, False]               is automatically set to False. If new_herding = True, the custom 
+            #                                           exemplar selection will be performed.
+            new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i, loss_config='bce', classifier='nme',lr=2.0)
         else:
             new_acc_, old_acc_, all_acc_ = learner.incremental_learning(i)
         print('new_acc', new_acc_)
@@ -58,26 +67,6 @@ def main(i):   # The parameter i can be set to ['1','2','3'] depending on the ra
         #print(dict_acc)
 
     return new_dict_acc, old_dict_acc, all_dict_acc
-
-    '''
-    # Write accuracy lists on file
-    utils.dumb_dict(i, dict_acc)
-
-    '''
-        #COMMENT FROM NOW ON IF YOU JUST WANT TO STORE RESULTS TO FILE
-    '''
-    # Load accuracy lists from file
-    dict_1,dict_2,dict_3 = utils.get_dict_from_file()
-
-    # This is an example dict to see if the plot works: IT DOESN'T SO PLEASE MODIFY THE CODE .... NOW IT WORKS!
-
-    dict_1 = {'fine_tuning': [0.295, 0.203, 0.13533333333333333, 0.093, 0.1054, 0.07733333333333334, 0.05785714285714286, 0.0635, 0.034444444444444444, 0.051],
-              'LwF': [0.158, 0.1165, 0.07366666666666667, 0.04575, 0.0376, 0.029833333333333333, 0.037142857142857144, 0.03325, 0.03133333333333333, 0.0285],
-              'iCaRL': [0.147, 0.09, 0.058333333333333334, 0.043, 0.0344, 0.0315, 0.024428571428571428, 0.024625, 0.02033333333333333, 0.0197]
-             }
-
-    plot_accuracy(dict_1,1)
-    '''
 
 
 
