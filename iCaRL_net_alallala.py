@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -376,7 +376,7 @@ class iCaRL(nn.Module):
           acc_per_group = {}
           labels_set = set([labels for _, labels, _ in test_dataloader])        #collecting all distinct labels of old images
           for i in range(10,len(test_dataloader)//100,10):                   
-                  groups[i] = [[labels_set[i-10:i]],0]        #storing labels of group i and running correct for that group 
+                  groups[i] = [[labels_set[i-10:i]],0]        #storing labels of group i and running corrects for that group 
                                                              #groups[10] = [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
                   acc_per_group[i] = 0                  #storing accuracy per group 
 
@@ -388,7 +388,9 @@ class iCaRL(nn.Module):
             running_corrects += (preds == labels.numpy()).sum()
             for key in list(groups.keys()):
                   if labels in groups[key][0]:
+                        print('qui\n')
                         groups[key][1] += (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
+                        print('groups[key][1]',groups[key][1])
           for key in list(groups.keys()):
                   acc_per_group[key] = groups[key][1]/1000                #for each 10-classes group there are 10*100 = 1000 images             
           accuracy = running_corrects / float(len(test_dataloader.dataset))
