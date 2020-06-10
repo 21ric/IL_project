@@ -22,7 +22,7 @@ from torch.autograd import Variable
 DEVICE = 'cuda'
 BATCH_SIZE = 128
 CLASSES_BATCH = 10
-MEMORY_SIZE = 3000
+MEMORY_SIZE = 4000
 ########################
 
 def incremental_learning(dict_num,loss_config,classifier,lr):
