@@ -285,9 +285,9 @@ def elaborate_different_ex():
   
   fig, ax = plt.subplots()
     
-  ax.plot(x, ex2000['all'],label='2000 ex', markersize=2, marker='o')
-  ax.plot(x, ex1000['all'],label='1000 ex', markersize=2, marker='o')
-  ax.plot(x, ex3000['all'],label='3000 ex', markersize=2, marker='o')
+  ax.plot(x, ex_2000['all'],label='2000 ex', markersize=2, marker='o')
+  ax.plot(x, ex_1000['all'],label='1000 ex', markersize=2, marker='o')
+  ax.plot(x, ex_3000['all'],label='3000 ex', markersize=2, marker='o')
   #ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
 
   ax.set_yticks(np.arange(0, 1., 0.1))
