@@ -276,8 +276,7 @@ class iCaRL(nn.Module):
         features, class_mean = self.get_features_and_mean(images)
         
         #facing new classes, use as class mean, mean on all data
-        if not recompute:           
-            self.new_means.append(class_mean)
+        self.new_means.append(class_mean)
         
         #construct exemeplars by random selection
         if random_flag:
