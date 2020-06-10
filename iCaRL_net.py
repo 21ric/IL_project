@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -228,9 +228,9 @@ class iCaRL(nn.Module):
                 
         #reducing by taking the most relevant at time t
         else:
-            for i, images in enumerate(self.exemplar_sets):
+            for n, images in enumerate(self.exemplar_sets):
                 
-                features, class_mean = self.get_features_and_mean(exemplars)
+                features, class_mean = self.get_features_and_mean(images)
                 
                 exemplar_set = []
                 exemplar_features = []
@@ -262,7 +262,7 @@ class iCaRL(nn.Module):
                             print('chosen i:{}'.format(i))
 
                 #adding or replacing an exemplars set
-                self.exemplar_sets[i] = np.array(exemplar_set)
+                self.exemplar_sets[n] = np.array(exemplar_set)
                 self.features_extractor.train(True)
             
             
