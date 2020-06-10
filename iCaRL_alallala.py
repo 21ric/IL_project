@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr):
+def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
 
     utils.set_seed(0)
 
@@ -40,6 +40,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
     new_acc_list = []
     old_acc_list = []
     all_acc_list = []
+    acc_per_class_list = []
 
     for i in range(int(100/CLASSES_BATCH)):
 
@@ -70,8 +71,25 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         print('Reducing exemplar sets ...')
         print('-'*30)
 
-        m = MEMORY_SIZE // (net.n_classes)
-        
+        #m = MEMORY_SIZE // (net.n_classes)
+
+        if ex_config == '15-15':
+            m = 150
+            
+        elif ex_config == '30-15':
+   
+            if i<=4:
+                 m = 300
+            else:
+                 m = 150
+
+        elif ex_config == '15-30':
+              
+            if i<=4:
+                 m = 150
+            else:
+                 m = 300         
+        '''
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
         print(f"index list is {index_list}")
@@ -80,15 +98,15 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
             m_list[elem] = m_list[elem] - (elem)*2
             m_list[elem] = m_list[elem] + (i - elem)*2
         print(f"m list after changes is {m_list}")
-        
-        net.reduce_exemplars_set(m_list[:-1])
+        '''
+        #net.reduce_exemplars_set(m_list[:-1])
 
         print('Constructing exemplar sets ...')
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m_list[-1], random_flag=False)
-
+           #net.construct_exemplars_set(train_dataset.get_class_imgs(y), m_list[-1], random_flag=False)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False) 
         
 
         print('Testing ...')
@@ -100,7 +118,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
         new_acc_list.append(new_acc)
         if i == 0:
             all_acc_list.append(new_acc)
-
+ 
         if i > 0:
 
             previous_classes = np.array([])
@@ -110,16 +128,16 @@ def incremental_learning(dict_num,loss_config,classifier,lr):
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
+            old_acc,acc_per_class = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
             print('All classes')
             all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
 
 
             old_acc_list.append(old_acc)
             all_acc_list.append(all_acc)
-
+            acc_per_class_list.append(acc_per_class)
             print('-'*30)
 
         net.n_known = net.n_classes
 
-    return new_acc_list, old_acc_list, all_acc_list
+    return new_acc_list, old_acc_list, all_acc_list,acc_per_class_list

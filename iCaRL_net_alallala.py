@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
 
         return
 
-
+   
     def reduce_exemplars_set(self, m_list):
         m_total = []
         for elem in m_list:
@@ -201,6 +201,7 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             self.exemplar_sets[y] = exemplars[:m_total[y]]
             print(len(self.exemplar_sets[y]))
+    
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
@@ -368,16 +369,29 @@ class iCaRL(nn.Module):
 
     def classify_all(self, test_dataset, map_reverse, classifier):
 
-        test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+              test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
+        
+       
+              groups = {}
+              acc_per_group = {}
+	      labels_set = set([label for _, labels, _ in test_dataloader])        #collecting all distinct labels of old images
+              for i in range(10,len(test_dataloader//100),10):                   
+                  groups[i] = [[labels_set[i-10:i],0]        #storing labels of group i and running correct for that group 
+                                                             #groups[10] = [[0,1,2,3,4,5,6,7,8,9,10],running_corrects]   
+	          acc_per_group[i] = 0                  #storing accuracy per group 
 
-        running_corrects = 0
+              running_corrects = 0                                              
+	      for imgs, labels, _ in  test_dataloader:
+		    imgs = Variable(imgs).cuda()
+		    preds = self.classify(imgs, classifier)
+		    preds = [map_reverse[pred] for pred in preds]
+		    running_corrects += (preds == labels.numpy()).sum()
+                    for key in list(groups.keys()):
+                         if labels in groups[key][0]:
+                            groups[key][1] += (preds == labels.numpy()).sum         #incrementing the running corrects of groups[key]
+              for key in list(groups.keys()):
+                   acc_per_group[key] = groups[key][1]/1000                #for each 10-classes group there are 10*100 = 1000 images             
+	      accuracy = running_corrects / float(len(test_dataloader.dataset))
 
-        for imgs, labels, _ in  test_dataloader:
-            imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier)
-            preds = [map_reverse[pred] for pred in preds]
-            running_corrects += (preds == labels.numpy()).sum()
-        accuracy = running_corrects / float(len(test_dataloader.dataset))
-        print('Test Accuracy: {}'.format(accuracy))
-
-        return accuracy
+              print('Test Accuracy: {}'.format(accuracy))
+              return accuracy,acc_per_group 
