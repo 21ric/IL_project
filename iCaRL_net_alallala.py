@@ -380,7 +380,7 @@ class iCaRL(nn.Module):
           accuracy = running_corrects / float(len(test_dataloader.dataset))
 
           print('Test Accuracy: {}'.format(accuracy))
-          return accuracy,acc_per_group 
+          return accuracy
 
     def classify_all2(self, test_dataset, map_reverse, classifier):
 
