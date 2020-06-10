@@ -228,9 +228,9 @@ class iCaRL(nn.Module):
                 
         #reducing by taking the most relevant at time t
         else:
-            for i, exemplars in enumerate(self.exemplar_sets):
+            for i, images in enumerate(self.exemplar_sets):
                 
-                feature, class_mean = self.get_features_and_mean(exemplars)
+                features, class_mean = self.get_features_and_mean(exemplars)
                 
                 exemplar_set = []
                 exemplar_features = []
