@@ -230,7 +230,7 @@ class iCaRL(nn.Module):
         else:
             for i, exemplars in enumerate(self.exemplar_sets):
                 
-                feature, class_mean = self.get_features_and_mean(self, exemplars)
+                feature, class_mean = self.get_features_and_mean(exemplars)
                 
                 exemplar_set = []
                 exemplar_features = []
@@ -321,7 +321,7 @@ class iCaRL(nn.Module):
                     print('chosen i:{}'.format(i))
 
         #adding or replacing an exemplars set
-        self.exemplar_sets[label] = np.array(exemplar_set)
+        self.exemplar_sets.append(np.array(exemplar_set))
         self.features_extractor.train(True)
             
             
