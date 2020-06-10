@@ -75,7 +75,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
             if not new_herding:
                 net.reduce_exemplars_set(m)
             else:
-                net.construct_exemplars_set(m, recompute=True)
+                net.reduce_exemplars_set(m, recompute=True)
 
         print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
