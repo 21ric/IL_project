@@ -265,7 +265,7 @@ def elaborate_different_ex():
   ex_1000 = {}
   ex_2000 = {}
   ex_3000 = {}
-  #ex_4000 = {}
+  ex_4000 = {}
   
   dict = get_dict_from_file('results/all_accuracy3.pickle')
   
@@ -278,7 +278,7 @@ def elaborate_different_ex():
   
   ex_1000 = get_dict_from_file('results/1000ex_accuracy3.pickle')
   ex_3000 = get_dict_from_file('results/3000ex_accuracy3.pickle')
-  #ex_4000 = get_dict_from_file('results/4000ex_accuracy3.pickle')
+  ex_4000 = get_dict_from_file('results/4000ex_accuracy3.pickle')
   
   x = list(map(str,list(range(10,110,10))))
   x_old = list(map(str,list(range(20,110,10))))
@@ -288,7 +288,7 @@ def elaborate_different_ex():
   ax.plot(x, ex_2000['all'],label='2000 ex', markersize=2, marker='o')
   ax.plot(x, ex_1000['all'],label='1000 ex', markersize=2, marker='o')
   ax.plot(x, ex_3000['all'],label='3000 ex', markersize=2, marker='o')
-  #ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
+  ax.plot(x, ex4000['all'],label='4000 ex', markersize=2, marker='o')
 
   ax.set_yticks(np.arange(0, 1., 0.1))
   ax.grid(axis='y')
