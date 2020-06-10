@@ -226,6 +226,7 @@ class iCaRL(nn.Module):
 
 
         else:
+            print('len fearues', len(features))
             #print('aggiungo a nuove medie', len(self.new_means))
             exemplar_set = []
             exemplar_features = []
