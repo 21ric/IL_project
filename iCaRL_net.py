@@ -219,6 +219,7 @@ class iCaRL(nn.Module):
 
     
     #reduce exemplars lists
+    @torch.no_grad()
     def reduce_exemplars_set(self, m, recompute=False):
         
         #reducing by discarding last elements
@@ -228,6 +229,7 @@ class iCaRL(nn.Module):
                 
         #reducing by taking the most relevant at time t
         else:
+            self.features_extractor.train(False)
             for n, images in enumerate(self.exemplar_sets):
                 
                 features, class_mean = self.get_features_and_mean(images)
@@ -268,7 +270,7 @@ class iCaRL(nn.Module):
             
             
 
-     #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
+    #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):
         
@@ -289,9 +291,11 @@ class iCaRL(nn.Module):
             
            
             
-    #method for constructin exemplars with herding       
+    #method for constructin exemplars with herding  
+    @torch.no_grad()
     def construct_exemplars(self, images, m, features, class_mean):
-            
+        
+        self.features_extractor.train(False)
         exemplar_set = []
         exemplar_features = []
         for k in range(m):
