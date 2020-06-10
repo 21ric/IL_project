@@ -280,7 +280,7 @@ class iCaRL(nn.Module):
                     print('chosen i:{}'.format(i))
 
         #adding or replacing an exemplars set
-        if not inplace:
+        if not recompute:
             self.exemplar_sets.append(np.array(exemplar_set))
         else:
             self.exemplar_sets[label] = np.array(exemplar_set)
