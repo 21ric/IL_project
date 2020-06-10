@@ -74,21 +74,21 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         #m = MEMORY_SIZE // (net.n_classes)
 
         if ex_config == '15-15':
-            m = 150
+            m = 15
             
         elif ex_config == '30-15':
    
             if i<=4:
-                 m = 300
+                 m = 30
             else:
-                 m = 150
+                 m = 15
 
         elif ex_config == '15-30':
               
             if i<=4:
-                 m = 150
+                 m = 15
             else:
-                 m = 300         
+                 m = 30         
         '''
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
