@@ -130,7 +130,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
 
             print('computing separately the accuracy for each old group of 10 classes')
             acc_per_group = {}
-            for c in range(0,len(prev_classes_dataset)/1000)):
+            for c in range(0,len(prev_classes_dataset)/1000):
                  acc_per_group[c+1] = net.classify_all(prev_classes_dataset[c*1000:c*1000+1000], map_reverse, classifier=classifier)
             
             acc_per_group_list.append(acc_per_group)
