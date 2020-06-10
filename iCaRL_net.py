@@ -252,40 +252,40 @@ class iCaRL(nn.Module):
     def construct_exemplars(images, m, recompute=False, label=None):
         print('len fearues', len(features))
             
-            exemplar_set = []
-            exemplar_features = []
-            for k in range(m):
-                S = np.sum(exemplar_features, axis=0)
-                phi = features
-                mu = class_mean
-                mu_p = 1.0 / (k+1)*(phi+S)
-                mu_p = mu_p / np.linalg.norm(mu_p) #l2 norm
-                i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+        exemplar_set = []
+        exemplar_features = []
+        for k in range(m):
+            S = np.sum(exemplar_features, axis=0)
+            phi = features
+            mu = class_mean
+            mu_p = 1.0 / (k+1)*(phi+S)
+            mu_p = mu_p / np.linalg.norm(mu_p) #l2 norm
+            i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
 
-                exemplar_set.append(images[i])
-                exemplar_features.append(features[i])
-                
-                #removing chosen image from candidates, avoiding duplicates
-                if i == 0:
-                    images = images[1:]
-                    features = features[1:]
+            exemplar_set.append(images[i])
+            exemplar_features.append(features[i])
 
-                elif i == (len(features)-1):
-                    images = images[:-1]
-                    features = features[:-1]
-                else:
-                    try:
-                        images = np.concatenate((images[:i], images[i+1:]))
-                        features = np.concatenate((features[:i], features[i+1:]))
-                    except:
-                        print('chosen i:{}'.format(i))
-            
-            #adding or replacing an exemplars set
-            if not inplace:
-                self.exemplar_sets.append(np.array(exemplar_set))
+            #removing chosen image from candidates, avoiding duplicates
+            if i == 0:
+                images = images[1:]
+                features = features[1:]
+
+            elif i == (len(features)-1):
+                images = images[:-1]
+                features = features[:-1]
             else:
-                self.exemplar_sets[label] = np.array(exemplar_set)
-            self.features_extractor.train(True)
+                try:
+                    images = np.concatenate((images[:i], images[i+1:]))
+                    features = np.concatenate((features[:i], features[i+1:]))
+                except:
+                    print('chosen i:{}'.format(i))
+
+        #adding or replacing an exemplars set
+        if not inplace:
+            self.exemplar_sets.append(np.array(exemplar_set))
+        else:
+            self.exemplar_sets[label] = np.array(exemplar_set)
+        self.features_extractor.train(True)
             
             
     
