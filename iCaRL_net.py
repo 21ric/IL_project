@@ -232,7 +232,7 @@ class iCaRL(nn.Module):
     def construct_exemplars_set(self, images, m, random_flag=False, recompute=False, class=None):
         
         #computing features from images and computing mean of features
-        features, class_mean = get_random_exemplars(images, m)
+        features, class_mean = self.get_features_and_mean(images)
         
         #facing new classes, use as class mean, mean on all data
         if not recompute:           
