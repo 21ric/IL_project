@@ -36,11 +36,11 @@ MOMENTUM = 0.9
 
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce = nn.BCEWithLogitsLoss()
+bce = nn.BCEWithLogitsLoss(reduction='sum')
 #ce = nn.CrossEntropyLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
-kl = nn.KLDivLoss(reduction='batchmean')
+kl = nn.KLDivLoss()
 
 losses = {'bce': bce, 'kl': kl,'l1': l1, 'mse': mse}
 
