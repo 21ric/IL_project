@@ -73,8 +73,8 @@ class iCaRL(nn.Module):
         self.dist_loss = losses[loss_config]
 
         # Change clf loss for L1 , MSE and KL
-        #if loss_config in ['l1', 'mse', 'kl']:
-        #    self.clf_loss = nn.BCEWithLogitsLoss()
+        if loss_config in ['l1', 'mse', 'kl']:
+            self.clf_loss = nn.BCEWithLogitsLoss()
 
         self.exemplar_means = []
         self.compute_means = True
@@ -171,11 +171,11 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
                 
-                out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                 loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
 
                 if self.n_known > 0:
-                    #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
