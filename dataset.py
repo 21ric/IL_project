@@ -2,6 +2,7 @@ from PIL import Image
 import os
 import os.path
 import numpy as np
+from sklearn.model_selection import train_test_split
 import torch
 import pickle
 
@@ -157,9 +158,12 @@ class CIFAR10(VisionDataset):
         self.data = np.concatenate((self.data, data), axis = 0)
 
     def get_class_imgs(self, target):
-
         return self.data[np.array(self.targets) == target] 
-
+    
+    def resample(self, resize_factor):
+        resamples_data, _, resampled_targets, _ = train_test_split(self.data,self.targets, test_size=(1-resize_factor), stratify=self.targets)
+        self.data = resamples_data
+        self.targets = resampled_targets
 
 class CIFAR100(CIFAR10):
     """`CIFAR100 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ Dataset.
