@@ -220,61 +220,12 @@ class iCaRL(nn.Module):
     
     #reduce exemplars lists
     @torch.no_grad()
-    def reduce_exemplars_set(self, m, recompute=False):
-        
+    def reduce_exemplars_set(self, m):        
         #reducing by discarding last elements
-        if not recompute:
-            for y, exemplars in enumerate(self.exemplar_sets):
-                self.exemplar_sets[y] = exemplars[:m]
+        for y, exemplars in enumerate(self.exemplar_sets):
+            self.exemplar_sets[y] = exemplars[:m]
                 
-        #reducing by taking the most relevant at time t
-        else:
-            self.features_extractor.train(False)
-            new_ex = [] # a list storing the new, reduced, exemplars of all classes 
-            for n, images in enumerate(self.exemplar_sets):
-                
-                features, class_mean = self.get_features_and_mean(images)
-                
-                exemplar_set = []
-                exemplar_features = []
-                
-                self.features_extractor.train(False)
-                for k in range(m):
-                    S = np.sum(exemplar_features, axis=0)
-                    phi = features
-                    mu = class_mean
-                    mu_p = 1.0 / (k+1)*(phi+S)
-                    mu_p = mu_p / np.linalg.norm(mu_p) #l2 norm
-                    i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
-
-                    exemplar_set.append(images[i])
-                    exemplar_features.append(features[i])
-
-                    #removing chosen image from candidates, avoiding duplicates
-                    if i == 0:
-                        images = images[1:]
-                        features = features[1:]
-
-                    elif i == (len(features)-1): #i is an index
-                        images = images[:-1]
-                        features = features[:-1]
-                    else:
-                        try:
-                            images = np.concatenate((images[:i], images[i+1:]))
-                            features = np.concatenate((features[:i], features[i+1:]))
-                        except:
-                            print('chosen i:{}'.format(i))
-
-                #adding or replacing an exemplars set
-                #self.exemplar_sets[n] = np.array(exemplar_set)
-                new_ex.append(np.array(exemplar_set))
-            
-            #print(new_ex)
-            self.exemplar_sets = new_ex
-            self.features_extractor.train(True)
-            
-            
-            
+                      
 
     #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
