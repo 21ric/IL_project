@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, undersample=False, resize_factor=0.5):
+def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, undersample=False, resize_factor=0.5, random_flag=False):
 
     utils.set_seed(0)
 
@@ -88,7 +88,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag)
 
 
         print('Testing ...')
