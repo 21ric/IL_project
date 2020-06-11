@@ -61,7 +61,9 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
         if undersample:
             train_indices, _ = train_test_split(range(len(train_dataset)), test_size=(1-resize_factor), stratify=train_dataset.targets)
             train_dataset = Subset(train_dataset, train_indices)
-            train_dataset = train_dataset.dataset
+            print('len1', len(train_dataset))
+            #train_dataset = train_dataset.dataset
+            print('len2', len(train_dataset))
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
