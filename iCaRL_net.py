@@ -269,7 +269,7 @@ class iCaRL(nn.Module):
                 #self.exemplar_sets[n] = np.array(exemplar_set)
                 new_ex.append(np.array(exemplar_set))
             
-            print(new_ex)
+            #print(new_ex)
             self.exemplar_sets = new_ex
             self.features_extractor.train(True)
             
