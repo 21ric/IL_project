@@ -58,11 +58,10 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
-        if undersample:
-            train_dataset.resample(resize_factor)
-            print('len1', len(train_dataset))
-            
-            print('len2', len(train_dataset))
+        if undersample and i != 0:            
+            train_dataset.resample(resize_factor = (5000/(10*m))
+            print('Resamplig to size', len(train_dataset)) 
+
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
@@ -73,6 +72,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
         
         m = MEMORY_SIZE // (net.n_classes)
+        
         
         if i != 0:
             print('Reducing exemplar sets ...')
