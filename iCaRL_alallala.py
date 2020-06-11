@@ -71,8 +71,8 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment_config,ex
         #print('Reducing exemplar sets ...')
         print('-'*30)
 
-        m = MEMORY_SIZE // (net.n_classes)
-        '''
+        #m = MEMORY_SIZE // (net.n_classes)
+        
         #if experiment1 = True we are experiment with different number of exemplars per class based on age
         if experiment_config: 
 
@@ -97,7 +97,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment_config,ex
        
              m = num_ex  
 
-        ''' 
+        
         '''
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
@@ -109,7 +109,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment_config,ex
         print(f"m list after changes is {m_list}")
         '''
         #net.reduce_exemplars_set(m_list[:-1])
-        net.reduce_exemplars_set(m)
+        #net.reduce_exemplars_set(m)
         print('Constructing exemplar sets ...')
         #print(f'chosen configuration: {ex_config}')
         print('-'*30)
