@@ -59,7 +59,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
         if undersample:
-            train_dataset.reasample(resize_factor)
+            train_dataset.resample(resize_factor)
             print('len1', len(train_dataset))
             
             print('len2', len(train_dataset))
