@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
 
         return
 
-   
+    '''
     def reduce_exemplars_set(self, m_list):
         m_total = []
         for elem in m_list:
@@ -201,7 +201,13 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             self.exemplar_sets[y] = exemplars[:m_total[y]]
             print(len(self.exemplar_sets[y]))
-    
+        
+    '''
+    @torch.no_grad()
+    def reduce_exemplars_set(self, m):        
+        #reducing by discarding last elements
+        for y, exemplars in enumerate(self.exemplar_sets):
+            self.exemplar_sets[y] = exemplars[:m]
 
     @torch.no_grad()
     def construct_exemplars_set(self, images, m, random_flag=False):

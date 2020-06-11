@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr,experiment1,ex_config,num_ex):
+def incremental_learning(dict_num,loss_config,classifier,lr,experiment_config,ex_config,num_ex):
 
     utils.set_seed(0)
 
@@ -74,7 +74,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment1,ex_confi
         m = MEMORY_SIZE // (net.n_classes)
         '''
         #if experiment1 = True we are experiment with different number of exemplars per class based on age
-        if experiment1: 
+        if experiment_config: 
 
           if ex_config == '15-15':
               m = 15
