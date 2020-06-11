@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, undersample=False, resize_factor=0.5, random_flag=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False):
 
     utils.set_seed(0)
 
@@ -78,10 +78,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
             print('Reducing exemplar sets ...')
             print('-'*30)
 
-            if not new_herding:
-                net.reduce_exemplars_set(m)
-            else:
-                net.reduce_exemplars_set(m, recompute=True)
+            net.reduce_exemplars_set(m)
 
         print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
