@@ -73,25 +73,26 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment1,ex_confi
 
         #m = MEMORY_SIZE // (net.n_classes)
  
+        #if experiment1 = True we are experiment with different number of exemplars per class based on age
         if experiment1: 
 
-		if ex_config == '15-15':
-		    m = 15
-		    
-		elif ex_config == '30-15':
-	   
-		    if i<=4:
-		         m = 30
-		    else:
-		         m = 15
+          if ex_config == '15-15':
+              m = 15
+            
+          elif ex_config == '30-15':
+        
+            if i<=4:
+                 m = 30
+            else:
+                 m = 15
 
-		elif ex_config == '15-30':
-		      
-		    if i<=4:
-		         m = 15
-		    else:
-		         m = 30   
-
+          elif ex_config == '15-30':
+              
+            if i<=4:
+                 m = 15
+            else:
+                 m = 30   
+        #otherwise we are exemperiment the fixed number of exemplars per class needed to reach the iCaRL performance 
         else:
        
              m = num_ex      
