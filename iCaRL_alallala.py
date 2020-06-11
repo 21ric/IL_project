@@ -72,7 +72,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr,experiment1,ex_confi
         print('-'*30)
 
         m = MEMORY_SIZE // (net.n_classes)
- '''
+        '''
         #if experiment1 = True we are experiment with different number of exemplars per class based on age
         if experiment1: 
 
