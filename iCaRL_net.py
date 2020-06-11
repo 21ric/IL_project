@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -288,7 +288,7 @@ class iCaRL(nn.Module):
         
         #construct exemeplars by random selection
         if random_flag:
-            self.get_random_exemplars(images, m)
+            self.construct_random_exemplars(images, m)
         
         #construct exemplar set
         else:
