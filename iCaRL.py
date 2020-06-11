@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
+def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, undersample=False, resize_factor=0.5):
 
     utils.set_seed(0)
 
@@ -57,6 +57,11 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
 
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
+        
+        if undersample:
+            train_indices, _ = train_test_split(range(len(train_dataset)), test_size=resize_factor, stratify=train_dataset.targets)
+            train_dataset = Subset(train_dataset, train_indices)
+            train_dataset = train_dataset.dataset
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
@@ -118,6 +123,8 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False):
         print('lunghezza nuove medie', len(net.new_means))
 
         net.n_known = net.n_classes
-
+        
+        if undersample:
+            return
 
     return new_acc_list, old_acc_list, all_acc_list
