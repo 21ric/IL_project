@@ -124,7 +124,7 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
 
         net.n_known = net.n_classes
         
-        if undersample:
-            return
+        #if undersample:
+            #return new_acc_list, old_acc_list, all_acc_list
 
     return new_acc_list, old_acc_list, all_acc_list
