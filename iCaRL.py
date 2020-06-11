@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, undersample=False, resize_factor=0.5):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False):
 
     utils.set_seed(0)
 
@@ -58,12 +58,10 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
-        if undersample:
-            train_indices, _ = train_test_split(range(len(train_dataset)), test_size=(1-resize_factor), stratify=train_dataset.targets)
-            train_dataset = Subset(train_dataset, train_indices)
-            print('len1', len(train_dataset))
-            #train_dataset = train_dataset.dataset
-            print('len2', len(train_dataset))
+        if undersample and i != 0:            
+            train_dataset.resample(resize_factor = (net.n_known*m)/5000)
+            print('Resamplig to size', len(train_dataset)) 
+
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
@@ -75,21 +73,19 @@ def incremental_learning(dict_num,loss_config,classifier,lr, new_herding=False, 
         
         m = MEMORY_SIZE // (net.n_classes)
         
+        
         if i != 0:
             print('Reducing exemplar sets ...')
             print('-'*30)
 
-            if not new_herding:
-                net.reduce_exemplars_set(m)
-            else:
-                net.reduce_exemplars_set(m, recompute=True)
+            net.reduce_exemplars_set(m)
 
         print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
         print('-'*30)
 
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag)
 
 
         print('Testing ...')
