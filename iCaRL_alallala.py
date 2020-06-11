@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
+def incremental_learning(dict_num,loss_config,classifier,lr,experiment1,ex_config,num_ex):
 
     utils.set_seed(0)
 
@@ -72,23 +72,29 @@ def incremental_learning(dict_num,loss_config,classifier,lr,ex_config):
         print('-'*30)
 
         #m = MEMORY_SIZE // (net.n_classes)
+ 
+        if experiment1: 
 
-        if ex_config == '15-15':
-            m = 15
-            
-        elif ex_config == '30-15':
-   
-            if i<=4:
-                 m = 30
-            else:
-                 m = 15
+		if ex_config == '15-15':
+		    m = 15
+		    
+		elif ex_config == '30-15':
+	   
+		    if i<=4:
+		         m = 30
+		    else:
+		         m = 15
 
-        elif ex_config == '15-30':
-              
-            if i<=4:
-                 m = 15
-            else:
-                 m = 30         
+		elif ex_config == '15-30':
+		      
+		    if i<=4:
+		         m = 15
+		    else:
+		         m = 30   
+
+        else:
+       
+             m = num_ex      
         '''
         m_list = [m]*(i+1)
         index_list = np.arange(i+1)
