@@ -237,6 +237,7 @@ class iCaRL(nn.Module):
                 exemplar_set = []
                 exemplar_features = []
                 
+                self.features_extractor.train(False)
                 for k in range(m):
                     S = np.sum(exemplar_features, axis=0)
                     phi = features
@@ -253,7 +254,7 @@ class iCaRL(nn.Module):
                         images = images[1:]
                         features = features[1:]
 
-                    elif i == (len(features)-1):
+                    elif i == (len(features)-1): #i is an index
                         images = images[:-1]
                         features = features[:-1]
                     else:
@@ -265,7 +266,7 @@ class iCaRL(nn.Module):
 
                 #adding or replacing an exemplars set
                 self.exemplar_sets[n] = np.array(exemplar_set)
-                self.features_extractor.train(True)
+            
             
             
             
@@ -324,7 +325,7 @@ class iCaRL(nn.Module):
                 except:
                     print('chosen i:{}'.format(i))
 
-        #adding or replacing an exemplars set
+        #adding exemplars set
         self.exemplar_sets.append(np.array(exemplar_set))
         self.features_extractor.train(True)
             
