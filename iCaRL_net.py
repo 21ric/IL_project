@@ -230,6 +230,7 @@ class iCaRL(nn.Module):
         #reducing by taking the most relevant at time t
         else:
             self.features_extractor.train(False)
+            new_ex = [] # a list storing the new, reduced, exemplars of all classes 
             for n, images in enumerate(self.exemplar_sets):
                 
                 features, class_mean = self.get_features_and_mean(images)
@@ -265,8 +266,12 @@ class iCaRL(nn.Module):
                             print('chosen i:{}'.format(i))
 
                 #adding or replacing an exemplars set
-                self.exemplar_sets[n] = np.array(exemplar_set)
+                #self.exemplar_sets[n] = np.array(exemplar_set)
+                new_ex.append(np.array(exemplar_set))
             
+            print(new_ex)
+            self.exemplar_sets = new_ex
+            self.features_extractor.train(True)
             
             
             
