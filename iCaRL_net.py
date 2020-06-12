@@ -261,12 +261,22 @@ class iCaRL(nn.Module):
                         
                         features = self.features_extractor.extract_features(imgs)
                         
+                       
                         for i, feat in enumerate(features):
                             features[i] = feat/torch.norm(feat, p=2)
                         
-                        ex_features_now = features[~(labels < self.n_known)]
-                        samples_features_now = features[~(labels >= self.n_known)]
                         
+                        old_features = f_ex.extract_features(imgs)
+                        new_features = new_extractor.extract_features(imgs)
+                        
+                        for i, feat in enumerate(old_features):
+                            old_features[i] = feat/torch.norm(feat, p=2)
+                        
+                        for i, feat in enumerate(new_features):
+                            new_features[i] = feat/torch.norm(feat, p=2)
+                        
+                        """
+                        ~(labels < self.n_known)
                         exemplars = imgs[~(labels < self.n_known)]
                         new_samples = imgs[~(labels >= self.n_known)]
                         
@@ -279,15 +289,16 @@ class iCaRL(nn.Module):
                         for i, feat in enumerate(samples_features):
                             samples_features[i] = feat/torch.norm(feat, p=2)
                         
+                        """
+                        ex_loss = mse_sum(features, old_features)
+                        sample_loss = mse_sum(features, new_features)
                         
-                        ex_loss = mse_sum(ex_features_now, ex_features)
-                        sample_loss = mse_sum(samples_features_now, samples_features)
-                        
-                        tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_samples))
+                        tot_loss = (ex_loss + sample_loss)/(len(features)*2)
                         
                         loss = 0.5*loss + 0.5*tot_loss
                         
                         self.features_extractor.train(True)
+                        
                         
                     else:
                         out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
