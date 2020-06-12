@@ -258,7 +258,7 @@ class iCaRL(nn.Module):
                         self.features_extractor.to(DEVICE)
                         
                         
-                        features = self.feature_extractor.extract_features(imgs)
+                        features = self.features_extractor.extract_features(imgs)
                         
                         for i, feat in enumerate(features):
                             features[i] = feat/torch.norm(feat, p=2)
@@ -285,6 +285,8 @@ class iCaRL(nn.Module):
                         tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_samples))
                         
                         loss = 0.5*loss + 0.5*tot_loss
+                        
+                        self.features_extractor.train(True)
                         
                     else:
                         out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
