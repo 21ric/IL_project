@@ -260,12 +260,12 @@ class iCaRL(nn.Module):
         
         # Create custom dataset
         for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
-            if i==0:
+            if i==0 :
                 dataset = ExemplarsDataset(imgs= exemplars, labels=([i]*len(exemplars)))
                 print('len dataset is')
                 print(len(dataset))
             
-            else:
+            else :
                 dataset.append_exemplars(imgs= exemplars, labels=([i]*len(exemplars)))
                 
         print("Exemplars' Dataset created!")
