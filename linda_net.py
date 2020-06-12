@@ -95,9 +95,9 @@ class ExemplarsDataset(Dataset):
     def __len__(self):
         return len(self.images)
     
-    def append_exemplars(self, imgs, labels):
-        self.images.extend(imgs)
-        self.labels.extend(labels)
+    def append_exemplars(self, imgs, labels):      
+        self.images = np.concatenate((self.images, imgs), axis=0)
+        self.labels = np.concatenate((self.labels, labels), axis=0)
         return
    
 
