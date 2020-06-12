@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -285,7 +285,7 @@ class iCaRL(nn.Module):
                         r_i = r_i[~(labels >= self.n_known)]
                         
                         ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
-                        sample_loss = mse_sum(sample_out[:, self.n_known:], r_i)
+                        sample_loss = bce_sum(sample_out[:, self.n_known:], r_i)
                         
                         tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_features))
                         
