@@ -258,15 +258,20 @@ class iCaRL(nn.Module):
         
         clf_net.to(DEVICE)
         
-        for exemplars, i in enumerate(self.exemplar_sets[:self.n_known]):
+        # Create custom dataset
+        for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
             if i==0:
                 dataset = ExemplarsDataset(imgs= exemplars, labels=([i]*len(exemplars)))
                 print('len dataset is')
                 print(len(dataset))
             print(i)
-            #else:
-                #dataset.append_exemplars
-            
+            else:
+                dataset.append_exemplars(imgs= exemplars, labels=([i]*len(exemplars)))
+        print("Exemplars' Dataset created!")
+        print(f"Len dataset is {len(dataset)}")
+        
+        # Create dataloader
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
              
         '''
         dataset.append_exemplars(imgs= , labels= )
