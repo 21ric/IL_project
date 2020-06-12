@@ -65,7 +65,7 @@ def modify_output_for_loss(loss_name, output):
 
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, loss_config,lr):
+    def __init__(self, n_classes, class_map, loss_config, lr, new_extractor=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -83,7 +83,7 @@ class iCaRL(nn.Module):
         self.new_means = []
         self.class_map = class_map #needed to map real label to fake label
         
-        
+        self.new_extractor = new_extractor
         
 
     #forward pass
@@ -130,6 +130,71 @@ class iCaRL(nn.Module):
 
         print('New classes:{}'.format(n))
         print('-'*30)
+        
+        #training a new network for new classes
+        if self.new_extractor and iter != 0:
+            print('Training a new network ...')
+            print('-'*30)
+            new_extractor = resnet32(num_classes=n)          
+            loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+            optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+            
+            #training phase
+            i = 0
+            new_extractor.to(DEVICE)
+            for epoch in range(NUM_EPOCHS):
+                #reducing learning 
+                if epoch in STEPDOWN_EPOCHS:
+                  for param_group in optimizer.param_groups:
+                    param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
+
+                new_extractor.train(True)
+                for imgs, labels, indexes in loader:
+                    imgs = imgs.to(DEVICE)
+                    indexes = indexes.to(DEVICE)            
+                    seen_labels = torch.LongTensor([class_map[label]-iter*10 for label in labels.numpy()])
+                    labels = Variable(seen_labels).to(DEVICE)
+
+                    #computing one hots of labels
+                    labels_hot=torch.eye(self.n_classes)[labels]
+                    labels_hot = labels_hot.to(DEVICE)
+
+                    #zeroing the gradients
+                    optimizer.zero_grad()
+
+                    #computing outputs
+                    out = self(imgs)
+
+                    #computing loss
+                    loss = self.clf_loss(out, labels_hot)
+
+                    #backward pass()
+                    loss.backward()
+                    optimizer.step()
+
+
+                if i % 10 == 0 or i == (NUM_EPOCHS-1):
+                    print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                    for param_group in optimizer.param_groups:
+                      print('Learning rate:{}'.format(param_group['lr']))
+                    print('-'*30)
+                i+=1
+                
+            #storing output of this network
+            new_extractor.to(DEVICE)
+            r = torch.zeros(len(dataset), n).to(DEVICE)
+            for images, labels, indexes in loader:
+                new_extractor.train(False)
+                images = Variable(images).to(DEVICE)
+                indexes = indexes.to(DEVICE)
+                g = new_extractor.forward(images)         
+                g = torch.sigmoid(g)               
+                r[indexes] = r.data
+            r = Variable(r).to(DEVICE)
+            new_extractor.train(True)
+            
+            
 
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
@@ -199,6 +264,12 @@ class iCaRL(nn.Module):
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                
+                if new_extractor and iter != 0:
+                    r_i = r[indexes]
+                    new_loss = self.dist_loss(out[:, self.n_known:self.n_classes], r_i)
+                    
+                    loss += new_loss
 
                 #backward pass()
                 loss.backward()
