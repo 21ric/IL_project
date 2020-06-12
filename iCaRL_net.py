@@ -190,7 +190,7 @@ class iCaRL(nn.Module):
                 indexes = indexes.to(DEVICE)
                 g = new_extractor.forward(images)         
                 g = torch.sigmoid(g)               
-                r[indexes] = r.data
+                r[indexes] = g.data
             r = Variable(r).to(DEVICE)
             new_extractor.train(True)
             
