@@ -5,6 +5,7 @@ import torch.optim as optim
 from torchvision import transforms
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 
 import numpy as np
 
@@ -64,7 +65,44 @@ def modify_output_for_loss(loss_name, output):
         return F.log_softmax(output, dim=1)
     
 
+
+
+
+
+
+class ExemplarsDataset(Dataset):
+    def __init__(self, imgs, labels):
+        self.images = imgs
+        self.labels = labels
+        self.transform = transforms.Compose([transforms.RandomCrop(32, padding=4),
+                                    transforms.RandomHorizontalFlip(),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+                                   ])
     
+    def __getitem__(self,index):
+        img, label = self.images[index], self.label[labels]
+        
+        # to return a PIL Image
+        img = Image.fromarray(img)
+        
+        # data sugmentation
+        if self.transform is not None:
+            img = self.transform(img)
+        
+        return img, target
+    
+    def __len__(self):
+        return len(self.images)
+    
+    def append_exemplars(self, imgs, labels):
+        self.images.extend(imgs)
+        self.labels.extend(labels)
+        return
+   
+
+
+
 class iCaRL(nn.Module):
     def __init__(self, n_classes, class_map, loss_config, lr):
         super(iCaRL, self).__init__()
@@ -211,7 +249,41 @@ class iCaRL(nn.Module):
     
     
     
+    def undersample_data(self, dataset, class_map, map_reverse, iter):
+        # here we train a Resnet32 on the exemplars
+        clf_net = resnet32(num_classes=self.n_known)
+        
+        criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy
+        optimizer = optim.SGD(clf_net.parameters(), lr=2, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
+        
+        clf_net.to(DEVICE)
+        
+        dataset = ExemplarsDataset(imgs= self.exemplar_sets[0],labels=([0]*len(exemplar_sets[0])))
+        print('len dataset is')
+        print(len(dataset))
+                         
+        '''
+        dataset.append_exemplars(imgs= , labels= )
+        
+        for exemplars in self.exemplar_sets[:self.n_known]:
+            features = []
+            for ex in  exemplars:
 
+                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                feature = feature.squeeze()
+                feature.data = feature.data / torch.norm(feature.data, p=2)
+                features.append(feature)
+
+            features = torch.stack(features)
+            mu_y = features.mean(0).squeeze()
+            mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+            exemplar_means.append(mu_y.cpu())
+
+        self.exemplar_means = exemplar_means
+        self.exemplar_means.extend(self.new_means)
+        '''
+        
     
     #reduce exemplars lists
     @torch.no_grad()
