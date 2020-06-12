@@ -42,7 +42,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
-mse_sum = nn.MSELoss(reduction='sum')
+bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss(reduction='batchmean')
 
 losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
@@ -181,6 +181,19 @@ class iCaRL(nn.Module):
                       print('Learning rate:{}'.format(param_group['lr']))
                     print('-'*30)
                 i+=1
+            
+            #storing outputs of this network
+            r = torch.zeros(len(dataset), n).to(DEVICE)
+            for images, labels, indexes in loader:
+                new_extractor.train(False)
+                images = Variable(images).to(DEVICE)
+                indexes = indexes.to(DEVICE)
+                g = new_extractor.forward(images)               
+                g = torch.sigmoid(g)
+                r[indexes] = g.data
+                
+            r = Variable(r).to(DEVICE)
+            
         
         
         #adding exemplars to dataset
@@ -254,46 +267,25 @@ class iCaRL(nn.Module):
                         f_ex.train(False)
                         new_extractor.train(False)
                         self.features_extractor.train(False)
+                        
                         f_ex.to(DEVICE)
                         new_extractor.to(DEVICE)
                         self.features_extractor.to(DEVICE)
                         
-                        
-                        features = torch.sigmoid(self.features_extractor.extract_features(imgs))
-                        
-                       
-                        #for i, feat in enumerate(features):
-                         #   features[i] = feat/torch.norm(feat, p=2)
-                        
-                        
-                        old_features = torch.sigmoid(f_ex.extract_features(imgs))
-                        new_features = torch.sigmoid(new_extractor.extract_features(imgs))
-                        
-                        #for i, feat in enumerate(old_features):
-                         #   old_features[i] = feat/torch.norm(feat, p=2)
-                        
-                        #for i, feat in enumerate(new_features):
-                         #   new_features[i] = feat/torch.norm(feat, p=2)
-                        
-                        """
-                        ~(labels < self.n_known)
                         exemplars = imgs[~(labels < self.n_known)]
                         new_samples = imgs[~(labels >= self.n_known)]
                         
-                        ex_features = f_ex.extract_features(exemplars)
-                        samples_features = new_extractor.extract_features(new_samples)
                         
-                        for i, feat in enumerate(ex_features):
-                            ex_features[i] = feat/torch.norm(feat, p=2)
+                        ex_out = torch.sigmoid(self.features_extractor(exemplars))
+                        sample_out = torch.sigmoid(self.features_extractor(new_samples))
                         
-                        for i, feat in enumerate(samples_features):
-                            samples_features[i] = feat/torch.norm(feat, p=2)
+                        q_i = q[indexes]
+                        r_i = r[indexes]
                         
-                        """
-                        ex_loss = mse_sum(features, old_features)
-                        sample_loss = mse_sum(features, new_features)
+                        ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
+                        sample_loss = mse_sum(sample_out[:, self.n_known:], r_i)
                         
-                        tot_loss = (ex_loss + sample_loss)/(len(features)*2)
+                        tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_features))
                         
                         loss = 0.5*loss + 0.5*tot_loss
                         
