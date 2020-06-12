@@ -264,9 +264,10 @@ class iCaRL(nn.Module):
                 dataset = ExemplarsDataset(imgs= exemplars, labels=([i]*len(exemplars)))
                 print('len dataset is')
                 print(len(dataset))
-            print(i)
+            
             else:
                 dataset.append_exemplars(imgs= exemplars, labels=([i]*len(exemplars)))
+                
         print("Exemplars' Dataset created!")
         print(f"Len dataset is {len(dataset)}")
         
