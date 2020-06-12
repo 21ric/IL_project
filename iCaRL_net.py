@@ -252,10 +252,10 @@ class iCaRL(nn.Module):
                     if self.new_extractor:
                         f_ex.train(False)
                         new_extractor.train(False)
-                        self.feature_extractor.train(False)
+                        self.features_extractor.train(False)
                         f_ex.to(DEVICE)
                         new_extractor.to(DEVICE)
-                        self.feature_extractor.to(DEVICE)
+                        self.features_extractor.to(DEVICE)
                         
                         
                         features = self.feature_extractor.extract_features(imgs)
