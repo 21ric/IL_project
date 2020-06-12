@@ -42,6 +42,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
+mse_sum = nn.MSELoss(reduction='sum')
 kl = nn.KLDivLoss(reduction='batchmean')
 
 losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
@@ -279,8 +280,8 @@ class iCaRL(nn.Module):
                             samples_features[i] = feat/torch.norm(feat, p=2)
                         
                         
-                        ex_loss = mse(ex_features_now, ex_features, reduction='sum')
-                        sample_loss = mse(samples_features_now, samples_features, reduction='sum')
+                        ex_loss = mse_sum(ex_features_now, ex_features)
+                        sample_loss = mse_sum(samples_features_now, samples_features)
                         
                         tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_samples))
                         
