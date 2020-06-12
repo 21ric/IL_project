@@ -280,7 +280,9 @@ class iCaRL(nn.Module):
                         sample_out = torch.sigmoid(self.features_extractor(new_samples))
                         
                         q_i = q[indexes]
+                        q_i = q_i[~(labels < self.n_known)]
                         r_i = r[indexes]
+                        r_i = r_i[~(labels >= self.n_known)]
                         
                         ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
                         sample_loss = mse_sum(sample_out[:, self.n_known:], r_i)
