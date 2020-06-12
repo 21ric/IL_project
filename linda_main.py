@@ -22,7 +22,7 @@ from torch.autograd import Variable
 DEVICE = 'cuda'
 BATCH_SIZE = 128
 CLASSES_BATCH = 10
-MEMORY_SIZE = 4000
+MEMORY_SIZE = 2000
 ########################
 
 def incremental_learning(dict_num, loss_config, classifier, lr):
@@ -55,17 +55,23 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
         print('Loading the Datasets ...')
         print('-'*30)
 
-
+        # Get dataset
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
 
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
         print('-'*30)
+        
+        # Undersample new classes (if not first iteration)
+        if i != 0:
+            net.undersample_data(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
+        
+        
         print('Updating representation ...')
         print('-'*30)
 
-        #perform training
+        # Perform training
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
         
         m = MEMORY_SIZE // (net.n_classes)
@@ -74,7 +80,6 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
         if i != 0:
             print('Reducing exemplar sets ...')
             print('-'*30)
-
             net.reduce_exemplars_set(m)
 
         print('len prev ex', len(net.exemplar_sets))
@@ -116,10 +121,9 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
 
         print('lunghezza medie', len(net.exemplar_means))
         print('lunghezza nuove medie', len(net.new_means))
-
-        net.n_known = net.n_classes
         
-        #if undersample:
-            #return new_acc_list, old_acc_list, all_acc_list
+        # Now the dataset knows 10 more classes
+        net.n_known = net.n_classes
+
 
     return new_acc_list, old_acc_list, all_acc_list
