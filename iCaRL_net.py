@@ -265,7 +265,7 @@ class iCaRL(nn.Module):
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 
-                if new_extractor and iter != 0:
+                if self.new_extractor and iter != 0:
                     r_i = r[indexes]
                     new_loss = self.dist_loss(out[:, self.n_known:self.n_classes], r_i)
                     
