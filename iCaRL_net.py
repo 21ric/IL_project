@@ -273,7 +273,7 @@ class iCaRL(nn.Module):
                         samples_features = new_extractor.extract_features(new_samples)
                         
                         for i, feat in enumerate(ex_features):
-                            ex_feature[i] = feat/torch.norm(feat, p=2)
+                            ex_features[i] = feat/torch.norm(feat, p=2)
                         
                         for i, feat in enumerate(samples_features):
                             samples_features[i] = feat/torch.norm(feat, p=2)
