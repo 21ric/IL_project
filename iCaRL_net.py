@@ -136,7 +136,7 @@ class iCaRL(nn.Module):
         if self.new_extractor and iter != 0:
             print('Training a new network ...')
             print('-'*30)
-            new_extractor = resnet32(num_classes=(n))          
+            new_extractor = resnet32(num_classes=n)          
             loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
             optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
             
