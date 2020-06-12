@@ -153,7 +153,7 @@ class iCaRL(nn.Module):
                 for imgs, labels, indexes in loader:
                     imgs = imgs.to(DEVICE)
                     indexes = indexes.to(DEVICE)            
-                    seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                    seen_labels = torch.LongTensor([class_map[label]-10*iter for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
 
                     #computing one hots of labels
