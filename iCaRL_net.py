@@ -259,21 +259,21 @@ class iCaRL(nn.Module):
                         self.features_extractor.to(DEVICE)
                         
                         
-                        features = self.features_extractor.extract_features(imgs)
+                        features = torch.sigmoid(self.features_extractor.extract_features(imgs))
                         
                        
-                        for i, feat in enumerate(features):
-                            features[i] = feat/torch.norm(feat, p=2)
+                        #for i, feat in enumerate(features):
+                         #   features[i] = feat/torch.norm(feat, p=2)
                         
                         
-                        old_features = f_ex.extract_features(imgs)
-                        new_features = new_extractor.extract_features(imgs)
+                        old_features = torch.sigmoid(f_ex.extract_features(imgs))
+                        new_features = torch.sigmoid(new_extractor.extract_features(imgs))
                         
-                        for i, feat in enumerate(old_features):
-                            old_features[i] = feat/torch.norm(feat, p=2)
+                        #for i, feat in enumerate(old_features):
+                         #   old_features[i] = feat/torch.norm(feat, p=2)
                         
-                        for i, feat in enumerate(new_features):
-                            new_features[i] = feat/torch.norm(feat, p=2)
+                        #for i, feat in enumerate(new_features):
+                         #   new_features[i] = feat/torch.norm(feat, p=2)
                         
                         """
                         ~(labels < self.n_known)
