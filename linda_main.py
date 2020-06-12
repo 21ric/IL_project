@@ -1,4 +1,4 @@
-passfrom linda_net import iCaRL
+from linda_net import iCaRL
 
 from torchvision import transforms
 from torch.utils.data import DataLoader, Subset
