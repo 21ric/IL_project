@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -135,7 +135,7 @@ class iCaRL(nn.Module):
         if self.new_extractor and iter != 0:
             print('Training a new network ...')
             print('-'*30)
-            new_extractor = resnet32(num_classes=self.n_classes + n)          
+            new_extractor = resnet32(num_classes=(self.n_classes+n))          
             loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
             optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
             
@@ -164,7 +164,7 @@ class iCaRL(nn.Module):
                     optimizer.zero_grad()
 
                     #computing outputs
-                    out = self(imgs)
+                    out = new_extractor(imgs)
 
                     #computing loss
                     loss = self.clf_loss(out, labels_hot)
