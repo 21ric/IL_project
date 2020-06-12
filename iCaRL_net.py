@@ -135,7 +135,7 @@ class iCaRL(nn.Module):
         if self.new_extractor and iter != 0:
             print('Training a new network ...')
             print('-'*30)
-            new_extractor = resnet32(num_classes=n)          
+            new_extractor = resnet32(num_classes=self.n_classes + n)          
             loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
             optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
             
@@ -153,7 +153,7 @@ class iCaRL(nn.Module):
                 for imgs, labels, indexes in loader:
                     imgs = imgs.to(DEVICE)
                     indexes = indexes.to(DEVICE)            
-                    seen_labels = torch.LongTensor([class_map[label]-iter*10 for label in labels.numpy()])
+                    seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
                     labels = Variable(seen_labels).to(DEVICE)
 
                     #computing one hots of labels
@@ -183,7 +183,7 @@ class iCaRL(nn.Module):
                 
             #storing output of this network
             new_extractor.to(DEVICE)
-            r = torch.zeros(len(dataset), n).to(DEVICE)
+            r = torch.zeros(len(dataset), self.n_classes+n).to(DEVICE)
             for images, labels, indexes in loader:
                 new_extractor.train(False)
                 images = Variable(images).to(DEVICE)
@@ -256,7 +256,7 @@ class iCaRL(nn.Module):
                 out = self(imgs)
                 
                 #computing loss
-                loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
                 if self.n_known > 0:
@@ -267,7 +267,7 @@ class iCaRL(nn.Module):
                 
                 if self.new_extractor and iter != 0:
                     r_i = r[indexes]
-                    new_loss = self.dist_loss(out[:, self.n_known:self.n_classes], r_i)
+                    new_loss = self.dist_loss(out[:, self.n_known:], r_i[:, self.n_known:])
                     
                     loss += new_loss
 
