@@ -157,7 +157,7 @@ class iCaRL(nn.Module):
                     labels = Variable(seen_labels).to(DEVICE)
 
                     #computing one hots of labels
-                    labels_hot=torch.eye(self.n_classes)[labels]
+                    labels_hot=torch.eye(self.n_classes+n)[labels]
                     labels_hot = labels_hot.to(DEVICE)
 
                     #zeroing the gradients
