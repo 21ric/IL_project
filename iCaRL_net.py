@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -272,12 +272,11 @@ class iCaRL(nn.Module):
                         new_extractor.to(DEVICE)
                         self.features_extractor.to(DEVICE)
                         
-                        exemplars = imgs[~(labels < self.n_known)]
-                        new_samples = imgs[~(labels >= self.n_known)]
+                        #exemplars = imgs[~(labels < self.n_known)]
+                        #new_samples = imgs[~(labels >= self.n_known)]
                         
-                        
-                        ex_out = torch.sigmoid(self.features_extractor(exemplars))
-                        sample_out = torch.sigmoid(self.features_extractor(new_samples))
+                        ex_out = out[~(labels < self.n_known)]
+                        sample_out = out[~(labels >= self.n_known)]
                         
                         q_i = q[indexes]
                         q_i = q_i[~(labels < self.n_known)]
