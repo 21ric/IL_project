@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -135,7 +135,7 @@ class iCaRL(nn.Module):
         if self.new_extractor and iter != 0:
             print('Training a new network ...')
             print('-'*30)
-            new_extractor = resnet32(num_classes=(self.n_classes+n))          
+            new_extractor = resnet32(num_classes=(n))          
             loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
             optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
             
@@ -157,7 +157,7 @@ class iCaRL(nn.Module):
                     labels = Variable(seen_labels).to(DEVICE)
 
                     #computing one hots of labels
-                    labels_hot=torch.eye(self.n_classes+n)[labels]
+                    labels_hot=torch.eye(n)[labels]
                     labels_hot = labels_hot.to(DEVICE)
 
                     #zeroing the gradients
@@ -180,22 +180,8 @@ class iCaRL(nn.Module):
                       print('Learning rate:{}'.format(param_group['lr']))
                     print('-'*30)
                 i+=1
-                
-            #storing output of this network
-            new_extractor.to(DEVICE)
-            r = torch.zeros(len(dataset), self.n_classes+n).to(DEVICE)
-            for images, labels, indexes in loader:
-                new_extractor.train(False)
-                images = Variable(images).to(DEVICE)
-                indexes = indexes.to(DEVICE)
-                g = new_extractor.forward(images)         
-                g = torch.sigmoid(g)               
-                r[indexes] = g.data
-            r = Variable(r).to(DEVICE)
-            new_extractor.train(True)
-            
-            
-
+        
+        
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
 
@@ -256,20 +242,56 @@ class iCaRL(nn.Module):
                 out = self(imgs)
                 
                 #computing loss
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                if self.new_extractor:
+                    loss = self.clf_loss(out, labels_hot)
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
                 if self.n_known > 0:
-                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
-                    q_i = q[indexes]
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    if self.new_extractor:
+                        f_ex.train(False)
+                        new_extractor.train(False)
+                        self.feature_extractor.train(False)
+                        f_ex.to(DEVICE)
+                        new_extractor.to(DEVICE)
+                        self.feature_extractor.to(DEVICE)
+                        
+                        
+                        features = self.feature_extractor.extract_features(imgs)
+                        
+                        for i, feat in enumerate(features):
+                            features[i] = feat/torch.norm(feat, p=2)
+                        
+                        ex_features_now = features[~(labels < self.n_known)]
+                        samples_features_now = features[~(labels >= self.n_known)]
+                        
+                        exemplars = imgs[~(labels < self.n_known)]
+                        new_samples = imgs[~(labels >= self.n_known)]
+                        
+                        ex_features = f_ex.extract_features(exemplars)
+                        samples_features = new_extractor.extract_features(new_samples)
+                        
+                        for i, feat in enumerate(ex_features):
+                            ex_feature[i] = feat/torch.norm(feat, p=2)
+                        
+                        for i, feat in enumerate(samples_features):
+                            samples_features[i] = feat/torch.norm(feat, p=2)
+                        
+                        
+                        ex_loss = mse(ex_features_now, ex_features, reduction='sum')
+                        sample_loss = mse(samples_features_now, samples_features, reduction='sum')
+                        
+                        tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_samples))
+                        
+                        loss = 0.5*loss + 0.5*tot_loss
+                        
+                    else:
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 
-                if self.new_extractor and iter != 0:
-                    r_i = r[indexes]
-                    new_loss = self.dist_loss(out[:, self.n_known:], r_i[:, self.n_known:])
-                    
-                    loss += new_loss
 
                 #backward pass()
                 loss.backward()
