@@ -257,7 +257,7 @@ class iCaRL(nn.Module):
                 
                 #computing loss
                 if self.new_extractor:
-                    loss = self.clf_loss(out, labels_hot)
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
@@ -275,20 +275,20 @@ class iCaRL(nn.Module):
                         #exemplars = imgs[~(labels < self.n_known)]
                         #new_samples = imgs[~(labels >= self.n_known)]
                         
-                        ex_out = out[~(labels < self.n_known)]
-                        sample_out = out[~(labels >= self.n_known)]
+                        #ex_out = out[~(labels < self.n_known)]
+                        #sample_out = out[~(labels >= self.n_known)]
                         
                         q_i = q[indexes]
-                        q_i = q_i[~(labels < self.n_known)]
+                        #q_i = q_i[~(labels < self.n_known)]
                         r_i = r[indexes]
-                        r_i = r_i[~(labels >= self.n_known)]
+                        #r_i = r_i[~(labels >= self.n_known)]
                         
-                        ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
-                        sample_loss = bce_sum(sample_out[:, self.n_known:], r_i)
+                        ex_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
+                        sample_loss = bce_sum(out[:, self.n_known:], r_i)
                         
-                        tot_loss = ex_loss*(len(ex_out)/len(out))*(iter/(iter+1)) + sample_loss*(len(sample_out)/len(out))*(1/(iter+1))
+                        tot_loss = ex_loss*(iter/(iter+1)) + sample_loss*(1/(iter+1))
                         
-                        loss = 0.5*loss + 0.5*tot_loss
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*tot_loss
                         
                         self.features_extractor.train(True)
                         
