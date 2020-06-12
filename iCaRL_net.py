@@ -286,7 +286,7 @@ class iCaRL(nn.Module):
                         ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
                         sample_loss = bce_sum(sample_out[:, self.n_known:], r_i)
                         
-                        tot_loss = (ex_loss + sample_loss)/(len(exemplars)+len(new_samples))
+                        tot_loss = (ex_loss + sample_loss)/(len(ex_out)+len(sample_out))
                         
                         loss = 0.5*loss + 0.5*tot_loss
                         
