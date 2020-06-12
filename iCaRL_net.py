@@ -286,8 +286,8 @@ class iCaRL(nn.Module):
                         ex_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
                         sample_loss = bce_sum(out[:, self.n_known:], r_i)
                         
-                        tot_loss = ex_loss*(iter/(iter+1)) + sample_loss*(1/(iter+1))
-                        
+                        #tot_loss = ex_loss*(iter/(iter+1)) + sample_loss*(1/(iter+1))
+                        tot_loss = ex_loss
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*tot_loss
                         
                         self.features_extractor.train(True)
