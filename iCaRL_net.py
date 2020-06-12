@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -42,7 +42,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
-bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
+bce_sum = nn.BCEWithLogitsLoss()
 kl = nn.KLDivLoss(reduction='batchmean')
 
 losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
@@ -286,7 +286,7 @@ class iCaRL(nn.Module):
                         ex_loss = bce_sum(ex_out[:, :self.n_known], q_i[:, :self.n_known])
                         sample_loss = bce_sum(sample_out[:, self.n_known:], r_i)
                         
-                        tot_loss = (ex_loss + sample_loss)/(len(ex_out)+len(sample_out))
+                        tot_loss = ex_loss*(len(ex_out)/len(out))*(iter/(iter+1)) + sample_loss*(len(sample_out)/len(out))*(1/(iter+1))
                         
                         loss = 0.5*loss + 0.5*tot_loss
                         
