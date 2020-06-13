@@ -72,7 +72,8 @@ def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classe
         coeff = balanced_coeff(beta, card_new)
         rescale_factor = num_new_classes/(coeff*num_new_classes)
         
-        return coeff*rescale_factor, 0
+        #return coeff*rescale_factor, 0
+        return coeff, 0
     
     else:
         
@@ -81,7 +82,8 @@ def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classe
 
         rescale_factor = (num_new_classes+num_old_classes)/(coeff_new*card_new+coeff_old*card_old)
 
-        return coeff_new*rescale_factor, coeff_old*rescale_factor
+        #return coeff_new*rescale_factor, coeff_old*rescale_factor
+        return coeff_new, coeff_old
         
 
     
