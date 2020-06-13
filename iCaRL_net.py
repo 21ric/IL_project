@@ -266,6 +266,7 @@ class iCaRL(nn.Module):
                         if self.class_balanced_loss:
                             dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
                         else:
+                            dist_loss = 0
                             dist_loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*(self.n_known))
                         
                         #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
