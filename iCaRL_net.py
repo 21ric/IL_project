@@ -250,8 +250,8 @@ class iCaRL(nn.Module):
                         
                         q_i = q[indexes]
                         
-                        q_i_ex = q_i[~(labels < self.n_known)]
-                        q_i_sample = q_i[~(labels >= self.n_known)]
+                        q_i_ex = q_i[(labels < self.n_known)]
+                        q_i_sample = q_i[(labels >= self.n_known)]
                         
                         
                         ex_loss = coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
