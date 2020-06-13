@@ -29,7 +29,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 ########################
@@ -197,6 +197,7 @@ class iCaRL(nn.Module):
                 
                 #computing loss
                 if self.class_balanced_loss:
+                    print('clf')
                     if iter != 0:
                         ex_out = out[~(labels < self.n_known)]
                         sample_out = out[~(labels >= self.n_known)]
@@ -223,6 +224,8 @@ class iCaRL(nn.Module):
                         
                         q_i_ex = q_i[~(labels < self.n_known)]
                         q_i_sample = q_i[~(labels >= self.n_known)]
+                        
+                        print('dist')
                         
                         ex_loss = balanced_coeff(0.8, self.exemplars_per_class)*bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
                         loss_sample = balanced_coeff(0.8, 500)*bce_sum(sample_out[:, self.n_known:], q_i_sample[:, :self.n_known])
