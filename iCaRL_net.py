@@ -226,14 +226,14 @@ class iCaRL(nn.Module):
                         
                         coeff_old, coeff_new = 1, 1
                         
-                        print('len sample', len(sample_out))
-                        print('len ex', len(ex_out))
+                        #print('len sample', len(sample_out))
+                        #print('len ex', len(ex_out))
                         
                         loss_ex = coeff_old * bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:])
                         loss_sample = coeff_new * bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:])
                         
-                        print('loss ex', loss_ex)
-                        print('loss sample', loss_sample)
+                        #print('loss ex', loss_ex)
+                        #print('loss sample', loss_sample)
                         
                         loss = (loss_ex + loss_sample)/(len(out)*10)
                         
