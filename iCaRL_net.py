@@ -226,7 +226,7 @@ class iCaRL(nn.Module):
                     labels_ex = labels_hot[(labels < self.n_known)]
                     labels_sample = labels_hot[(labels >= self.n_known)]
                     
-                    if class_balanced_loss:
+                    if self.class_balanced_loss:
                         coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
                     #~coeff_new, coeff_old = get_balanced_coefficients(0.8, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
                     else:
@@ -237,7 +237,7 @@ class iCaRL(nn.Module):
 
                     #print('loss ex', loss_ex)
                     #print('loss sample', loss_sample)
-                    if class_balanced_loss:
+                    if self.class_balanced_loss:
                         loss = (loss_ex + loss_sample)/(len(out)*10)
                     else:
                         loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*10)
@@ -258,7 +258,7 @@ class iCaRL(nn.Module):
                         ex_loss = coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
                         loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
                         
-                        if class_balanced_loss:
+                        if self.class_balanced_loss:
                             dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
                         else:
                             dist_loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*(self.n_known))
