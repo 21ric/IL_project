@@ -213,7 +213,7 @@ class iCaRL(nn.Module):
                 
                 #computing loss
                 if self.class_balanced_loss:
-                    print('clf')
+                    
                     if iter != 0:
                         ex_out = out[~(labels < self.n_known)]
                         sample_out = out[~(labels >= self.n_known)]
@@ -244,7 +244,6 @@ class iCaRL(nn.Module):
                         q_i_ex = q_i[~(labels < self.n_known)]
                         q_i_sample = q_i[~(labels >= self.n_known)]
                         
-                        print('dist')
                         
                         ex_loss = coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
                         loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
