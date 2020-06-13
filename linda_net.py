@@ -67,9 +67,6 @@ def modify_output_for_loss(loss_name, output):
 
 
 
-
-
-
 class ExemplarsDataset(Dataset):
     def __init__(self, imgs, labels):
         self.images = imgs
@@ -86,7 +83,7 @@ class ExemplarsDataset(Dataset):
         # to return a PIL Image
         img = Image.fromarray(img)
         
-        # data sugmentation
+        # data augmentation
         if self.transform is not None:
             img = self.transform(img)
         
@@ -253,49 +250,63 @@ class iCaRL(nn.Module):
         # here we train a Resnet32 on the exemplars
         clf_net = resnet32(num_classes=self.n_known)
         
-        criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy
-        optimizer = optim.SGD(clf_net.parameters(), lr=2, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
+        criterion = nn.CrossEntropyLoss() # for classification, we use Cross Entropy with LR=0.2
+        optimizer = optim.SGD(clf_net.parameters(), lr=0.2, momentum=MOMENTUM, weight_decay=WEIGHT_DECAY)
         
         clf_net.to(DEVICE)
         
         # Create custom dataset
         for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
             if i==0 :
-                dataset = ExemplarsDataset(imgs= exemplars, labels=([i]*len(exemplars)))
-                print('len dataset is')
-                print(len(dataset))
-            
+                dataset = ExemplarsDataset(imgs= exemplars, labels=([i]*len(exemplars)))          
             else :
                 dataset.append_exemplars(imgs= exemplars, labels=([i]*len(exemplars)))
                 
         print("Exemplars' Dataset created!")
         print(f"Len dataset is {len(dataset)}")
         
-        # Create dataloader
+        # Create dataloader, shuffleing the data
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-             
-        '''
-        dataset.append_exemplars(imgs= , labels= )
         
-        for exemplars in self.exemplar_sets[:self.n_known]:
-            features = []
-            for ex in  exemplars:
+        # Training 
+        i=0
+        clf_net.train(True)
+        for epoch in range(NUM_EPOCHS):
+                 
+            if epoch in STEPDOWN_EPOCHS:
+              for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
 
-                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                feature = feature.squeeze()
-                feature.data = feature.data / torch.norm(feature.data, p=2)
-                features.append(feature)
+            for imgs, labels in loader:
+                imgs = imgs.to(DEVICE)          
+                labels = labels.to(DEVICE)
 
-            features = torch.stack(features)
-            mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
-            exemplar_means.append(mu_y.cpu())
+                #zeroing the gradients
+                optimizer.zero_grad()
 
-        self.exemplar_means = exemplar_means
-        self.exemplar_means.extend(self.new_means)
-        '''
+                #computing outputs
+                out = clf_net(imgs)
+
+                #computing loss
+                loss = self.criterion(out, labels)
+
+                loss.backward()
+                optimizer.step()
+
+
+            if i % 10 == 0 or i == (NUM_EPOCHS-1):
+                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                for param_group in optimizer.param_groups:
+                  print('Learning rate:{}'.format(param_group['lr']))
+                print('-'*30)
+                
+            i+=1
         
+        # To be continued ......
+        
+        
+   
+
     
     #reduce exemplars lists
     @torch.no_grad()
