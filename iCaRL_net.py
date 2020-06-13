@@ -251,9 +251,9 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
-                if self.n_known > 0 and  not self.proportional_loss:
+                if self.n_known > 0 :
                     print('dist')
-                    if self.class_balanced_loss:
+                    if self.class_balanced_loss or self.proportional_loss:
                         
                         q_i = q[indexes]
                         
@@ -266,9 +266,13 @@ class iCaRL(nn.Module):
                         
                         if self.class_balanced_loss:
                             dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
+                            
+                        else:
+                            dist_loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*10)
                         
                         #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                        loss = loss + (iter/(iter+1))*dist_loss
+                        
+                        loss = loss + dist_loss
                         
                         
                     else:
@@ -287,6 +291,8 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
+                  print('loss', loss)
+                  print('dist loss', dist_loss)
                 print('-'*30)
             i+=1
 
