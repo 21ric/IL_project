@@ -216,29 +216,34 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
                 
-                #computing loss
+                #computing classification loss
                 if self.class_balanced_loss or self.proportional_loss:
                     
                     
-                    ex_out = out[(labels < self.n_known)]
-                    sample_out = out[(labels >= self.n_known)]
+                    ex_out = out[(labels < self.n_known)] #masking: taking only outputs of images of new classes
+                    sample_out = out[(labels >= self.n_known)] #masking: taking only outputs of images of old classes
 
-                    labels_ex = labels_hot[(labels < self.n_known)]
-                    labels_sample = labels_hot[(labels >= self.n_known)]
+                    labels_ex = labels_hot[(labels < self.n_known)] #masking: taking only true labels of images of new classes
+                    labels_sample = labels_hot[(labels >= self.n_known)] #masking: taking only true labels of images of old classes
                     
                     if self.class_balanced_loss:
+                        #taking coefficients for new images (coeff_new), exemplars (coeff_old)
                         coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
-                    #~coeff_new, coeff_old = get_balanced_coefficients(0.8, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
+                    
                     else:
                         coeff_new , coeff_old = 1, (500/self.exemplars_per_class) if self.exemplars_per_class else 1
                         
-                    loss_ex = coeff_old * bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:])
-                    loss_sample = coeff_new * bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:])
-
+                    #loss_ex = coeff_old * bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
+                    #loss_sample = coeff_new * bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:]) #calculating clf loss on new images
+                    
+                    loss_ex = coeff_old * bce_sum(ex_out, labels_ex)
+                    loss_sample = coeff_new * bce_sum(sample_out, labels_sample)
+                    
                     #print('loss ex', loss_ex)
                     #print('loss sample', loss_sample)
                     if self.class_balanced_loss:
                         loss = (loss_ex + loss_sample)/(len(out)*10)
+                        
                     else:
                         loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*10)
                                     
