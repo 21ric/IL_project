@@ -251,7 +251,7 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
-                if self.n_known > 0 and  not proportional_loss:
+                if self.n_known > 0 and  not self.proportional_loss:
                     print('dist')
                     if self.class_balanced_loss:
                         
