@@ -197,7 +197,7 @@ class iCaRL(nn.Module):
                 
                 #computing loss
                 if self.class_balanced_loss:
-                    if i != 0:
+                    if iter != 0:
                         ex_out = out[~(labels < self.n_known)]
                         sample_out = out[~(labels >= self.n_known)]
                     
