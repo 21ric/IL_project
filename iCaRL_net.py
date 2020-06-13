@@ -252,7 +252,7 @@ class iCaRL(nn.Module):
 
                 #computing distillation loss
                 if self.n_known > 0:
-                    if self.class_balanced_loss:
+                    if self.class_balanced_loss or self.proportional_loss:
                         
                         q_i = q[indexes]
                         
@@ -268,7 +268,8 @@ class iCaRL(nn.Module):
                         else:
                             dist_loss = (loss_ex + loss_sample)/((len(sample_out)+len(ex_out)*coeff_old)*(self.n_known))
                         
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        loss = loss + (iter/(iter+1))*dist_loss
                         
                         
                     else:
