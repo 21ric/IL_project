@@ -32,6 +32,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
+BETA = 0.5
 ########################
 
 #transofrmation for exemplars
@@ -68,14 +69,14 @@ def balanced_coeff(beta, card):
 
 def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classes, card_old=None):
     if i == 0:
-        coeff = balanced_coeff(0, card_new)
+        coeff = balanced_coeff(beta, card_new)
         rescale_factor = num_new_classes/(coeff*num_new_classes)
         return coeff*rescale_factor
     
     else:
         
-        coeff_new = balanced_coeff(0, card_new)
-        coeff_old = balanced_coeff(0, card_old)
+        coeff_new = balanced_coeff(beta, card_new)
+        coeff_old = balanced_coeff(beta, card_old)
         
         rescale_factor = (num_new_classes+num_old_classes)/(coeff_new*card_new+coeff_old*card_old)
         
@@ -221,14 +222,9 @@ class iCaRL(nn.Module):
                         labels_ex = labels_hot[(labels < self.n_known)]
                         labels_sample = labels_hot[(labels >= self.n_known)]
                         
-                        #coeff_new, coeff_old = get_balanced_coefficients(0.8, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
+                        coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
                         #~coeff_new, coeff_old = get_balanced_coefficients(0.8, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
-                        
-                        coeff_old, coeff_new = 1, 1
-                        
-                        #print('len sample', len(sample_out))
-                        #print('len ex', len(ex_out))
-                        
+
                         loss_ex = coeff_old * bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:])
                         loss_sample = coeff_new * bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:])
                         
