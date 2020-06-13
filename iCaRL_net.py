@@ -42,7 +42,7 @@ transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4
 bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
-bce_sum = nn.BCEWithLogitsLoss()
+bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss(reduction='batchmean')
 
 losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
@@ -62,11 +62,13 @@ def modify_output_for_loss(loss_name, output):
     # KL loss needs input to be log-softmax
     if loss_name == "kl":
         return F.log_softmax(output, dim=1)
-    
+
+def balanced_coeff(beta, card):
+    return(1-beta)/(1-beta**card)
 
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, loss_config, lr, new_extractor=False):
+    def __init__(self, n_classes, class_map, loss_config, lr, class_balanced_loss=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -84,8 +86,8 @@ class iCaRL(nn.Module):
         self.new_means = []
         self.class_map = class_map #needed to map real label to fake label
         
-        self.new_extractor = new_extractor
-        
+        self.class_balanced_loss = class_balanced_loss
+        self.exemplars_per_class = 0
 
     #forward pass
     def forward(self, x):
@@ -131,68 +133,6 @@ class iCaRL(nn.Module):
 
         print('New classes:{}'.format(n))
         print('-'*30)
-        
-        #training a new network for new classes
-        if self.new_extractor and iter != 0:
-            print('Training a new network ...')
-            print('-'*30)
-            new_extractor = resnet32(num_classes=n)          
-            loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-            optimizer = optim.SGD(new_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
-            
-            #training phase
-            i = 0
-            new_extractor.to(DEVICE)
-            for epoch in range(NUM_EPOCHS):
-                #reducing learning 
-                if epoch in STEPDOWN_EPOCHS:
-                  for param_group in optimizer.param_groups:
-                    param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
-
-
-                new_extractor.train(True)
-                for imgs, labels, indexes in loader:
-                    imgs = imgs.to(DEVICE)
-                    indexes = indexes.to(DEVICE)            
-                    seen_labels = torch.LongTensor([class_map[label]-10*iter for label in labels.numpy()])
-                    labels = Variable(seen_labels).to(DEVICE)
-
-                    #computing one hots of labels
-                    labels_hot=torch.eye(n)[labels]
-                    labels_hot = labels_hot.to(DEVICE)
-
-                    #zeroing the gradients
-                    optimizer.zero_grad()
-
-                    #computing outputs
-                    out = new_extractor(imgs)
-
-                    #computing loss
-                    loss = self.clf_loss(out, labels_hot)
-
-                    #backward pass()
-                    loss.backward()
-                    optimizer.step()
-
-
-                if i % 10 == 0 or i == (NUM_EPOCHS-1):
-                    print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
-                    for param_group in optimizer.param_groups:
-                      print('Learning rate:{}'.format(param_group['lr']))
-                    print('-'*30)
-                i+=1
-            
-            #storing outputs of this network
-            r = torch.zeros(len(dataset), n).to(DEVICE)
-            for images, labels, indexes in loader:
-                new_extractor.train(False)
-                images = Variable(images).to(DEVICE)
-                indexes = indexes.to(DEVICE)
-                g = new_extractor.forward(images)               
-                g = torch.sigmoid(g)
-                r[indexes] = g.data
-                
-            r = Variable(r).to(DEVICE)
             
         
         
@@ -256,41 +196,40 @@ class iCaRL(nn.Module):
                 out = self(imgs)
                 
                 #computing loss
-                if self.new_extractor:
-                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                if self.class_balanced_loss:
+                    if i != 0:
+                        ex_out = out[~(labels < self.n_known)]
+                        sample_out = out[~(labels >= self.n_known)]
+                    
+                        labels_ex = labels_hot[~(labels < self.n_known)]
+                        labels_sample = [~(labels >= self.n_known)]
+                        
+                        loss_ex = balanced_coeff(0.8, self.exemplars_per_class)*bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:])
+                        loss_sample = balanced_coeff(0.8, 500)*bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:])
+                        
+                        loss = (loss_ex + loss_sample)/len(out)
+                        
+                    else:               
+                        loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])/len(out)
+                    
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
                 if self.n_known > 0:
-                    if self.new_extractor:
-                        f_ex.train(False)
-                        new_extractor.train(False)
-                        self.features_extractor.train(False)
-                        
-                        f_ex.to(DEVICE)
-                        new_extractor.to(DEVICE)
-                        self.features_extractor.to(DEVICE)
-                        
-                        #exemplars = imgs[~(labels < self.n_known)]
-                        #new_samples = imgs[~(labels >= self.n_known)]
-                        
-                        #ex_out = out[~(labels < self.n_known)]
-                        #sample_out = out[~(labels >= self.n_known)]
+                    if self.class_balanced_loss:
                         
                         q_i = q[indexes]
-                        #q_i = q_i[~(labels < self.n_known)]
-                        r_i = r[indexes]
-                        #r_i = r_i[~(labels >= self.n_known)]
                         
-                        ex_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
-                        sample_loss = bce_sum(out[:, self.n_known:], r_i)
+                        q_i_ex = q_i[~(labels < self.n_known)]
+                        q_i_sample = q_i[~(labels >= self.n_known)]
                         
-                        #tot_loss = ex_loss*(iter/(iter+1)) + sample_loss*(1/(iter+1))
-                        tot_loss = ex_loss
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*tot_loss
+                        ex_loss = balanced_coeff(0.8, self.exemplars_per_class)*bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
+                        loss_sample = balanced_coeff(0.8, 500)*bce_sum(sample_out[:, self.n_known:], q_i_sample[:, :self.n_known])
                         
-                        self.features_extractor.train(True)
+                        dist_loss = (loss_ex + loss_sample)/len(out)
+                        
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                         
                         
                     else:
