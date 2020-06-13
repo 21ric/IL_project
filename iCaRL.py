@@ -72,6 +72,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
         
         m = MEMORY_SIZE // (net.n_classes)
+        net.exemplars_per_class = m
         
         
         if i != 0:
