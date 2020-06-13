@@ -227,7 +227,7 @@ class iCaRL(nn.Module):
                         ex_loss = balanced_coeff(0.8, self.exemplars_per_class)*bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
                         loss_sample = balanced_coeff(0.8, 500)*bce_sum(sample_out[:, self.n_known:], q_i_sample[:, :self.n_known])
                         
-                        dist_loss = (loss_ex + loss_sample)/len(out*10)
+                        dist_loss = (loss_ex + loss_sample)/len(out*self.n_known)
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                         
