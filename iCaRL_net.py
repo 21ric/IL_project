@@ -32,7 +32,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
-BETA = 0.5
+BETA = 0.8
 ########################
 
 #transofrmation for exemplars
