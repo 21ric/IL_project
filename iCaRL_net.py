@@ -220,6 +220,8 @@ class iCaRL(nn.Module):
                 if self.class_balanced_loss or self.proportional_loss:
                     
                     
+                    
+                    
                     ex_out = out[(labels < self.n_known)] #masking: taking only outputs of images of new classes
                     sample_out = out[(labels >= self.n_known)] #masking: taking only outputs of images of old classes
 
@@ -261,9 +263,10 @@ class iCaRL(nn.Module):
                         
                         q_i = q[indexes]
                         
+                        
                         q_i_ex = q_i[(labels < self.n_known)]
                         q_i_sample = q_i[(labels >= self.n_known)]
-                        q_i_sample = torch.zeros(len(q_i_sample), self.self.n_known).to(DEVICE)
+                        q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
                         
                         
                         ex_loss = coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
