@@ -301,9 +301,10 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                  print('loss', clf_contr)
+                  
                   if iter!= 0:
                     print('dist loss', dist_contr)
+                    print('clf loss', clf_contr)
                 print('-'*30)
             i+=1
 
