@@ -230,8 +230,9 @@ class iCaRL(nn.Module):
                     
                     if self.class_balanced_loss:
                         #taking coefficients for new images (coeff_new), exemplars (coeff_old)
-                        coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
-                    
+                        #coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
+                        coeff_new, coeff_old = 1, 1
+                        
                     else:
                         #coeff_new , coeff_old = 1, (500/self.exemplars_per_class) if self.exemplars_per_class else 1
                         coeff_new , coeff_old = 1, 1
