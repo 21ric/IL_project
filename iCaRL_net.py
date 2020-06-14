@@ -265,7 +265,7 @@ class iCaRL(nn.Module):
                         
                         q_i_ex = q_i[(labels < self.n_known)]
                         q_i_sample = q_i[(labels >= self.n_known)]
-                        q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
+                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
                         
                         
                         ex_loss =  bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
