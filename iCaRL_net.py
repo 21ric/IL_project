@@ -232,7 +232,7 @@ class iCaRL(nn.Module):
                         #coeff_new, coeff_old = 1, 1
                         
                     else:
-                        coeff_new , coeff_old = 1, (500/self.exemplars_per_class) if self.exemplars_per_class else 1
+                        coeff_new , coeff_old = 1, (500/self.exemplars_per_class)*0.7 if self.exemplars_per_class else 1
                         #coeff_new , coeff_old = 1, 1
                         
                     clf_loss_ex =  bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
