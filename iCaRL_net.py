@@ -251,7 +251,7 @@ class iCaRL(nn.Module):
                         loss = (loss_ex + loss_sample)/(len(out)*10)
                         
                     else:
-                        loss = (loss_ex + loss_sample)/((len(out)*10)
+                        loss = (loss_ex + loss_sample)/((len(out)*10))
                         #loss = loss_sample/(len(sample_out)*10)          
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
