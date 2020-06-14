@@ -228,8 +228,8 @@ class iCaRL(nn.Module):
                     
                     if self.class_balanced_loss:
                         #taking coefficients for new images (coeff_new), exemplars (coeff_old)
-                        #coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
-                        coeff_new, coeff_old = 1, 1
+                        coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
+                        #coeff_new, coeff_old = 1, 1
                         
                     else:
                         #coeff_new , coeff_old = 1, (500/self.exemplars_per_class) if self.exemplars_per_class else 1
@@ -268,16 +268,16 @@ class iCaRL(nn.Module):
                         #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
                         
                         
-                        ex_loss =  bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
-                        loss_sample = bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
+                        ex_loss =  coeff_old*bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
+                        loss_sample = coeff_new*bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
                         
                         if self.class_balanced_loss:
-                            dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
+                            dist_loss = (ex_loss + loss_sample)/(len(out)*(self.n_known))
                             #dist_loss = loss_ex/(len(ex_out)*(self.n_known))
                             
                         else:
                             #dist_loss = loss_ex/(len(ex_out)*(self.n_known))
-                            dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
+                            dist_loss = (ex_loss + loss_sample)/(len(out)*(self.n_known))
                         
                         clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
