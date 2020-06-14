@@ -265,7 +265,7 @@ class iCaRL(nn.Module):
                         
                         q_i_ex = q_i[(labels < self.n_known)]
                         q_i_sample = q_i[(labels >= self.n_known)]
-                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
+                        q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
                         
                         
                         ex_loss =  bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
@@ -279,6 +279,7 @@ class iCaRL(nn.Module):
                             #dist_loss = loss_ex/(len(ex_out)*(self.n_known))
                             dist_loss = (loss_ex + loss_sample)/(len(out)*(self.n_known))
                         
+                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                         
                         #loss = loss + 2*dist_loss
@@ -300,9 +301,9 @@ class iCaRL(nn.Module):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
-                  print('loss', loss)
+                  print('loss', clf_contr)
                   if iter!= 0:
-                    print('dist loss', dist_loss)
+                    print('dist loss', dist_contr)
                 print('-'*30)
             i+=1
 
