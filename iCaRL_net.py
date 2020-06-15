@@ -26,6 +26,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
+from imblearn.over_sampling import SMOTE
+
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -487,7 +489,7 @@ class iCaRL(nn.Module):
 
     #classification method
     @torch.no_grad()
-    def classify(self, x, classifier, pca=False):
+    def classify(self, x, classifier, pca=False, train_dataset=None):
 
         #Using NME as classifier
         if classifier == 'nme':
@@ -534,8 +536,10 @@ class iCaRL(nn.Module):
                 X_train, y_train = [], []
 
                 #computing features on exemplars to create X_train, y_train
+                lim = self.self.n_known if pca = True else lim=self.n_classes
+                
                 self.features_extractor.train(False)
-                for i, exemplars in enumerate(self.exemplar_sets):
+                for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
                     for ex in  exemplars:
                         ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                         feature = self.features_extractor.extract_features(ex.unsqueeze(0))
@@ -543,9 +547,24 @@ class iCaRL(nn.Module):
                         feature.data = feature.data / torch.norm(feature.data, p=2)
                         X_train.append(feature.cpu().numpy())
                         y_train.append(i)
+            
                 
                 if pca:
-                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=20))])                  
+                    for i in range(self.n_knwon, self.n_classes):
+                        images = train_dataset.get_class_imgs(i)
+                        for img in  images:
+                                img = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                                feature = self.features_extractor.extract_features(img.unsqueeze(0))
+                                feature = feature.squeeze()                        
+                                feature.data = feature.data / torch.norm(feature.data, p=2)
+                                X_train.append(feature.cpu().numpy())
+                                y_train.append(i)
+                        
+                        X_train, y_train = SMOTE().fit_resample(X, y)                  
+            
+                
+                if pca:
+                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=45))])                  
                     X_train = pipe.fit_transform(X_train)
                     self.pca = pipe
                     
@@ -585,7 +604,7 @@ class iCaRL(nn.Module):
             return preds
 
     #method to classify all batches of the test dataloader
-    def classify_all(self, test_dataset, map_reverse, classifier, pca):
+    def classify_all(self, test_dataset, map_reverse, classifier, pca, train_dataset=None):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
@@ -593,7 +612,7 @@ class iCaRL(nn.Module):
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier, pca=pca)
+            preds = self.classify(imgs, classifier, pca=pca, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
             preds = [map_reverse[pred] for pred in preds]
