@@ -209,7 +209,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 
                 #creating new samples by linear combination if True
-                if self.add_sample:
+                if self.add_samples:
                    
                    #skipping first iteration
                    if self.n_known:
