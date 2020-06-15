@@ -246,7 +246,7 @@ class iCaRL(nn.Module):
     
     
     
-    def undersample_data(self, dataset, class_map, map_reverse, iter):
+    def undersample_data(self, dataset_new , class_map, map_reverse, iter):
         # here we train a Resnet32 on the exemplars
         clf_net = resnet32(num_classes=self.n_known)
         
@@ -303,7 +303,18 @@ class iCaRL(nn.Module):
             i+=1
         
         # To be continued ......
+        # Training is finished.
+        # Predict values on new data 
+        clf_net.train(False)
+        dataloader_new = DataLoader(dataset_new, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
+        features = []
+        for images, labels, indexes in dataloader_new:
+            out = clf_net.extract_features(images)
+            features.extend(out)
+        
+        print("len features is")
+        print(len(features))
         
    
 
