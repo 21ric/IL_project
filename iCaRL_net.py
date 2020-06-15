@@ -111,6 +111,8 @@ class iCaRL(nn.Module):
         self.proportional_loss = proportional_loss
         self.exemplars_per_class = 0
         self.pca = None
+        self.train_model = True
+        self.model = None
 
     #forward pass
     def forward(self, x):
@@ -524,31 +526,42 @@ class iCaRL(nn.Module):
             return preds
 
         # Using KNN, SVC, 3-layers MLP as classifier
-        elif classifier == 'knn' or classifier == 'svc' or classifier == 'mlp':
+        elif classifier == 'knn' or classifier == 'svc' or classifier == 'svc-rbf':
 
-            X_train, y_train = [], []
+            if self.train_model:
+                X_train, y_train = [], []
 
-            #computing features on exemplars to create X_train, y_train
-            self.features_extractor.train(False)
-            for i, exemplars in enumerate(self.exemplar_sets):
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / torch.norm(feature.data, p=2)
-                    X_train.append(feature.cpu().numpy())
-                    y_train.append(i)
+                #computing features on exemplars to create X_train, y_train
+                self.features_extractor.train(False)
+                for i, exemplars in enumerate(self.exemplar_sets):
+                    for ex in  exemplars:
+                        ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                        feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                        feature = feature.squeeze()
+                        feature.data = feature.data / torch.norm(feature.data, p=2)
+                        X_train.append(feature.cpu().numpy())
+                        y_train.append(i)
+                
+                if pca:
+                    print('pca')
+                    pca = PCA(n_components=30)
+                    pca.fit(X_train)
+                    self.pca = pca
+                    print('end-pca')
+                
+                #choice of the model
+                if classifier == 'knn':
+                    model = KNeighborsClassifier(n_neighbors=3)
+                elif classifier == 'svc':
+                    model = LinearSVC()
+                elif classifier == 'mlp':
+                    model = MLPClassifier(hidden_layer_sizes=(100,50,25), random_state=1)
 
-            #choice of the model
-            if classifier == 'knn':
-                model = KNeighborsClassifier(n_neighbors=3)
-            elif classifier == 'svc':
-                model = LinearSVC()
-            elif classifier == 'mlp':
-                model = MLPClassifier(hidden_layer_sizes=(100,50,25), random_state=1)
-            
-            #fitting the model
-            model.fit(X_train, y_train)
+                #fitting the model
+                model.fit(X_train, y_train)
+                
+                self.model = model
+                self.train_model = False
 
             #computing features of images to be classified
             x = x.to(DEVICE)
@@ -559,7 +572,10 @@ class iCaRL(nn.Module):
             #l2 normalization
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
-                X.append(feat.cpu().numpy())
+                if pca:
+                    X.append(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
+                else:
+                    X.append(feat.cpu().numpy())
             
             #getting predictions
             preds = model.predict(X)
