@@ -464,11 +464,13 @@ class iCaRL(nn.Module):
                     feature = feature.squeeze()
                     feature.data = feature.data / torch.norm(feature.data, p=2)
                     features.append(pca.transform(feature.unsqueeze(0).cpu().numpy()))
+                    
+                    features = torch.from_numpy(features)
             
-                    features = torch.stack(features)
-                    mu_y = features.mean(0).squeeze()
-                    mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
-                    exemplar_means.append(mu_y.cpu())
+                features = torch.stack(features)
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+                exemplar_means.append(mu_y.cpu())
             
             self.exemplar_means = exemplar_means
             
@@ -504,7 +506,7 @@ class iCaRL(nn.Module):
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
                 if pca:
-                    feat = pca_model.transform(feat.unsqueeze(0))
+                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0)))
                
                     
 
