@@ -51,6 +51,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
 
         net.new_means = []
         net.compute_means = True
+        net.train_model = True
 
         print('Loading the Datasets ...')
         print('-'*30)
