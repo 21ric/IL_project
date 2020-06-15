@@ -65,7 +65,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
         
         # Undersample new classes (if not first iteration)
         if i != 0:
-            net.undersample_data(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
+            net.undersample_data(dataset_new=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
         
         
         print('Updating representation ...')
