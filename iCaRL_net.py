@@ -30,7 +30,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -453,10 +453,10 @@ class iCaRL(nn.Module):
                     feature.data = feature.data / torch.norm(feature.data, p=2)
                     features.append(feature.cpu().numpy())
             
-            print('pre-pca')
+            
             pca = PCA(n_components=30)
             pca.fit(features)
-            print('post-pca')
+            
             
             exemplar_means = []
             for exemplars in self.exemplar_sets:
@@ -478,7 +478,7 @@ class iCaRL(nn.Module):
             
             self.exemplar_means = exemplar_means
             
-            print('end_pca')
+            
             self.pca = pca
             
         
@@ -543,11 +543,11 @@ class iCaRL(nn.Module):
                         y_train.append(i)
                 
                 if pca:
-                    print('pca')
+                    
                     pca = PCA(n_components=30)
                     X_train = pca.fit_transform(X_train)
                     self.pca = pca
-                    print('end-pca')
+                    
                 
                 #choice of the model
                 if classifier == 'knn':
@@ -577,10 +577,10 @@ class iCaRL(nn.Module):
                 else:
                     X.append(feat.cpu().numpy())
             
-            print('start predicting')
+            
             #getting predictions
             preds = self.model.predict(X)
-            print('end_classify')
+            
             return preds
 
     #method to classify all batches of the test dataloader
