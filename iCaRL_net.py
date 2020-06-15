@@ -465,7 +465,7 @@ class iCaRL(nn.Module):
                     feature.data = feature.data / torch.norm(feature.data, p=2)
                     features.append(pca.transform(feature.unsqueeze(0).cpu().numpy()))
                     
-                    features = torch.from_numpy(features)
+                features = torch.from_numpy(np.array(features))
             
                 features = torch.stack(features)
                 mu_y = features.mean(0).squeeze()
