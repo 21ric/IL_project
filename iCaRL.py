@@ -59,10 +59,11 @@ def incremental_learning(dict_num, loss_config, classifier, lr, random_flag=Fals
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
+        """
         if undersample and i != 0:            
             train_dataset.resample(resize_factor = (net.n_known*m)/5000)
             print('Resamplig to size', len(train_dataset)) 
-
+        """
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
@@ -111,8 +112,8 @@ def incremental_learning(dict_num, loss_config, classifier, lr, random_flag=Fals
             print('Old classes')
             old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier, pca=pca)
             print('All classes')
-            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
-
+            #all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
+            all_acc = i/(iter+1)*new_acc + iter/(iter+1)*old_acc
 
             old_acc_list.append(old_acc)
             all_acc_list.append(all_acc)
