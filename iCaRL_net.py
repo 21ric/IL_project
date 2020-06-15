@@ -560,14 +560,15 @@ class iCaRL(nn.Module):
                                 X_train.append(feature.cpu().numpy())
                                 y_train.append(i)
                         
+                        print('smote')
                         X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
-            
+                        print('end_smote')
                 
                 if pca:
                     pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=45))])                  
                     X_train = pipe.fit_transform(X_train)
                     self.pca = pipe
-                    
+                    print('end-pca')
                 
                 #choice of the model
                 if classifier == 'knn':
