@@ -281,7 +281,7 @@ class iCaRL(nn.Module):
         
     #MIXED UP SAMPLES
     #creating samples by combining samples
-    def mixed_up_samples(self, img, labels_hot, labels):
+    def mixed_up_samples(self, imgs, labels_hot, labels):
         #mix up augmentation
                         
         #dividing exemplars from new images      
