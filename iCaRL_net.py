@@ -307,7 +307,7 @@ class iCaRL(nn.Module):
             new_sample2, new_target1 = w2*samples[j1]+(1-w2)*exemplars[j2], w2*samples_labels[j1]+(1-w2)*ex_labels[j2]
        
             new_samples.extend([new_sample1, new_sample2])
-            new_targets.exetend([new_target1, new_target2])
+            new_targets.extend([new_target1, new_target2])
 
         #creating tensor from list of tensors
         new_samples = torch.stack(mixed_up_points)
