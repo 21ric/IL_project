@@ -34,7 +34,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -554,7 +554,6 @@ class iCaRL(nn.Module):
                     for i in range(self.n_known, self.n_classes):
                         images = train_dataset.get_class_imgs(self.map_reverse[i])
                         for img in  images:
-                            print('cycle')
                             img = Variable(transform(Image.fromarray(img))).to(DEVICE)
                             feature = self.features_extractor.extract_features(img.unsqueeze(0))
                             feature = feature.squeeze()                        
