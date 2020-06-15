@@ -309,6 +309,9 @@ class iCaRL(nn.Module):
                 feature = feature.squeeze()
                 #feature.data = feature.data / torch.norm(feature.data, p=2)
                 features.append(feature)
+                print(image)
+                print(len(image))
+                print(len(image[0]))
         
         print("len features is")
         print(len(features))
