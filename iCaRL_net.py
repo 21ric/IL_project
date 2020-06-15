@@ -439,7 +439,7 @@ class iCaRL(nn.Module):
             
         else:
             self.features_extractor.train(False)
-            for exemplars in self.exemplar_sets[:self.n_known]:
+            for exemplars in self.exemplar_sets:
                 features = []
                 for ex in  exemplars:
 
@@ -452,6 +452,7 @@ class iCaRL(nn.Module):
             pca = PCA(n_components=300)
             pca.fit(features)
             
+            exemplar_means = []
             for exemplars in self.exemplar_sets:
                 features = []
                 for ex in  exemplars:
@@ -460,7 +461,7 @@ class iCaRL(nn.Module):
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
                     feature.data = feature.data / torch.norm(feature.data, p=2)
-                    features.append(feature.cpu().numpy())
+                    features.append(pca.transform(feature.cpu().numpy()))
             
                     #features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
@@ -468,20 +469,23 @@ class iCaRL(nn.Module):
                     exemplar_means.append(mu_y.cpu())
             
             self.exemplar_means = exemplar_means
-        
+            return pca
             
         
 
     #classification method
     @torch.no_grad()
-    def classify(self, x, classifier, pca):
+    def classify(self, x, classifier, pca=False):
 
         #Using NME as classifier
         if classifier == 'nme':
             
             #computing mean only if first iteration
             if self.compute_means:
-                self.compute_exemplars_mean(pca=pca)
+                if pca:
+                    pca_model = self.compute_exemplars_mean(pca=pca)
+                else:
+                    self.compute_exemplars_mean(pca=pca)
             self.compute_means = False 
 
             exemplar_means = self.exemplar_means
@@ -495,6 +499,7 @@ class iCaRL(nn.Module):
             for feat in feature:
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
+                feat = pca_model.transform(feat)
 
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
