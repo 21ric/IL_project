@@ -310,8 +310,8 @@ class iCaRL(nn.Module):
             new_targets.extend([new_target1, new_target2])
 
         #creating tensor from list of tensors
-        new_samples = torch.stack(mixed_up_points)
-        new_targets = torch.stack(mixed_up_targets)
+        new_samples = torch.stack(new_samples)
+        new_targets = torch.stack(new_targets)
         
         return new_samples, new_targets
     
