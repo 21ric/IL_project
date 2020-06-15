@@ -20,7 +20,7 @@ import utils
 import math
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+from sklearn.svm import LinearSVC, SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.decomposition import PCA
 
@@ -554,8 +554,8 @@ class iCaRL(nn.Module):
                     model = KNeighborsClassifier(n_neighbors=3)
                 elif classifier == 'svc':
                     model = LinearSVC()
-                elif classifier == 'mlp':
-                    model = MLPClassifier(hidden_layer_sizes=(100,50,25), random_state=1)
+                elif classifier == 'svc-rbf':
+                    model = SVC()
 
                 #fitting the model
                 model.fit(X_train, y_train)
@@ -584,7 +584,7 @@ class iCaRL(nn.Module):
             return preds
 
     #method to classify all batches of the test dataloader
-    def classify_all(self, test_dataset, map_reverse, classifier):
+    def classify_all(self, test_dataset, map_reverse, classifier, pca):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
@@ -592,7 +592,7 @@ class iCaRL(nn.Module):
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier, pca=True)
+            preds = self.classify(imgs, classifier, pca=pca)
             
             #mapping back fake lable to true label
             preds = [map_reverse[pred] for pred in preds]
