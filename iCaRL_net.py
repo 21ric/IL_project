@@ -548,7 +548,22 @@ class iCaRL(nn.Module):
                         X_train.append(feature.cpu().numpy())
                         y_train.append(i)
             
-                
+                #mix up augmentation
+                if pca:
+                    points = []
+                    targets = []
+                    for i in range(1000):
+                        for i, exemplars in enumerate(self.exemplar_sets):
+                            points.extend(exemplars)
+                            targets.extend([i]*len(exemplars))
+                        
+                        i1, i2 = np.randint(len(points)), np.randint(len(points))
+                        
+                        print('indexes', i1, i2)
+                        
+                        new_point = 0.4 *point[i1] + 0.6* point[i2]
+                        new_target = 0.4 *targets[i1] + 0.6* targets[i2]
+                        
                 
                 
                 if pca:
