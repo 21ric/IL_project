@@ -263,7 +263,7 @@ class iCaRL(nn.Module):
                             dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
                             dist_loss_new = bce_sum(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
                             #average
-                            dist_loss = (dist_loss+ dist_loss_new/((len(out)+len(new_out))*self.n_known)
+                            dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
 
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 
