@@ -22,6 +22,7 @@ import math
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neural_network import MLPClassifier
+from sklearn.decomposition import PCA
 
 ####Hyper-parameters####
 LR = 2
@@ -29,7 +30,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -412,39 +413,76 @@ class iCaRL(nn.Module):
     
     #method to compute means of exemplars
     @torch.no_grad()
-    def compute_exemplars_mean(self):
+    def compute_exemplars_mean(self, pca=False):
         
-        exemplar_means = []
-        self.features_extractor.train(False)
-        for exemplars in self.exemplar_sets[:self.n_known]:
-            features = []
-            for ex in  exemplars:
+        if not pca:
+        
+            exemplar_means = []
+            self.features_extractor.train(False)
+            for exemplars in self.exemplar_sets[:self.n_known]:
+                features = []
+                for ex in  exemplars:
 
-                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                feature = feature.squeeze()
-                feature.data = feature.data / torch.norm(feature.data, p=2)
-                features.append(feature)
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
+                    features.append(feature)
 
-            features = torch.stack(features)
-            mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
-            exemplar_means.append(mu_y.cpu())
+                features = torch.stack(features)
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+                exemplar_means.append(mu_y.cpu())
 
-        self.exemplar_means = exemplar_means
-        self.exemplar_means.extend(self.new_means)
+            self.exemplar_means = exemplar_means
+            self.exemplar_means.extend(self.new_means)
+            
+       else:
+        
+            self.features_extractor.train(False)
+            for exemplars in self.exemplar_sets[:self.n_known]:
+                features = []
+                for ex in  exemplars:
+
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
+                    features.append(feature.cpu().numpy())
+            
+            pca = PCA(n_components=300)
+            pca.fit(features)
+            
+            for exemplars in self.exemplar_sets:
+                features = []
+                for ex in  exemplars:
+
+                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                    feature = feature.squeeze()
+                    feature.data = feature.data / torch.norm(feature.data, p=2)
+                    features.append(feature.cpu().numpy())
+            
+                    #features = torch.stack(features)
+                    mu_y = features.mean(0).squeeze()
+                    mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+                    exemplar_means.append(mu_y.cpu())
+            
+            self.exemplar_means = exemplar_means
+        
+            
         
 
     #classification method
     @torch.no_grad()
-    def classify(self, x, classifier):
+    def classify(self, x, classifier, pca):
 
         #Using NME as classifier
         if classifier == 'nme':
             
             #computing mean only if first iteration
             if self.compute_means:
-                self.compute_exemplars_mean()
+                self.compute_exemplars_mean(pca=pca)
             self.compute_means = False 
 
             exemplar_means = self.exemplar_means
@@ -520,7 +558,7 @@ class iCaRL(nn.Module):
 
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier)
+            preds = self.classify(imgs, classifier, pca=True)
             
             #mapping back fake lable to true label
             preds = [map_reverse[pred] for pred in preds]
