@@ -561,7 +561,7 @@ class iCaRL(nn.Module):
                         
                         print('indexes', i1, i2)
                         
-                        new_point = 0.4 *point[i1] + 0.6* point[i2]
+                        new_point = 0.4 *points[i1] + 0.6* points[i2]
                         new_target = 0.4 *targets[i1] + 0.6* targets[i2]
                         
                 
