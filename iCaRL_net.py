@@ -50,8 +50,9 @@ l1 = nn.L1Loss()
 mse = nn.MSELoss()
 bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss(reduction='batchmean')
+ce = nn.CrossEntropyLoss()
 
-losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
+losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse], 'ce':[ce, bce]}
 
 
 
@@ -263,7 +264,10 @@ class iCaRL(nn.Module):
                         loss = (clf_loss_ex + clf_loss_sample)/((len(ex_out)*coeff_old+len(sample_out))*10)
                         #loss = loss_sample/(len(sample_out)*10)          
                 else:
-                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                    if self.loss_config == 'ce':
+                        loss = self.clf_loss(torch.sigmoid(out), labels)
+                    else:
+                        loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
                 #computing distillation loss
                 if self.n_known > 0 :
