@@ -499,6 +499,7 @@ class iCaRL(nn.Module):
             preds = []
             
             #computing features of images to be classified
+            print('computing pca')
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
@@ -506,10 +507,10 @@ class iCaRL(nn.Module):
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
                 if pca:
-                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0)))
+                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0)cpu().numpy()))
                
                     
-
+                print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
                     measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
