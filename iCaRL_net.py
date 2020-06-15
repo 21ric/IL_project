@@ -451,7 +451,7 @@ class iCaRL(nn.Module):
                     features.append(feature.cpu().numpy())
             
             print('pre-pca')
-            pca = PCA(n_components=50)
+            pca = PCA(n_components=30)
             pca.fit(features)
             print('post-pca')
             
