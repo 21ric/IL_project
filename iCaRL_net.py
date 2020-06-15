@@ -222,7 +222,7 @@ class iCaRL(nn.Module):
 
                 if self.proportional_loss:
                     
-                    if i !=0:
+                    if iter !=0:
                         #mix up augmentation
                         exemplars = imgs[(labels < self.n_known)]
                         ex_labels = labels_hot[(labels < self.n_known)]
@@ -275,7 +275,7 @@ class iCaRL(nn.Module):
                         
                     clf_loss_ex =  bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
                     clf_loss_sample =  bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:]) #calculating clf loss on new images
-                    if i !=0:
+                    if iter !=0:
                         clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
                     
                     #loss_ex = coeff_old * bce_sum(ex_out, labels_ex)
@@ -291,7 +291,7 @@ class iCaRL(nn.Module):
                         loss = (clf_loss_ex + clf_loss_sample)/(len(out)*10)
                         
                     else:
-                        if i != 0:
+                        if iter != 0:
                             loss = (clf_loss_ex + clf_loss_sample + clf_loss_mixedup)/((len(ex_out)+len(sample_out)+len(mixed_out))*10)
                         else:
                             loss = (clf_loss_ex + clf_loss_sample )/((len(ex_out)+len(sample_out))*10)
