@@ -562,14 +562,14 @@ class iCaRL(nn.Module):
                             X_train.append(feature.cpu().numpy())
                             y_train.append(i)
                         
-                        print('range', self.n_known, self.n_classes)
-                        print('len', len(X_train), len(y_train))
-                        print('Xtrain', np.array(X_train).shape)
-                        print('yTrain', np.array(y_train).shape)
-                        print('smote')
-                        print('targets', list(set(y_train)))
-                        X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
-                        print('end_smote')
+                    print('range', self.n_known, self.n_classes)
+                    print('len', len(X_train), len(y_train))
+                    print('Xtrain', np.array(X_train).shape)
+                    print('yTrain', np.array(y_train).shape)
+                    print('smote')
+                    print('targets', list(set(y_train)))
+                    X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
+                    print('end_smote')
                 
                 if pca:
                     pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=45))])                  
