@@ -23,6 +23,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
 ####Hyper-parameters####
 LR = 2
@@ -543,10 +545,9 @@ class iCaRL(nn.Module):
                         y_train.append(i)
                 
                 if pca:
-                    
-                    pca = PCA(n_components=30)
-                    X_train = pca.fit_transform(X_train)
-                    self.pca = pca
+                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=30))])                  
+                    X_train = pipe.fit_transform(X_train)
+                    self.pca = pipe
                     
                 
                 #choice of the model
