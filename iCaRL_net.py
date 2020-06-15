@@ -561,7 +561,7 @@ class iCaRL(nn.Module):
                                 y_train.append(i)
                         
                         print('smote')
-                        X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
+                        X_train, y_train = SMOTE().fit_resample(X_train, np.squeeze(y_train))                  
                         print('end_smote')
                 
                 if pca:
