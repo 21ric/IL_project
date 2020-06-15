@@ -266,7 +266,7 @@ class iCaRL(nn.Module):
         print(f"Len dataset is {len(dataset)}")
         
         # Create dataloader, shuffleing the data
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
         
         # Training 
         i=0
@@ -280,19 +280,14 @@ class iCaRL(nn.Module):
             for imgs, labels in loader:
                 imgs = imgs.to(DEVICE)          
                 labels = labels.to(DEVICE)
-
                 #zeroing the gradients
                 optimizer.zero_grad()
-
                 #computing outputs
                 out = clf_net(imgs)
-
                 #computing loss
                 loss = self.criterion(out, labels)
-
                 loss.backward()
                 optimizer.step()
-
 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
@@ -309,7 +304,6 @@ class iCaRL(nn.Module):
        
         features = []
         for image in  dataset_new:
-
                 image = Variable(transform(Image.fromarray(image))).to(DEVICE)
                 feature = self.features_extractor.extract_features(image.unsqueeze(0))
                 feature = feature.squeeze()
