@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
                    #skipping first iteration
                    if self.n_known > 0:
                         #creating new samples
-                        new_samples, new_targets = mixed_up_samples(img, labels_hot, labels)
+                        new_samples, new_targets = self.mixed_up_samples(img, labels_hot, labels)
                         
                         #computing outputs        
                         new_out = self(new_samples)
