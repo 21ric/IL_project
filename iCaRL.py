@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False, class_balanced_loss=False, proportional_loss=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False, class_balanced_loss=False, proportional_loss=False, pca=False):
 
     utils.set_seed(0)
 
@@ -94,7 +94,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         print('-'*30)
 
         print('New classes')
-        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier)
+        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier, pca=pca)
 
         new_acc_list.append(new_acc)
         if i == 0:
@@ -109,9 +109,9 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier)
+            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier, pca=pca)
             print('All classes')
-            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier)
+            all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
 
 
             old_acc_list.append(old_acc)
