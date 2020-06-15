@@ -438,7 +438,6 @@ class iCaRL(nn.Module):
             self.exemplar_means.extend(self.new_means)
             
        else:
-        
             self.features_extractor.train(False)
             for exemplars in self.exemplar_sets[:self.n_known]:
                 features = []
