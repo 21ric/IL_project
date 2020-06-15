@@ -34,7 +34,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -238,8 +238,8 @@ class iCaRL(nn.Module):
                             mixed_up_points.append(new_point)
                             mixed_up_targets.append(new_target)
 
-                        mixed_up_points = torch.FloatTensor(mixed_up_points)
-                        mixed_up_targets = torch.FloatTensor(mixed_up_targets)
+                        mixed_up_points = torch.stack(mixed_up_points)
+                        mixed_up_targets = torch.stack(mixed_up_targets)
                     
                         
                 #zeroing the gradients
