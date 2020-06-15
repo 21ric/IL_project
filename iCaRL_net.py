@@ -30,7 +30,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -501,7 +501,7 @@ class iCaRL(nn.Module):
             preds = []
             
             #computing features of images to be classified
-            print('computing pca')
+            #print('computing pca')
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
@@ -512,7 +512,7 @@ class iCaRL(nn.Module):
                     feat = torch.from_numpy(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
                
                     
-                print('computing distance')
+                #print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
                     measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
