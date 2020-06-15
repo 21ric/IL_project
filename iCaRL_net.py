@@ -557,7 +557,7 @@ class iCaRL(nn.Module):
                             points.extend(exemplars)
                             targets.extend([i]*len(exemplars))
                         
-                        i1, i2 = scipy.randint(len(points)), scipy.randint(len(points))
+                        i1, i2 = np.random.randint(len(points)), np.random.randint(len(points))
                         
                         print('indexes', i1, i2)
                         
