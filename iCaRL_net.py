@@ -560,7 +560,7 @@ class iCaRL(nn.Module):
                                 X_train.append(feature.cpu().numpy())
                                 y_train.append(i)
                         
-                        X_train, y_train = SMOTE().fit_resample(X, y)                  
+                        X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
             
                 
                 if pca:
