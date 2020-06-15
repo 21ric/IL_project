@@ -463,7 +463,7 @@ class iCaRL(nn.Module):
                     feature = self.features_extractor.extract_features(ex.unsqueeze(0))
                     feature = feature.squeeze()
                     feature.data = feature.data / torch.norm(feature.data, p=2)
-                    features.append(pca.transform(feature.cpu().numpy()))
+                    features.append(pca.transform(feature.unsqueeze(0).cpu().numpy()))
             
                     #features = torch.stack(features)
                     mu_y = features.mean(0).squeeze()
@@ -471,6 +471,8 @@ class iCaRL(nn.Module):
                     exemplar_means.append(mu_y.cpu())
             
             self.exemplar_means = exemplar_means
+            
+            print('end_pca')
             return pca
             
         
