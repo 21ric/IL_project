@@ -87,7 +87,7 @@ class ExemplarsDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
         
-        return img, target
+        return img, label
     
     def __len__(self):
         return len(self.images)
@@ -266,7 +266,7 @@ class iCaRL(nn.Module):
         print(f"Len dataset is {len(dataset)}")
         
         # Create dataloader, shuffleing the data
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last=True)
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
         # Training 
         i=0
