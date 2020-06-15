@@ -291,6 +291,7 @@ class iCaRL(nn.Module):
                         out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                         q_i = q[indexes]
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 
 
