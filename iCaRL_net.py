@@ -573,10 +573,11 @@ class iCaRL(nn.Module):
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
                 if pca:
-                    X.append(self.pca.transform(feat.cpu().numpy()))
+                    X.append(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
                 else:
                     X.append(feat.cpu().numpy())
             
+            print('start predicting')
             #getting predictions
             preds = model.predict(X)
             print('end_classify')
