@@ -114,6 +114,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, random_flag=Fals
             print('All classes')
             #all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
             all_acc = i/(i+1)*new_acc + i/(i+1)*old_acc
+            print(all_acc)
 
             old_acc_list.append(old_acc)
             all_acc_list.append(all_acc)
