@@ -93,7 +93,7 @@ def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classe
 
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, loss_config, lr, class_balanced_loss=False, proportional_loss=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, class_balanced_loss=False, proportional_loss=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -110,6 +110,7 @@ class iCaRL(nn.Module):
         self.compute_means = True
         self.new_means = []
         self.class_map = class_map #needed to map real label to fake label
+        self.map_reverse = map_reverse
         
         self.class_balanced_loss = class_balanced_loss
         self.proportional_loss = proportional_loss
@@ -551,7 +552,7 @@ class iCaRL(nn.Module):
                 
                 if pca:
                     for i in range(self.n_known, self.n_classes):
-                        images = train_dataset.get_class_imgs(i)
+                        images = train_dataset.get_class_imgs(map_reverse[i])
                         for img in  images:
                             print('cycle')
                             img = Variable(transform(Image.fromarray(img))).to(DEVICE)
