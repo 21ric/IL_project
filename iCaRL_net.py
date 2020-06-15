@@ -550,7 +550,7 @@ class iCaRL(nn.Module):
             
                 
                 if pca:
-                    for i in range(self.n_knwon, self.n_classes):
+                    for i in range(self.n_known, self.n_classes):
                         images = train_dataset.get_class_imgs(i)
                         for img in  images:
                                 img = Variable(transform(Image.fromarray(img))).to(DEVICE)
