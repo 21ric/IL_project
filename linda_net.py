@@ -306,15 +306,21 @@ class iCaRL(nn.Module):
         # Training is finished.
         # Predict values on new data 
         clf_net.train(False)
-        dataloader_new = DataLoader(dataset_new, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-        
+       
         features = []
-        for images, labels, indexes in dataloader_new:
-            out = clf_net.extract_features(images)
-            features.extend(out)
+        for image in  dataset_new:
+
+                image = Variable(transform(Image.fromarray(image))).to(DEVICE)
+                feature = self.features_extractor.extract_features(image.unsqueeze(0))
+                feature = feature.squeeze()
+                feature.data = feature.data / torch.norm(feature.data, p=2)
+                features.append(feature)
         
         print("len features is")
         print(len(features))
+        print(len(features[0]))
+        print(len(dataset_new))
+        print(len(dataset_new[0]))
         
    
 
