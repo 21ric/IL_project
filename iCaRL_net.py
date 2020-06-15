@@ -579,7 +579,7 @@ class iCaRL(nn.Module):
             
             print('start predicting')
             #getting predictions
-            preds = model.predict(X)
+            preds = self.model.predict(X)
             print('end_classify')
             return preds
 
