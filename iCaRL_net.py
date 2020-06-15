@@ -212,7 +212,7 @@ class iCaRL(nn.Module):
                 if self.add_samples:
                    
                    #skipping first iteration
-                   if self.n_known:
+                   if self.n_known > 0:
                         #creating new samples
                         new_samples, new_targets = mixed_up_samples(img, labels_hot, labels)
                         
@@ -226,7 +226,7 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
-                if self.add_classes and self.n_knwon > 0:
+                if self.add_classes and self.n_known > 0:
                     
                     #loss for samples and added samples
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
