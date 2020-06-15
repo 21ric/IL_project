@@ -78,7 +78,7 @@ class ExemplarsDataset(Dataset):
                                    ])
     
     def __getitem__(self,index):
-        img, label = self.images[index], self.label[labels]
+        img, label = self.images[index], self.labels[index]
         
         # to return a PIL Image
         img = Image.fromarray(img)
