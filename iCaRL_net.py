@@ -107,35 +107,6 @@ class iCaRL(nn.Module):
         return x
     
     
-    
-
-    #INCREMENT NUMBER OF CLASSES
-    def add_classes(self, n):
-        in_features = self.features_extractor.fc.in_features
-        out_features = self.features_extractor.fc.out_features
-        
-        #copying old weights
-        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
-        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
-        self.features_extractor.fc = nn.Linear(in_features, out_features+n)
-        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
-        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
-
-        #incrementing number of seen classes
-        self.n_classes += n
-        
-        
-        
-
-    #ADD EXEMPLARS TO DATASET
-    def add_exemplars(self, dataset, map_reverse):
-        for y, exemplars in enumerate(self.exemplar_sets):
-            dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
-            
-            
-            
-         
-    
     #UPDATE REPRESENTATION
     #updating the feature extractor
     def update_representation(self, dataset, class_map, map_reverse, iter):
@@ -280,19 +251,32 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
         return
-  
-                                         
-                                         
-                                        
-    #SEPARATE EXEMPLARS  
-    #separating exemplars from new data
-    def separate_exemplars(self, imgs, labels_hot, labels):
+    
+
+    #INCREMENT NUMBER OF CLASSES
+    def add_classes(self, n):
+        in_features = self.features_extractor.fc.in_features
+        out_features = self.features_extractor.fc.out_features
         
-        exemplars, ex_labels = imgs[(labels < self.n_known)], labels_hot[(labels < self.n_known)]
-        samples, samples_labels = imgs[(labels > self.n_known)], labels_hot[(labels >= self.n_known)]
+        #copying old weights
+        weight = copy.deepcopy(self.features_extractor.fc.weight.data)
+        bias = copy.deepcopy(self.features_extractor.fc.bias.data)
+        self.features_extractor.fc = nn.Linear(in_features, out_features+n)
+        self.features_extractor.fc.weight.data[:out_features] = copy.deepcopy(weight)
+        self.features_extractor.fc.bias.data[:out_features] = copy.deepcopy(bias)
+
+        #incrementing number of seen classes
+        self.n_classes += n
         
-        return exemplars, ex_labels, samples, samples_labels
         
+        
+
+    #ADD EXEMPLARS TO DATASET
+    def add_exemplars(self, dataset, map_reverse):
+        for y, exemplars in enumerate(self.exemplar_sets):
+            dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
+            
+
         
         
     #MIXED UP SAMPLES
@@ -301,7 +285,7 @@ class iCaRL(nn.Module):
         #mix up augmentation
                         
         #dividing exemplars from new images      
-        exemplars, ex_labels, samples, samples_labels = self.eparate_exemplars(imgs, labels_hot, labels)
+        exemplars, ex_labels, samples, samples_labels = self.separate_exemplars(imgs, labels_hot, labels)
         
         new_samples = []
         new_targets = []
@@ -330,6 +314,16 @@ class iCaRL(nn.Module):
         new_targets = torch.stack(mixed_up_targets)
         
         return new_samples, new_targets
+    
+    
+    #SEPARATE EXEMPLARS  
+    #separating exemplars from new data
+    def separate_exemplars(self, imgs, labels_hot, labels):
+        
+        exemplars, ex_labels = imgs[(labels < self.n_known)], labels_hot[(labels < self.n_known)]
+        samples, samples_labels = imgs[(labels > self.n_known)], labels_hot[(labels >= self.n_known)]
+        
+        return exemplars, ex_labels, samples, samples_labels
     
     
     
