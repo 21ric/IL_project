@@ -291,23 +291,23 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(BATCH_SIZE):
+        for _ in range(50):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
-            j1, j2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+            #j1, j2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
 
             #weights of linear combinatioins
-            w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
+            #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
 
             #creating new samples
             #exemplar + exemplar
-            new_sample1, new_target1 = w1*exemplars[i1]+(1-w1)*exemplars[i2], w1*ex_labels[i1]+(1-w1)*ex_labels[i2]
+            new_sample1, new_target1 = 0.8*exemplars[i1]+(1-0.8)*exemplars[i2], 0.8*ex_labels[i1]+(1-0.8)*ex_labels[i2]
             #exemplar + samples
-            new_sample2, new_target2 = w2*exemplars[j1]+(1-w2)*exemplars[j2], w2*ex_labels[j1]+(1-w2)*ex_labels[j2]
+            #new_sample2, new_target2 = w2*exemplars[j1]+(1-w2)*exemplars[j2], w2*ex_labels[j1]+(1-w2)*ex_labels[j2]
        
-            new_samples.extend([new_sample1, new_sample2])
-            new_targets.extend([new_target1, new_target2])
+            new_samples.extend([new_sample1])
+            new_targets.extend([new_target1])
 
         #creating tensor from list of tensors
         new_samples = torch.stack(new_samples)
