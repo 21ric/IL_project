@@ -302,9 +302,9 @@ class iCaRL(nn.Module):
 
             #creating new samples
             #exemplar + exemplar
-            new_sample1, new_target1 = w*exemplars[i1]+(1-w)*exemplars[i2], w*ex_labels[i1]+(1-w)*ex_labels[i2]
+            new_sample1, new_target1 = w1*exemplars[i1]+(1-w1)*exemplars[i2], w1*ex_labels[i1]+(1-w1)*ex_labels[i2]
             #exemplar + samples
-            new_sample2, new_target1 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
+            new_sample2, new_target1 = w2*samples[j1]+(1-w2)*exemplars[j2], w2*samples_labels[j1]+(1-w2)*ex_labels[j2]
        
             new_samples.extend([new_sample1, new_sample2])
             new_targets.exetend([new_target1, new_target2])
