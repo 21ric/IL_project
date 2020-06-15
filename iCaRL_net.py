@@ -138,7 +138,7 @@ class iCaRL(nn.Module):
         previous_net.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
-            f_ex.train(False)
+            previous_net.train(False)
             images = Variable(images).to(DEVICE)
             indexes = indexes.to(DEVICE)
             g = previous_net.forward(images)
