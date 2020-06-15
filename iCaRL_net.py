@@ -545,7 +545,7 @@ class iCaRL(nn.Module):
                         y_train.append(i)
                 
                 if pca:
-                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=30))])                  
+                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=20))])                  
                     X_train = pipe.fit_transform(X_train)
                     self.pca = pipe
                     
