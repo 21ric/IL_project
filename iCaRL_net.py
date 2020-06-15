@@ -567,6 +567,7 @@ class iCaRL(nn.Module):
                         print('Xtrain', np.array(X_train).shape)
                         print('yTrain', np.array(y_train).shape)
                         print('smote')
+                        print('targets', list(set(y_train)))
                         X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
                         print('end_smote')
                 
