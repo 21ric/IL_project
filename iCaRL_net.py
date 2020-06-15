@@ -536,10 +536,10 @@ class iCaRL(nn.Module):
                 X_train, y_train = [], []
 
                 #computing features on exemplars to create X_train, y_train
-                lim = self.self.n_known if pca else lim=self.n_classes
+                lim = self.self.n_known if pca else self.n_classes
                 
                 self.features_extractor.train(False)
-                for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
+                for i, exemplars in enumerate(self.exemplar_sets[:lim]):
                     for ex in  exemplars:
                         ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                         feature = self.features_extractor.extract_features(ex.unsqueeze(0))
