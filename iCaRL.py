@@ -94,7 +94,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         print('-'*30)
 
         print('New classes')
-        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier, pca=pca)
+        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier, pca=pca, train_dataset=train_dataset)
 
         new_acc_list.append(new_acc)
         if i == 0:
