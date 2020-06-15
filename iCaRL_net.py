@@ -222,23 +222,24 @@ class iCaRL(nn.Module):
 
                 if self.proportional_loss:
                     
-                    #mix up augmentation
-                    exemplars = imgs[(labels < self.n_known)]
-                    ex_labels = labels_hot[(labels < self.n_known)]
-                    
-                    mixed_up_points = []
-                    mixed_up_targets = []
+                    if i !=0:
+                        #mix up augmentation
+                        exemplars = imgs[(labels < self.n_known)]
+                        ex_labels = labels_hot[(labels < self.n_known)]
 
-                    for i in range(128 - len(exemplars)):
-                        i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
-                        new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
-                        new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
-                        
-                        mixed_up_points.append(new_point)
-                        mixed_up_targets.append(new_target)
-                    
-                    mixed_up_points = torch.FloatTensor(mixed_up_points)
-                    mixed_up_targets = torch.FloatTensor(mixed_up_targets)
+                        mixed_up_points = []
+                        mixed_up_targets = []
+
+                        for i in range(128 - len(exemplars)):
+                            i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+                            new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
+                            new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
+
+                            mixed_up_points.append(new_point)
+                            mixed_up_targets.append(new_target)
+
+                        mixed_up_points = torch.FloatTensor(mixed_up_points)
+                        mixed_up_targets = torch.FloatTensor(mixed_up_targets)
                     
                         
                 #zeroing the gradients
@@ -247,7 +248,7 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
                 
-                if self.proportional_loss:              
+                if self.proportional_loss and i !=0:              
                     mixed_out = self(mixed_up_points)
                 
                 #computing classification loss
@@ -289,7 +290,10 @@ class iCaRL(nn.Module):
                         loss = (clf_loss_ex + clf_loss_sample)/(len(out)*10)
                         
                     else:
-                        loss = (clf_loss_ex + clf_loss_sample + clf_loss_mixedup)/((len(ex_out)+len(sample_out)+len(mixed_out))*10)
+                        if i != 0:
+                            loss = (clf_loss_ex + clf_loss_sample + clf_loss_mixedup)/((len(ex_out)+len(sample_out)+len(mixed_out))*10)
+                        else:
+                            loss = (clf_loss_ex + clf_loss_sample )/((len(ex_out)+len(sample_out))*10)
                         #loss = loss_sample/(len(sample_out)*10)
                         
                 else:
