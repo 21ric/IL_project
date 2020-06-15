@@ -507,7 +507,7 @@ class iCaRL(nn.Module):
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
                 if pca:
-                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0)cpu().numpy()))
+                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0).cpu().numpy()))
                
                     
                 print('computing distance')
