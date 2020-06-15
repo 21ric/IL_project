@@ -285,7 +285,7 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = clf_net(imgs)
                 #computing loss
-                loss = self.criterion(out, labels)
+                loss = criterion(out, labels)
                 loss.backward()
                 optimizer.step()
 
