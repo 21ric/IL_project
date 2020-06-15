@@ -563,6 +563,8 @@ class iCaRL(nn.Module):
                         
                         new_point = 0.4 *points[i1] + 0.6* points[i2]
                         new_target = 0.4 *targets[i1] + 0.6* targets[i2]
+                        X_train.append(new_point)
+                        y_train.append(new_target)
                         
                 
                 
