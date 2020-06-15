@@ -560,6 +560,7 @@ class iCaRL(nn.Module):
                                 X_train.append(feature.cpu().numpy())
                                 y_train.append(i)
                         
+                        print('len', len(X_train), len(y_train))
                         print('Xtrain', np.array(X_train).shape)
                         print('yTrain', np.array(y_train).shape)
                         print('smote')
