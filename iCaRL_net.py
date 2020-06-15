@@ -127,18 +127,21 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
+        #incrementing number of classes
+        self.add_classes(n)
+        
         #storing previous network
         self.features_extractor.to(DEVICE)
         previous_net = copy.deepcopy(self.features_extractor)
         
-        """
-        f_ex.to(DEVICE)
+        
+        previous_net.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
             images = Variable(images).to(DEVICE)
             indexes = indexes.to(DEVICE)
-            g = f_ex.forward(images)
+            g = previous_net.forward(images)
             if self.loss_config == 'bce':
                 g = torch.sigmoid(g)
             else: 
@@ -146,10 +149,9 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
         self.features_extractor.train(True)
-        """
         
-        #incrementing number of classes
-        self.add_classes(n)
+        
+        
 
         #defining optimizer and resetting learning rate
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
@@ -215,10 +217,10 @@ class iCaRL(nn.Module):
                             previous_net.to(DEVICE)
                             previous_net.train(False)
 
-                            q_i = torch.sigmoid(previous_net(imgs))
+                            #q_i = torch.sigmoid(previous_net(imgs))
                             q_i_new = torch.sigmoid(previous_net(new_samples))
                                              
-                            #q_i = q[indexes]
+                            q_i = q[indexes]
                             #q_i_ex = q_i[(labels < self.n_known)]
                             #q_i_sample = q_i[(labels >= self.n_known)]
                             #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
@@ -291,7 +293,7 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(50):
+        for _ in range(128 - len(exemplars)):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
@@ -302,7 +304,7 @@ class iCaRL(nn.Module):
 
             #creating new samples
             #exemplar + exemplar
-            new_sample1, new_target1 = 0.8*exemplars[i1]+(1-0.8)*exemplars[i2], 0.8*ex_labels[i1]+(1-0.8)*ex_labels[i2]
+            new_sample1, new_target1 = 0.6*exemplars[i1]+(1-0.6)*exemplars[i2], 0.6*ex_labels[i1]+(1-0.6)*ex_labels[i2]
             #exemplar + samples
             #new_sample2, new_target2 = w2*exemplars[j1]+(1-w2)*exemplars[j2], w2*ex_labels[j1]+(1-w2)*ex_labels[j2]
        
