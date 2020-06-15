@@ -248,7 +248,7 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
                 
-                if self.proportional_loss and i !=0:              
+                if self.proportional_loss and iter !=0:              
                     mixed_out = self(mixed_up_points)
                 
                 #computing classification loss
