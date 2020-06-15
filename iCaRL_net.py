@@ -536,7 +536,7 @@ class iCaRL(nn.Module):
                 X_train, y_train = [], []
 
                 #computing features on exemplars to create X_train, y_train
-                lim = self.self.n_known if pca = True else lim=self.n_classes
+                lim = self.self.n_known if pca else lim=self.n_classes
                 
                 self.features_extractor.train(False)
                 for i, exemplars in enumerate(self.exemplar_sets[:self.n_known]):
