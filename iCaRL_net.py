@@ -539,9 +539,8 @@ class iCaRL(nn.Module):
                     for ex in  exemplars:
                         ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                         feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                        feature = feature.squeeze()
-                        if not pca:
-                            feature.data = feature.data / torch.norm(feature.data, p=2)
+                        feature = feature.squeeze()                        
+                        feature.data = feature.data / torch.norm(feature.data, p=2)
                         X_train.append(feature.cpu().numpy())
                         y_train.append(i)
                 
