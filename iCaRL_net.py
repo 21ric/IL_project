@@ -545,7 +545,7 @@ class iCaRL(nn.Module):
                 if pca:
                     print('pca')
                     pca = PCA(n_components=30)
-                    X_train = pca.fit_transofrm(X_train)
+                    X_train = pca.fit_transform(X_train)
                     self.pca = pca
                     print('end-pca')
                 
