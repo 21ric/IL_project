@@ -552,7 +552,7 @@ class iCaRL(nn.Module):
                 
                 if pca:
                     for i in range(self.n_known, self.n_classes):
-                        images = train_dataset.get_class_imgs(map_reverse[i])
+                        images = train_dataset.get_class_imgs(self.map_reverse[i])
                         for img in  images:
                             print('cycle')
                             img = Variable(transform(Image.fromarray(img))).to(DEVICE)
@@ -567,7 +567,7 @@ class iCaRL(nn.Module):
                         print('Xtrain', np.array(X_train).shape)
                         print('yTrain', np.array(y_train).shape)
                         print('smote')
-                        X_train, y_train = SMOTE().fit_resample(X_train, np.unsqueeze(y_train))                  
+                        X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
                         print('end_smote')
                 
                 if pca:
