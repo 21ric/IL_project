@@ -537,10 +537,9 @@ class iCaRL(nn.Module):
                 X_train, y_train = [], []
 
                 #computing features on exemplars to create X_train, y_train
-                lim = self.n_known if pca else self.n_classes
                 
                 self.features_extractor.train(False)
-                for i, exemplars in enumerate(self.exemplar_sets[:lim]):
+                for i, exemplars in enumerate(self.exemplar_sets):
                     for ex in  exemplars:
                         ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
                         feature = self.features_extractor.extract_features(ex.unsqueeze(0))
@@ -550,28 +549,10 @@ class iCaRL(nn.Module):
                         y_train.append(i)
             
                 
-                if pca:
-                    for i in range(self.n_known, self.n_classes):
-                        images = train_dataset.get_class_imgs(self.map_reverse[i])
-                        for img in  images:
-                            img = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                            feature = self.features_extractor.extract_features(img.unsqueeze(0))
-                            feature = feature.squeeze()                        
-                            feature.data = feature.data / torch.norm(feature.data, p=2)
-                            X_train.append(feature.cpu().numpy())
-                            y_train.append(i)
-                        
-                    print('range', self.n_known, self.n_classes)
-                    print('len', len(X_train), len(y_train))
-                    print('Xtrain', np.array(X_train).shape)
-                    print('yTrain', np.array(y_train).shape)
-                    print('smote')
-                    print('targets', list(set(y_train)))
-                    X_train, y_train = SMOTE().fit_resample(X_train, y_train)                  
-                    print('end_smote')
+                
                 
                 if pca:
-                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=45))])                  
+                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=30))])                  
                     X_train = pipe.fit_transform(X_train)
                     self.pca = pipe
                     print('end-pca')
