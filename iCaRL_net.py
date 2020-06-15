@@ -449,7 +449,7 @@ class iCaRL(nn.Module):
                     feature.data = feature.data / torch.norm(feature.data, p=2)
                     features.append(feature.cpu().numpy())
             
-            pca = PCA(n_components=300)
+            pca = PCA(n_components=50)
             pca.fit(features)
             
             exemplar_means = []
