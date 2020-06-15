@@ -303,9 +303,9 @@ class iCaRL(nn.Module):
         clf_net.train(False)
        
         features = []
-        for image in  dataset_new:
+        for image, _, _ in  dataset_new:
                 image = Variable(transform(Image.fromarray(image))).to(DEVICE)
-                feature = self.features_extractor.extract_features(image.unsqueeze(0))
+                feature = clf_net.extract_features(image.unsqueeze(0))
                 feature = feature.squeeze()
                 feature.data = feature.data / torch.norm(feature.data, p=2)
                 features.append(feature)
