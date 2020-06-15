@@ -553,12 +553,13 @@ class iCaRL(nn.Module):
                     for i in range(self.n_known, self.n_classes):
                         images = train_dataset.get_class_imgs(i)
                         for img in  images:
-                                img = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                                feature = self.features_extractor.extract_features(img.unsqueeze(0))
-                                feature = feature.squeeze()                        
-                                feature.data = feature.data / torch.norm(feature.data, p=2)
-                                X_train.append(feature.cpu().numpy())
-                                y_train.append(i)
+                            print('cycle')
+                            img = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                            feature = self.features_extractor.extract_features(img.unsqueeze(0))
+                            feature = feature.squeeze()                        
+                            feature.data = feature.data / torch.norm(feature.data, p=2)
+                            X_train.append(feature.cpu().numpy())
+                            y_train.append(i)
                         
                         print('len', len(X_train), len(y_train))
                         print('Xtrain', np.array(X_train).shape)
