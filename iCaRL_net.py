@@ -286,7 +286,7 @@ class iCaRL(nn.Module):
                                         
     #SEPARATE EXEMPLARS  
     #separating exemplars from new data
-    def separate_exemplars(imgs, labels_hot, labels):
+    def separate_exemplars(self, imgs, labels_hot, labels):
         
         exemplars, ex_labels = imgs[(labels < self.n_known)], labels_hot[(labels < self.n_known)]
         samples, samples_labels = imgs[(labels > self.n_known)], labels_hot[(labels >= self.n_known)]
@@ -297,11 +297,11 @@ class iCaRL(nn.Module):
         
     #MIXED UP SAMPLES
     #creating samples by combining samples
-    def mixed_up_samples(img, labels_hot, labels):
+    def mixed_up_samples(self, img, labels_hot, labels):
         #mix up augmentation
                         
         #dividing exemplars from new images      
-        exemplars, ex_labels, samples, samples_labels = separate_exemplars(imgs, labels_hot, labels)
+        exemplars, ex_labels, samples, samples_labels = self.eparate_exemplars(imgs, labels_hot, labels)
         
         new_samples = []
         new_targets = []
