@@ -110,6 +110,7 @@ class iCaRL(nn.Module):
         self.class_balanced_loss = class_balanced_loss
         self.proportional_loss = proportional_loss
         self.exemplars_per_class = 0
+        self.pca = None
 
     #forward pass
     def forward(self, x):
@@ -475,7 +476,7 @@ class iCaRL(nn.Module):
             self.exemplar_means = exemplar_means
             
             print('end_pca')
-            return pca
+            self.pca = pca
             
         
 
@@ -489,9 +490,10 @@ class iCaRL(nn.Module):
             #computing mean only if first iteration
             if self.compute_means:
                 if pca:
-                    pca_model = self.compute_exemplars_mean(pca=pca)
+                    self.compute_exemplars_mean(pca=pca)
                 else:
                     self.compute_exemplars_mean(pca=pca)
+                    
             self.compute_means = False 
 
             exemplar_means = self.exemplar_means
@@ -507,7 +509,7 @@ class iCaRL(nn.Module):
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
                 if pca:
-                    feat = torch.from_numpy(pca_model.transform(feat.unsqueeze(0).cpu().numpy()))
+                    feat = torch.from_numpy(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
                
                     
                 print('computing distance')
