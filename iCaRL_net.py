@@ -34,7 +34,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 1
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -214,7 +214,7 @@ class iCaRL(nn.Module):
                    #skipping first iteration
                    if self.n_known > 0:
                         #creating new samples
-                        new_samples, new_targets = self.mixed_up_samples(img, labels_hot, labels)
+                        new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
                         
                         #computing outputs        
                         new_out = self(new_samples)
