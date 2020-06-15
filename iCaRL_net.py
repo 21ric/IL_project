@@ -275,7 +275,8 @@ class iCaRL(nn.Module):
                         
                     clf_loss_ex =  bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
                     clf_loss_sample =  bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:]) #calculating clf loss on new images
-                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                    if i !=0:
+                        clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
                     
                     #loss_ex = coeff_old * bce_sum(ex_out, labels_ex)
                     #loss_sample = coeff_new * bce_sum(sample_out, labels_sample)
