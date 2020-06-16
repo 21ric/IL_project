@@ -113,10 +113,8 @@ class iCaRL(nn.Module):
         self.add_classes(n)
         
         #storing previous network
-        self.features_extractor.to(DEVICE)
         previous_net = copy.deepcopy(self.features_extractor)
-        
-        
+          
         previous_net.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
@@ -130,11 +128,9 @@ class iCaRL(nn.Module):
                 g = F.softmax(g,dim=1)
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
+        
+        
         self.features_extractor.train(True)
-        
-        
-        
-
         #defining optimizer and resetting learning rate
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
 
@@ -218,6 +214,7 @@ class iCaRL(nn.Module):
                         dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
 
                     else:
+                        q_i = q[indexes]
                         #computing dist loss
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
