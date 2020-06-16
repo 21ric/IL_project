@@ -164,7 +164,7 @@ class iCaRL(nn.Module):
                 
                                                           
                 #computing outputs of training data
-                out = self(imgs)            
+                out = self(imgs)             
                 
                 #computing classification loss
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
@@ -205,6 +205,11 @@ class iCaRL(nn.Module):
                         dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
 
                     else:
+                        #modifying outputs to match losses requireents
+                        out = F.softmax(out, dim=1) if self.dist_loss in ['mse', 'l1'] \
+                              F.log_softmax(out, dim = 1) if self.dist_loss == 'kl' \
+                              else out
+                                 
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
