@@ -279,18 +279,18 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(60):
+        for _ in range(128):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
-            j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
+            #j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
             #weight of combination
             w = 0.6
             #creating new sample
             new_sample1, new_target1 = w*exemplars[i1]+(1-w)*exemplars[i2], w*ex_labels[i1]+(1-w)*ex_labels[i2]
-            new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
+            #new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
        
-            new_samples.extend([new_sample1, new_sample2])
-            new_targets.extend([new_target1, new_target2])
+            new_samples.extend([new_sample1])
+            new_targets.extend([new_target1])
 
         #creating tensor from list of tensors
         new_samples = torch.stack(new_samples)
