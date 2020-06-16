@@ -283,9 +283,9 @@ class iCaRL(nn.Module):
                 if self.proportional_loss:
                     
                     if iter !=0:
-                        #mix up augmentation
-                        exemplars = imgs[(labels < self.n_known)]
-                        ex_labels = labels_hot[(labels < self.n_known)]
+                         #mix up augmentation
+                         exemplars = imgs[(labels < self.n_known)]
+                         ex_labels = labels_hot[(labels < self.n_known)]
                          mixed_up_points = []
                          mixed_up_targets = []
 
@@ -300,8 +300,9 @@ class iCaRL(nn.Module):
 
                              mixed_up_points.append(new_point)
                              mixed_up_targets.append(new_target)
-                        mixed_up_points = torch.stack(mixed_up_points)
-                        mixed_up_targets = torch.stack(mixed_up_targets)
+                                 
+                         mixed_up_points = torch.stack(mixed_up_points)
+                         mixed_up_targets = torch.stack(mixed_up_targets)
                     
                         
                 #zeroing the gradients
