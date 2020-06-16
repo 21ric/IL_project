@@ -485,13 +485,12 @@ class iCaRL(nn.Module):
                     X_train.extend(features)
                     y_train.extend([i]*len(features))
                 
-                print('len', np.array(X_train).shape, np.array(y_train).shape)
+                
                 #fitting the model
                 self.model.fit(X_train, y_train)
-                print('done')
                 self.train_model = False #avoid refitting the model
             
-            features, _ = self.get_features_and_mean(self, x, tensor_flag=True)
+            features, _ = self.get_features_and_mean(x, tensor_flag=True)
             X = features
 
             #getting predictions
