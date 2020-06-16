@@ -27,7 +27,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -123,7 +123,6 @@ class iCaRL(nn.Module):
             indexes = indexes.to(DEVICE)
             g = previous_net.forward(images)
             if self.loss_config == 'bce':
-                print('sig')
                 g = torch.sigmoid(g)
             else: 
                 g = F.softmax(g,dim=1)
