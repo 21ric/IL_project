@@ -178,10 +178,11 @@ class iCaRL(nn.Module):
                 out = self(imgs)            
                 
                 #computing classification loss
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                if not self.add_classes:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
-                if self.add_classes and self.n_known > 0:
+                elif self.add_classes and self.n_known > 0:
                     
                     #loss for samples and added samples
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
