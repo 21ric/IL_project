@@ -130,7 +130,7 @@ class iCaRL(nn.Module):
         self.add_classes(n)
         
         #obtaining previous outputs and previous network
-        q, previous_net = self.get_previous_outputs(self, loader)
+        q, previous_net = self.get_previous_outputs(loader)
         
         """
         previous_net = copy.deepcopy(self.features_extractor)
