@@ -79,7 +79,6 @@ class iCaRL(nn.Module):
         self.map_reverse = map_reverse
         
         self.exemplars_per_class = 0
-        self.pca = None
         self.train_model = True
         self.model = None
         self.add_samples = add_samples
@@ -90,7 +89,7 @@ class iCaRL(nn.Module):
         return x
     
     
-    """
+    
     #UPDATE REPRESENTATION
     #updating the feature extractor
     def update_representation(self, dataset, class_map, map_reverse, iter):
@@ -232,8 +231,8 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
         return
-    """
     
+    """
     #UPDATE
     #updating representation
     def update_representation(self, dataset, class_map, map_reverse, iter):
@@ -327,7 +326,8 @@ class iCaRL(nn.Module):
             i+=1
 
         return
-
+    """
+    
     #INCREMENT NUMBER OF CLASSES
     def add_classes(self, n):
         in_features = self.features_extractor.fc.in_features
