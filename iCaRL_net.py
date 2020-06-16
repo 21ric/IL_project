@@ -168,6 +168,10 @@ class iCaRL(nn.Module):
                 
                 #computing classification loss
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                
+                if self.add_samples:
+                      #reduction is sum, averaging
+                      loss = loss/(len(out)*10)
                     
                     
                 #DISTILLATION LOSS
@@ -206,8 +210,8 @@ class iCaRL(nn.Module):
 
                     else:
                         #modifying outputs to match losses requireents
-                        out = F.softmax(out, dim=1) if self.dist_loss in ['mse', 'l1'] \
-                              F.log_softmax(out, dim = 1) if self.dist_loss == 'kl' \
+                        out = F.softmax(out, dim=1) if self.dist_loss in ['mse', 'l1'] 
+                              F.log_softmax(out, dim = 1) if self.dist_loss == 'kl' 
                               else out
                                  
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
