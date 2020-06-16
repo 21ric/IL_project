@@ -178,11 +178,11 @@ class iCaRL(nn.Module):
                 out = self(imgs)            
                 
                 #computing classification loss
-                if not self.add_classes:
+                if not self.add_samples:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
-                elif self.add_classes and self.n_known > 0:
+                elif self.add_samples and self.n_known > 0:
                     
                     #loss for samples and added samples
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
@@ -196,7 +196,7 @@ class iCaRL(nn.Module):
                 if self.n_known > 0 :
                     
                     
-                    if self.add_classes:                      
+                    if self.samples:                      
                         with torch.no_grad():   
                             previous_net.to(DEVICE)
                             previous_net.train(False)
