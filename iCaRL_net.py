@@ -90,7 +90,7 @@ class iCaRL(nn.Module):
         return x
     
     
-    
+    """
     #UPDATE REPRESENTATION
     #updating the feature extractor
     def update_representation(self, dataset, class_map, map_reverse, iter):
@@ -232,7 +232,101 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
         return
+    """
     
+    #UPDATE
+    #updating representation
+    def update_representation(self, dataset, class_map, map_reverse, iter):
+
+        #computing number of new classes
+        targets = list(set(dataset.targets))
+        n = len(targets)
+
+        print('New classes:{}'.format(n))
+        print('-'*30)
+        
+        #adding exemplars to dataset
+        self.add_exemplars(dataset, map_reverse)
+
+        print('Dataset extended to {} elements'.format(len(dataset)))
+
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+
+        #incrementing number of classes
+        self.add_classes(n)
+
+        #storing outputs of previous network
+        self.features_extractor.to(DEVICE)
+        f_ex = copy.deepcopy(self.features_extractor)
+        f_ex.to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
+        for images, labels, indexes in loader:
+            f_ex.train(False)
+            images = Variable(images).to(DEVICE)
+            indexes = indexes.to(DEVICE)
+            g = f_ex.forward(images)
+            if self.loss_config == 'bce':
+                g = torch.sigmoid(g)
+            else: 
+                g = F.softmax(g,dim=1)
+            q[indexes] = g.data
+        q = Variable(q).to(DEVICE)
+        self.features_extractor.train(True)
+
+        #defining optimizer and resetting learning rate
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+
+        #training phase
+        i = 0
+        self.features_extractor.to(DEVICE)
+        for epoch in range(NUM_EPOCHS):
+            
+            #reducing learning 
+            if epoch in STEPDOWN_EPOCHS:
+              for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+
+
+            self.features_extractor.train(True)
+            for imgs, labels, indexes in loader:
+                imgs = imgs.to(DEVICE)
+                indexes = indexes.to(DEVICE)            
+                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                labels = Variable(seen_labels).to(DEVICE)
+                
+                #computing one hots of labels
+                labels_hot=torch.eye(self.n_classes)[labels]
+                labels_hot = labels_hot.to(DEVICE)
+
+                #zeroing the gradients
+                optimizer.zero_grad()
+                
+                #computing outputs
+                out = self(imgs)
+                
+                #computing clf loss
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+
+                #computing distillation loss
+                if self.n_known > 0:
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    q_i = q[indexes]
+                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                
+                #backward pass
+                loss.backward()
+                optimizer.step()
+
+
+            if i % 10 == 0 or i == (NUM_EPOCHS-1):
+                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                for param_group in optimizer.param_groups:
+                  print('Learning rate:{}'.format(param_group['lr']))
+                print('-'*30)
+            i+=1
+
+        return
 
     #INCREMENT NUMBER OF CLASSES
     def add_classes(self, n):
