@@ -178,8 +178,7 @@ class iCaRL(nn.Module):
                 out = self(imgs)            
                 
                 #computing classification loss
-                if not self.add_samples:
-                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
                 elif self.add_samples and self.n_known > 0:
