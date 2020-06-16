@@ -482,8 +482,8 @@ class iCaRL(nn.Module):
                 #computing features on exemplars to create X_train, y_train
                 for i, exemplars in enumerate(self.exemplar_sets):
                     features, _ = self.get_features_and_mean(exemplars)
-                    X_train.append(features)
-                    y_train.append([i]*len(features))
+                    X_train.extend(features)
+                    y_train.extend([i]*len(features))
                 
                 print('len', np.array(X_train).shape, np.array(y_train).shape)
                 #fitting the model
