@@ -6,19 +6,6 @@ from torchvision import transforms
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 
-import numpy as np
-
-from PIL import Image
-
-from resnet import resnet32
-import copy
-
-import random
-
-import utils
-
-import math
-
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 from sklearn.neural_network import MLPClassifier
@@ -26,7 +13,13 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-from imblearn.over_sampling import SMOTE
+import numpy as np
+from PIL import Image
+from resnet import resnet32
+import copy
+import random
+import utils
+import math
 
 ####Hyper-parameters####
 LR = 2
@@ -42,18 +35,6 @@ BETA = 0.8
 
 #transofrmation for exemplars
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
-
-
-#different combination of classification/distillation losses
-bce = nn.BCEWithLogitsLoss()
-l1 = nn.L1Loss()
-mse = nn.MSELoss()
-bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
-kl = nn.KLDivLoss(reduction='batchmean')
-ce = nn.CrossEntropyLoss()
-
-losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
-
 
 
 #define function to apply to network outputs
@@ -78,23 +59,23 @@ class iCaRL(nn.Module):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
-        self.n_classes = 0 #number of seen classes
-        self.n_known = 0 #number of known classes before new training
+        self.n_classes = 0 #number of classes at step t
+        self.n_known = 0 #number of classes at step t-1
         self.exemplar_sets = []
-        self.loss_config = loss_config
+        
         self.lr = lr
-
+        self.loss_config = loss_config
+        self.loss_
         self.clf_loss = losses[loss_config][0]
         self.dist_loss = losses[loss_config][1]
 
         self.exemplar_means = []
-        self.compute_means = True
-        self.new_means = []
+        self.compute_means = True 
+        self.new_means = [] #use mean of all data for new samples
+              
         self.class_map = class_map #needed to map real label to fake label
         self.map_reverse = map_reverse
         
-        self.class_balanced_loss = class_balanced_loss
-        self.proportional_loss = proportional_loss
         self.exemplars_per_class = 0
         self.pca = None
         self.train_model = True
@@ -105,6 +86,7 @@ class iCaRL(nn.Module):
     def forward(self, x):
         x = self.features_extractor(x)
         return x
+    
     
     
     #UPDATE REPRESENTATION
@@ -118,8 +100,6 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
             
-        
-        
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
 
@@ -127,7 +107,8 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
-        
+        #incrementing number of classes
+        self.add_classes(n)
         
         #storing previous network
         self.features_extractor.to(DEVICE)
@@ -150,8 +131,7 @@ class iCaRL(nn.Module):
         self.features_extractor.train(True)
         """
         
-        #incrementing number of classes
-        self.add_classes(n)
+        
 
         #defining optimizer and resetting learning rate
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
@@ -366,15 +346,15 @@ class iCaRL(nn.Module):
     def construct_exemplars(self, images, m, features, class_mean):
         
         self.features_extractor.train(False)
+        
         exemplar_set = []
         exemplar_features = []
+        
         for k in range(m):
             S = np.sum(exemplar_features, axis=0)
-            phi = features
-            mu = class_mean
-            mu_p = 1.0 / (k+1)*(phi+S)
-            mu_p = mu_p / np.linalg.norm(mu_p) #l2 norm
-            i = np.argmin(np.sqrt(np.sum((mu - mu_p) ** 2, axis =1)))
+            mu = 1.0 / (k+1)*(features+S)
+            mu = mu / np.linalg.norm(mu) #l2 norm
+            i = np.argmin(np.sqrt(np.sum((class_mean - mu) ** 2, axis =1)))
 
             exemplar_set.append(images[i])
             exemplar_features.append(features[i])
