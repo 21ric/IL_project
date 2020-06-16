@@ -113,7 +113,7 @@ class iCaRL(nn.Module):
         
         #storing previous network
         previous_net = copy.deepcopy(self.features_extractor)
-          
+        
         previous_net.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
@@ -191,11 +191,11 @@ class iCaRL(nn.Module):
                     
                     
                     if self.add_samples:                      
-                        with torch.no_grad():   
-                            previous_net.to(DEVICE)
-                            previous_net.train(False)
-                            #q_i = torch.sigmoid(previous_net(imgs))
-                            q_i_new = torch.sigmoid(previous_net(new_samples))
+                        #with torch.no_grad():   
+                        previous_net.to(DEVICE)
+                        previous_net.train(False)
+                        #q_i = torch.sigmoid(previous_net(imgs))
+                        q_i_new = torch.sigmoid(previous_net(new_samples))
                                              
                         q_i = q[indexes]
                         #q_i_ex = q_i[(labels < self.n_known)]
@@ -374,7 +374,7 @@ class iCaRL(nn.Module):
 
             #weights of linear combinatioins
             #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
-            w = 0.7
+            w = 0.6
 
             #creating new samples
             #exemplar + exemplar
