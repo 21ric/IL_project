@@ -65,7 +65,6 @@ class iCaRL(nn.Module):
         
         self.lr = lr
         self.loss_config = loss_config
-        self.loss_
         self.clf_loss = losses[loss_config][0]
         self.dist_loss = losses[loss_config][1]
 
