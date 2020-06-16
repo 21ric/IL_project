@@ -367,7 +367,7 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(30):
+        for _ in range(60):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
@@ -375,7 +375,7 @@ class iCaRL(nn.Module):
 
             #weights of linear combinatioins
             #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
-            w = 0.8
+            w = 0.5
 
             #creating new samples
             #exemplar + exemplar
