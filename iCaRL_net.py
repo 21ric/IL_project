@@ -209,37 +209,38 @@ class iCaRL(nn.Module):
                     loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)                   
                 
 
-                #computing distillation loss
+                #DISTILLATION LOSS
                 if self.n_known > 0 :
-                    if self.class_balanced_loss or self.proportional_loss:
-                        
+                    
+                    
+                    if self.add_classes:                      
                         with torch.no_grad():   
                             previous_net.to(DEVICE)
                             previous_net.train(False)
-
                             #q_i = torch.sigmoid(previous_net(imgs))
                             q_i_new = torch.sigmoid(previous_net(new_samples))
                                              
-                            q_i = q[indexes]
-                            #q_i_ex = q_i[(labels < self.n_known)]
-                            #q_i_sample = q_i[(labels >= self.n_known)]
-                            #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
-                            
-                            #dist_loss_ex =  coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
-                            #dist_loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
-                            
-                        #computing dist loss
-                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        q_i = q[indexes]
+                        #q_i_ex = q_i[(labels < self.n_known)]
+                        #q_i_sample = q_i[(labels >= self.n_known)]
+                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
 
-                        if self.add_classes:
-                            #computing sum of losses
-                            dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
-                            dist_loss_new = bce_sum(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
-                            #average
-                            dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
+                        #dist_loss_ex =  coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
+                        #dist_loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
+                            
+                        #computing sum of losses
+                        dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
+                        dist_loss_new = bce_sum(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
+                        
+                        #average
+                        dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
+                        
+
+                        else:
+                            #computing dist loss
+                            dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                
 
                 #backward pass()
                 loss.backward()
