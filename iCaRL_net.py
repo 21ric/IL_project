@@ -284,7 +284,7 @@ class iCaRL(nn.Module):
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
             #weight of combination
-            w = 0.6
+            w = 0.1
             #creating new sample
             new_sample1, new_target1 = w*exemplars[i1]+(1-w)*exemplars[i2], w*ex_labels[i1]+(1-w)*ex_labels[i2]
             #new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
