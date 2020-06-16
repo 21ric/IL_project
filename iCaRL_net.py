@@ -225,6 +225,7 @@ class iCaRL(nn.Module):
         return
     
     
+
     #INCREMENT NUMBER OF CLASSES
     def add_classes(self, n):
         in_features = self.features_extractor.fc.in_features
@@ -469,7 +470,8 @@ class iCaRL(nn.Module):
                 #print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
-                    measures.append((feat - mean).pow(2).sum().squeeze().item())
+                    measures.append(np.sqrt(np.sum((feat - mean) ** 2, axis =1)))
+                    #measures.append((feat - mean).pow(2).sum().squeeze().item())
 
                 #chosing closest mean label as prediction
                 preds.append(np.argmin(np.array(measures)))
