@@ -127,14 +127,13 @@ class iCaRL(nn.Module):
 
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
         
-        #incrementing number of classes
-        self.add_classes(n)
+        
         
         #storing previous network
         self.features_extractor.to(DEVICE)
         previous_net = copy.deepcopy(self.features_extractor)
         
-        
+        """
         previous_net.to(DEVICE)
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
@@ -149,9 +148,10 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
         self.features_extractor.train(True)
+        """
         
-        
-        
+        #incrementing number of classes
+        self.add_classes(n)
 
         #defining optimizer and resetting learning rate
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
@@ -217,10 +217,10 @@ class iCaRL(nn.Module):
                         with torch.no_grad():   
                             previous_net.to(DEVICE)
                             previous_net.train(False)
-                            #q_i = torch.sigmoid(previous_net(imgs))
+                            q_i = torch.sigmoid(previous_net(imgs))
                             q_i_new = torch.sigmoid(previous_net(new_samples))
                                              
-                        q_i = q[indexes]
+                        #q_i = q[indexes]
                         #q_i_ex = q_i[(labels < self.n_known)]
                         #q_i_sample = q_i[(labels >= self.n_known)]
                         #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
