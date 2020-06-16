@@ -176,6 +176,7 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
+                """
                 if self.add_samples and self.n_known > 0:
                     
                     #loss for samples and added samples
@@ -184,7 +185,7 @@ class iCaRL(nn.Module):
                     
                     #average loss
                     loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)                   
-                
+                """
 
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
@@ -370,7 +371,7 @@ class iCaRL(nn.Module):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
-            j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
+            #j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
 
             #weights of linear combinatioins
             #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
@@ -380,10 +381,10 @@ class iCaRL(nn.Module):
             #exemplar + exemplar
             new_sample1, new_target1 = w*exemplars[i1]+(1-w)*exemplars[i2], w*ex_labels[i1]+(1-w)*ex_labels[i2]
             #exemplar + samples
-            new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
+            #new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
        
-            new_samples.extend([new_sample1, new_sample2])
-            new_targets.extend([new_target1, new_target2])
+            new_samples.extend([new_sample1])
+            new_targets.extend([new_target1])
 
         #creating tensor from list of tensors
         new_samples = torch.stack(new_samples)
