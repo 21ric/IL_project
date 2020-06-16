@@ -181,7 +181,7 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
-                elif self.add_samples and self.n_known > 0:
+                if self.add_samples and self.n_known > 0:
                     
                     #loss for samples and added samples
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
