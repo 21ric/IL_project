@@ -162,16 +162,6 @@ class iCaRL(nn.Module):
                 #zeroing the gradients
                 optimizer.zero_grad()
                 
-                #creating new samples by linear combination if True
-                if self.add_samples:
-                   
-                   #skipping first iteration
-                   if self.n_known > 0:
-                        #creating new samples
-                        new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
-                        
-                        #computing outputs        
-                        new_out = self(new_samples)
                                                           
                 #computing outputs of training data
                 out = self(imgs)            
@@ -185,7 +175,15 @@ class iCaRL(nn.Module):
                     
                     q_i = q[indexes]
 
+                    #creating new samples by linear combination of exemplars
                     if self.add_samples:
+                      
+                        #creating new samples
+                        new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
+                        
+                        #computing outputs        
+                        new_out = self(new_samples)
+                                 
                         #classification loss with added samples
                         clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
                         clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
@@ -456,11 +454,6 @@ class iCaRL(nn.Module):
             preds = []
             
             #computing features of images to be classified
-            """
-            x = x.to(DEVICE)
-            self.features_extractor.train(False)
-            feature = self.features_extractor.extract_features(x)
-            """ 
             features, _ = self.get_features_and_mean(x, tensor_flag=True)
                     
             for feat in features:
@@ -470,8 +463,7 @@ class iCaRL(nn.Module):
                 #print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
-                    measures.append(np.sqrt(np.sum((feat - mean) ** 2, axis =1)))
-                    #measures.append((feat - mean).pow(2).sum().squeeze().item())
+                    measures.append(np.sqrt(np.sum((feat - mean) ** 2)))
 
                 #chosing closest mean label as prediction
                 preds.append(np.argmin(np.array(measures)))
