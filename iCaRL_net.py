@@ -85,6 +85,7 @@ class iCaRL(nn.Module):
         self.train_model = True
         self.model = models[classifier]
         
+        self.class_balanced_loss =False
         #choose if create new samples
         self.add_samples = add_samples
 
@@ -280,7 +281,7 @@ class iCaRL(nn.Module):
                 #computing one hots of labels
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
-                if self.proportional_loss:
+                if self.add_samples:
                     
                     if iter !=0:
                          #mix up augmentation
@@ -310,11 +311,11 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
                 
-                if self.proportional_loss and iter !=0:              
+                if self.add_samples and iter !=0:              
                     mixed_out = self(mixed_up_points)
                 
                 #computing classification loss
-                if self.class_balanced_loss or self.proportional_loss:
+                if self.class_balanced_loss or self.add_samples:
                                                             
                     
                     ex_out = out[(labels < self.n_known)] #masking: taking only outputs of images of new classes
@@ -363,7 +364,7 @@ class iCaRL(nn.Module):
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 #computing distillation loss
                 if self.n_known > 0 :
-                    if self.class_balanced_loss or self.proportional_loss:
+                    if self.class_balanced_loss or self.add_samples:
                         
                         f_ex.to(DEVICE)
                         f_ex.train(False)
