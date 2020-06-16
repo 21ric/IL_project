@@ -43,7 +43,7 @@ losses = { 'bce': nn.BCEWithLogitsLoss(),
 #possible classifier
 models = {'svc': LinearSVC(),
           'knn': KNeighborsClassifier(n_neighbors=3),
-          'svc-rbf': SVC()}
+          'svc-rbf': SVC(),
           'nme': None }
     
 
