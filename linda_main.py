@@ -64,8 +64,8 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
         print('-'*30)
         
         # Undersample new classes (if not first iteration)
-        if i != 0:
-            net.undersample_data(dataset_new=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
+        #if i != 0:
+        #    net.undersample_data(dataset_new=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
         
         
         print('Updating representation ...')
@@ -82,7 +82,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
             print('-'*30)
             net.reduce_exemplars_set(m)
 
-        print('len prev ex', len(net.exemplar_sets))
+        #print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
         print('-'*30)
 
@@ -119,8 +119,8 @@ def incremental_learning(dict_num, loss_config, classifier, lr):
 
             print('-'*30)
 
-        print('lunghezza medie', len(net.exemplar_means))
-        print('lunghezza nuove medie', len(net.new_means))
+        #print('lunghezza medie', len(net.exemplar_means))
+        #print('lunghezza nuove medie', len(net.new_means))
         
         # Now the dataset knows 10 more classes
         net.n_known = net.n_classes
