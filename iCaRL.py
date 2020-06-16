@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_flag=False,  add_samples=False, pca=False):
+def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_flag=False,  add_samples=False, undersample=False):
 
     utils.set_seed(0)
 
@@ -59,11 +59,12 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
 
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
-        """
+        
+        #doing undersample on training data to match exemplars cardinality
         if undersample and i != 0:            
             train_dataset.resample(resize_factor = (net.n_known*m)/5000)
             print('Resamplig to size', len(train_dataset)) 
-        """
+        
 
         print('-'*30)
         print(f'Known classes: {net.n_known}')
