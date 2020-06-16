@@ -185,8 +185,8 @@ class iCaRL(nn.Module):
                         new_out = self(new_samples)
                                  
                         #classification loss with added samples
-                        clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                        clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
+                        clf_loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                        clf_loss_new = self.clf_loss(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
                         #average loss
                         loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)  
                         
@@ -198,8 +198,8 @@ class iCaRL(nn.Module):
                         q_i_new = torch.sigmoid(previous_net(new_samples))                    
 
                         #computing sum of losses
-                        dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
-                        dist_loss_new = bce_sum(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        dist_loss_new = self.dist_loss(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
                         
                         #average
                         dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
