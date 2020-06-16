@@ -36,6 +36,9 @@ BETA = 0.8
 #transofrmation for exemplars
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
+bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
+bce = nn.BCEWithLogitsLoss()
+losses ={'bce': [bce,bce]}
 
 #define function to apply to network outputs
 def modify_output_for_loss(loss_name, output):        
