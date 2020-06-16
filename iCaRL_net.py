@@ -407,11 +407,12 @@ class iCaRL(nn.Module):
             
             if not tensor:
                 x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                
             else:
                 x = img
-                feature = self.features_extractor.extract_features(x).data.cpu().numpy()
-                                 
+                #feature = self.features_extractor.extract_features(x).data.cpu().numpy()
+            
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature) #l2 norm
             features.append(feature[0])
 
@@ -484,7 +485,7 @@ class iCaRL(nn.Module):
                     X_train.append(features)
                     y_train.append([i]*len(features))
                 
-                print('len', len(X_train), len(y_train))
+                print('len', np.array(X_train).shape, np.array(y_train).shape)
                 #fitting the model
                 self.model.fit(X_train, y_train)
                 print('done')
