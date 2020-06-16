@@ -123,6 +123,7 @@ class iCaRL(nn.Module):
             indexes = indexes.to(DEVICE)
             g = previous_net.forward(images)
             if self.loss_config == 'bce':
+                print('sig')
                 g = torch.sigmoid(g)
             else: 
                 g = F.softmax(g,dim=1)
