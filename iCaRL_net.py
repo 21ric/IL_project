@@ -462,7 +462,7 @@ class iCaRL(nn.Module):
             """ 
             features, _ = self.get_features_and_mean(x, tensor_flag=True)
                     
-            for feat in feature:
+            for feat in features:
                 measures = []
                 #feat = feat / torch.norm(feat, p=2) #l2 norm
 
