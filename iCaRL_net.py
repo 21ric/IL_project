@@ -460,7 +460,7 @@ class iCaRL(nn.Module):
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
             """ 
-            features, _ = self.get_feeatures_and_mean(x, tensor_flag=True)
+            features, _ = self.get_features_and_mean(x, tensor_flag=True)
                     
             for feat in feature:
                 measures = []
