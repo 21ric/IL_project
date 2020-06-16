@@ -176,17 +176,16 @@ class iCaRL(nn.Module):
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
                 #computing classification loss  with added samples, skipping first iteration 
-                """
+                
                 if self.add_samples and self.n_known > 0:
                     
                     #loss for samples and added samples
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                    clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])
-                    
+                    clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
                     #average loss
                     loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)                   
-                """
 
+                    
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
                     
@@ -367,7 +366,7 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(60):
+        for _ in range(len(samples)-len(exemplars)):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
@@ -375,7 +374,7 @@ class iCaRL(nn.Module):
 
             #weights of linear combinatioins
             #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
-            w = 0.5
+            w = 0.7
 
             #creating new samples
             #exemplar + exemplar
