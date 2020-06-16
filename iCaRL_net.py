@@ -399,13 +399,13 @@ class iCaRL(nn.Module):
     
     #GET FEATURES AND MEAN OF IMAGES
     @torch.no_grad()
-    def get_features_and_mean(self, images, tensor=False):
+    def get_features_and_mean(self, images, tensor_flag=False):
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
         for img in images:
             
-            if not tensor:
+            if not tensor_flag:
                 x = Variable(transform(Image.fromarray(img))).to(DEVICE)
                 
             else:
@@ -491,7 +491,7 @@ class iCaRL(nn.Module):
                 print('done')
                 self.train_model = False #avoid refitting the model
             
-            features, _ = self.get_features_and_mean(self, x, tensor=True)
+            features, _ = self.get_features_and_mean(self, x, tensor_flag=True)
             X = features
 
             #getting predictions
