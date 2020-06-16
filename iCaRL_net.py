@@ -105,7 +105,7 @@ class iCaRL(nn.Module):
         print('-'*30)
             
         #adding exemplars to dataset
-        self.add_exemplars(dataset, map_reverse)
+        self.add_exemplars(dataset)
 
         print('Datset extended to {} elements'.format(len(dataset)))
 
