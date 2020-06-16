@@ -17,6 +17,8 @@ import random
 import utils
 import math
 
+import time
+
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -168,10 +170,14 @@ class iCaRL(nn.Module):
                     if self.add_samples:
                       
                         #creating new samples
+                        start = time.time()
+                        print('new_samples')
                         new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
-                        
-                        #computing outputs        
+                        print('get new samples time', time.time() - start)
+                        #computing outputs  
+                        start = time.time()
                         new_out = self(new_samples)
+                        print('forwarding new samples time', time.time() - start)
                                  
                         #classification loss with added samples
                         clf_loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
@@ -179,12 +185,14 @@ class iCaRL(nn.Module):
                         #average loss
                         loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)  
                         
-                        
+                        start = time.time()
                         #with torch.no_grad():   
                         previous_net.to(DEVICE)
                         previous_net.train(False)
                         #q_i = torch.sigmoid(previous_net(imgs))
-                        q_i_new = torch.sigmoid(previous_net(new_samples))                    
+                        new_samples.to(DEVICE)
+                        q_i_new = torch.sigmoid(previous_net(new_samples)) 
+                        print('qi new time', time.time() - start)
 
                         #computing sum of losses
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
