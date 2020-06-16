@@ -25,7 +25,7 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num, loss_config, classifier, lr, random_flag=False,  add_samples=False, pca=False):
+def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_flag=False,  add_samples=False, pca=False):
 
     utils.set_seed(0)
 
@@ -35,7 +35,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, random_flag=Fals
                                                                              path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, map_reverse=map_reverse, loss_config=loss_config,lr=lr, add_samples=add_samples)
+    net = iCaRL(0, class_map, map_reverse=map_reverse, clf_loss=clf_loss, dist_loss=dist_loss, lr=lr, add_samples=add_samples)
 
     new_acc_list = []
     old_acc_list = []
