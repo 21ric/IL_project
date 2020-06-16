@@ -35,7 +35,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
                                                                              path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, map_reverse=map_reverse, clf_loss=clf_loss, dist_loss=dist_loss, lr=lr, add_samples=add_samples)
+    net = iCaRL(0, class_map, map_reverse=map_reverse, clf_loss=clf_loss, dist_loss=dist_loss, classifier=classifier, lr=lr, add_samples=add_samples)
 
     new_acc_list = []
     old_acc_list = []
