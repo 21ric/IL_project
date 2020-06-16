@@ -491,7 +491,7 @@ class iCaRL(nn.Module):
     
     
     #CLASSIFY ALL BATCHES OF A DATASET
-    def classify_all(self, test_dataset, classifier, pca, train_dataset=None):
+    def classify_all(self, test_dataset, classifier, train_dataset=None):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
