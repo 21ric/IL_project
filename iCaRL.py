@@ -35,7 +35,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
                                                                              path+'revmap'+ dict_num +'.pickle')
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, map_reverse=map_reverse, clf_loss=clf_loss, dist_loss=dist_loss, classifier=classifier, lr=lr, add_samples=add_samples)
+    net = iCaRL(0, class_map=class_map, map_reverse=map_reverse, clf_loss=clf_loss, dist_loss=dist_loss, classifier=classifier, lr=lr, add_samples=add_samples)
 
     new_acc_list = []
     old_acc_list = []
@@ -71,7 +71,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
         print('Updating representation ...')
         print('-'*30)
 
-        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
+        net.update_representation(dataset=train_dataset, iter=i)
         
         m = MEMORY_SIZE // (net.n_classes)
         net.exemplars_per_class = m
@@ -95,7 +95,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
         print('-'*30)
 
         print('New classes')
-        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier, pca=pca, train_dataset=train_dataset)
+        new_acc = net.classify_all(test_dataset, classifier=classifier, pca=pca, train_dataset=train_dataset)
 
         new_acc_list.append(new_acc)
         if i == 0:
@@ -110,7 +110,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            old_acc = net.classify_all(prev_classes_dataset, map_reverse, classifier=classifier, pca=pca)
+            old_acc = net.classify_all(prev_classes_dataset, classifier=classifier, pca=pca)
             print('All classes')
             #all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
             all_acc = (new_acc + i*old_acc)/(i+1)
