@@ -47,21 +47,6 @@ models = {'svc': LinearSVC(),
           'nme': None }
     
 
-#define function to apply to network outputs
-def modify_output_for_loss(loss_name, output):        
-    #BCEWithLogits doesn't need to apply sigmoid func
-    if loss_name == "bce":
-        return output
-
-    # L1 loss and MSE loss need input to be softmax
-    if loss_name in ["mse", "l1"]:
-        return F.softmax(output, dim=1)
-
-    # KL loss needs input to be log-softmax
-    if loss_name == "kl":
-        return F.log_softmax(output, dim=1)
-
-
     
 #ICARL MODEL
 class iCaRL(nn.Module):
@@ -110,7 +95,7 @@ class iCaRL(nn.Module):
     
     #UPDATE REPRESENTATION
     #updating the feature extractor
-    def update_representation(self, dataset, class_map, map_reverse, iter):
+    def update_representation(self, dataset, iter):
 
         #computing number of new classes
         targets = list(set(dataset.targets))
@@ -152,7 +137,7 @@ class iCaRL(nn.Module):
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
                 #indexes = indexes.to(DEVICE)            
-                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                seen_labels = torch.LongTensor([self.class_map[label] for label in labels.numpy()])
                 labels = Variable(seen_labels).to(DEVICE)
                 
                 #computing one hots of labels
@@ -252,9 +237,9 @@ class iCaRL(nn.Module):
         
 
     #ADD EXEMPLARS TO DATASET
-    def add_exemplars(self, dataset, map_reverse):
+    def add_exemplars(self, dataset):
         for y, exemplars in enumerate(self.exemplar_sets):
-            dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
+            dataset.append(exemplars, [self.map_reverse[y]]*len(exemplars))
             
             
     
@@ -506,7 +491,7 @@ class iCaRL(nn.Module):
     
     
     #CLASSIFY ALL BATCHES OF A DATASET
-    def classify_all(self, test_dataset, map_reverse, classifier, pca, train_dataset=None):
+    def classify_all(self, test_dataset, classifier, pca, train_dataset=None):
 
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
 
@@ -517,7 +502,7 @@ class iCaRL(nn.Module):
             preds = self.classify(imgs, classifier, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
-            preds = [map_reverse[pred] for pred in preds]
+            preds = [self.map_reverse[pred] for pred in preds]
             
             #computing accuracy
             running_corrects += (preds == labels.numpy()).sum()
