@@ -48,7 +48,7 @@ models = {'svc': LinearSVC(),
           'svc-rbf': SVC(),
           'nme': None } 
     
-
+bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
     
 #ICARL MODEL
 class iCaRL(nn.Module):
