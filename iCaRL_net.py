@@ -97,6 +97,7 @@ class iCaRL(nn.Module):
     
     #UPDATE REPRESENTATION
     #updating the feature extractor
+    """
     def update_representation(self, dataset, iter):
 
         #computing number of new classes
@@ -146,6 +147,10 @@ class iCaRL(nn.Module):
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
                 
+                #creating new samples
+                if self.add_samples and self.n_known > 0:
+                      new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
+                
                 #zeroing the gradients
                 optimizer.zero_grad()
                 
@@ -168,11 +173,7 @@ class iCaRL(nn.Module):
 
                     #creating new samples by linear combination of exemplars
                     if self.add_samples:
-                      
-                        #creating new samples
-                        
-                        print('new_samples')
-                        new_samples, new_targets = self.mixed_up_samples(imgs, labels_hot, labels)
+                     
                         
                         #computing outputs  
                         start = time.time()
@@ -225,7 +226,199 @@ class iCaRL(nn.Module):
                 print('-'*30)
             i+=1
         return
-    
+    """
+    def update_representation(self, dataset, iter):
+        #computing number of new classes
+        targets = list(set(dataset.targets))
+        n = len(targets)
+        print('New classes:{}'.format(n))
+        print('-'*30)
+            
+        
+        
+        #adding exemplars to dataset
+        self.add_exemplars(dataset)
+        print('Datset extended to {} elements'.format(len(dataset)))
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        #incrementing number of classes
+        self.add_classes(n)
+        #storing outputs of previous network
+        self.features_extractor.to(DEVICE)
+        f_ex = copy.deepcopy(self.features_extractor)
+        f_ex.to(DEVICE)
+        q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
+        for images, labels, indexes in loader:
+            f_ex.train(False)
+            images = Variable(images).to(DEVICE)
+            indexes = indexes.to(DEVICE)
+            g = f_ex.forward(images)
+            if self.loss_config == 'bce':
+                g = torch.sigmoid(g)
+            else: 
+                g = F.softmax(g,dim=1)
+            q[indexes] = g.data
+        q = Variable(q).to(DEVICE)
+        self.features_extractor.train(True)
+        #defining optimizer and resetting learning rate
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        #training phase
+        i = 0
+        self.features_extractor.to(DEVICE)
+        for epoch in range(NUM_EPOCHS):
+            
+            #reducing learning 
+            if epoch in STEPDOWN_EPOCHS:
+              for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+            self.features_extractor.train(True)
+            for imgs, labels, indexes in loader:
+                imgs = imgs.to(DEVICE)
+                indexes = indexes.to(DEVICE)            
+                seen_labels = torch.LongTensor([self.class_map[label] for label in labels.numpy()])
+                labels = Variable(seen_labels).to(DEVICE)
+                
+                #computing one hots of labels
+                labels_hot=torch.eye(self.n_classes)[labels]
+                labels_hot = labels_hot.to(DEVICE)
+                if self.proportional_loss:
+                    
+                    if iter !=0:
+                        #mix up augmentation
+                        exemplars = imgs[(labels < self.n_known)]
+                        ex_labels = labels_hot[(labels < self.n_known)]
+                         mixed_up_points = []
+                         mixed_up_targets = []
+
+                         for i in range(128 - len(exemplars)):
+                         for j in range(128 - len(exemplars)):
+                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+                             new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
+                             new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
+                             w = np.random.uniform(0.1,0.9)
+                             new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
+                             new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
+
+                             mixed_up_points.append(new_point)
+                             mixed_up_targets.append(new_target)
+                        mixed_up_points = torch.stack(mixed_up_points)
+                        mixed_up_targets = torch.stack(mixed_up_targets)
+                    
+                        
+                #zeroing the gradients
+                optimizer.zero_grad()
+                
+                #computing outputs
+                out = self(imgs)
+                
+                if self.proportional_loss and iter !=0:              
+                    mixed_out = self(mixed_up_points)
+                
+                #computing classification loss
+                if self.class_balanced_loss or self.proportional_loss:
+                                                            
+                    
+                    ex_out = out[(labels < self.n_known)] #masking: taking only outputs of images of new classes
+                    sample_out = out[(labels >= self.n_known)] #masking: taking only outputs of images of old classes
+                    
+                    labels_ex = labels_hot[(labels < self.n_known)] #masking: taking only true labels of images of new classes
+                    labels_sample = labels_hot[(labels >= self.n_known)] #masking: taking only true labels of images of old classes
+                    
+                    
+                    
+                    
+                    if self.class_balanced_loss:
+                        #taking coefficients for new images (coeff_new), exemplars (coeff_old)
+                        coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
+                        #coeff_new, coeff_old = 1, 1
+                        
+                    else:
+                        #coeff_new , coeff_old = 1, (500/self.exemplars_per_class) * (iter/(iter+1)) if self.exemplars_per_class else 1
+                        coeff_new , coeff_old = 1, 1
+                        
+                    clf_loss_ex =  bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
+                    clf_loss_sample =  bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:]) #calculating clf loss on new images
+                    if iter !=0:
+                        clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                    
+                    #loss_ex = coeff_old * bce_sum(ex_out, labels_ex)
+                    #loss_sample = coeff_new * bce_sum(sample_out, labels_sample)
+                    
+                    #print('loss ex', loss_ex)
+                    #print('loss sample', loss_sample)
+                    
+                    
+                    
+                    if self.class_balanced_loss:
+                        #loss = loss_sample/(len(sample)*10)
+                        loss = (clf_loss_ex + clf_loss_sample)/(len(out)*10)
+                        
+                    else:
+                        if iter != 0:
+                            loss = (clf_loss_ex + clf_loss_sample + clf_loss_mixedup)/((len(ex_out)+len(sample_out)+len(mixed_out))*10)
+                        else:
+                            loss = (clf_loss_ex + clf_loss_sample )/((len(ex_out)+len(sample_out))*10)
+                        #loss = loss_sample/(len(sample_out)*10)
+                        
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                #computing distillation loss
+                if self.n_known > 0 :
+                    if self.class_balanced_loss or self.proportional_loss:
+                        
+                        f_ex.to(DEVICE)
+                        f_ex.train(False)
+                        
+                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
+                        
+                        q_i = q[indexes]
+                        
+                        
+                        q_i_ex = q_i[(labels < self.n_known)]
+                        q_i_sample = q_i[(labels >= self.n_known)]
+                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
+                        
+                        
+                        dist_loss_ex =  coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
+                        dist_loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
+                        
+                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
+                        
+                        if self.class_balanced_loss:
+                            dist_loss = (dist_loss_ex + dist_loss_sample)/(len(out)*(self.n_known))
+                            #dist_loss = loss_ex/(len(ex_out)*(self.n_known))
+                            
+                        else:
+                            #dist_loss = loss_ex/(len(ex_out)*(self.n_known))
+                            dist_loss = (dist_loss_ex + dist_loss_sample + dist_loss_mixed)/((len(ex_out)*coeff_old+len(sample_out)+len(mixed_out))*self.n_known)
+                        
+                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        
+                        #loss = loss + 2*dist_loss
+                        
+                        
+                    else:
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                
+                #backward pass()
+                loss.backward()
+                optimizer.step()
+                      
+            if i % 10 == 0 or i == (NUM_EPOCHS-1):
+                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                for param_group in optimizer.param_groups:
+                  print('Learning rate:{}'.format(param_group['lr']))
+                  
+                  if iter!= 0:
+                    print('dist loss', dist_contr)
+                    print('clf loss', clf_contr)
+                print('-'*30)
+            i+=1
+        return
     
 
     #INCREMENT NUMBER OF CLASSES
