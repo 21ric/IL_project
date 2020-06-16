@@ -455,18 +455,21 @@ class iCaRL(nn.Module):
             preds = []
             
             #computing features of images to be classified
-            
+            """
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
+            """ 
+            features, _ = self.get_feeatures_and_mean(x, tensor_flag=True)
+                    
             for feat in feature:
                 measures = []
-                feat = feat / torch.norm(feat, p=2) #l2 norm
+                #feat = feat / torch.norm(feat, p=2) #l2 norm
 
                 #print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
-                    measures.append((feat.cpu() - mean).pow(2).sum().squeeze().item())
+                    measures.append((feat - mean).pow(2).sum().squeeze().item())
 
                 #chosing closest mean label as prediction
                 preds.append(np.argmin(np.array(measures)))
@@ -484,8 +487,7 @@ class iCaRL(nn.Module):
                     features, _ = self.get_features_and_mean(exemplars)
                     X_train.extend(features)
                     y_train.extend([i]*len(features))
-                
-                
+                  
                 #fitting the model
                 self.model.fit(X_train, y_train)
                 self.train_model = False #avoid refitting the model
