@@ -407,10 +407,11 @@ class iCaRL(nn.Module):
             
             if not tensor:
                 x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+                feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             else:
                 x = img
-                
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+                feature = self.features_extractor.extract_features(x).data.cpu().numpy()
+                                 
             feature = feature / np.linalg.norm(feature) #l2 norm
             features.append(feature[0])
 
