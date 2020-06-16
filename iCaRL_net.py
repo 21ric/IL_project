@@ -210,7 +210,8 @@ class iCaRL(nn.Module):
                                  
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    loss = (loss + iter * dist_loss)/(iter + 1)
 
                 #backward pass()
                 loss.backward()
