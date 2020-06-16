@@ -96,7 +96,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
         print('-'*30)
 
         print('New classes')
-        new_acc = net.classify_all(test_dataset, classifier=classifier, pca=pca, train_dataset=train_dataset)
+        new_acc = net.classify_all(test_dataset, classifier=classifier, train_dataset=train_dataset)
 
         new_acc_list.append(new_acc)
         if i == 0:
@@ -111,7 +111,7 @@ def incremental_learning(dict_num, clf_loss, dist_loss, classifier, lr, random_f
             prev_classes_dataset, all_classes_dataset = utils.get_additional_datasets(previous_classes, np.concatenate((previous_classes, classes_groups[i])))
 
             print('Old classes')
-            old_acc = net.classify_all(prev_classes_dataset, classifier=classifier, pca=pca)
+            old_acc = net.classify_all(prev_classes_dataset, classifier=classifier)
             print('All classes')
             #all_acc = net.classify_all(all_classes_dataset, map_reverse, classifier=classifier, pca=pca)
             all_acc = (new_acc + i*old_acc)/(i+1)
