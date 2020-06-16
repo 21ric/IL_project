@@ -196,7 +196,7 @@ class iCaRL(nn.Module):
                 if self.n_known > 0 :
                     
                     
-                    if self.samples:                      
+                    if self.add_samples:                      
                         with torch.no_grad():   
                             previous_net.to(DEVICE)
                             previous_net.train(False)
