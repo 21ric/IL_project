@@ -555,10 +555,7 @@ class iCaRL(nn.Module):
             for feat in feature:
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
-                if pca:
-                    feat = torch.from_numpy(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
-               
-                    
+
                 #print('computing distance')
                 #computing l2 distance with all class means
                 for mean in exemplar_means:
