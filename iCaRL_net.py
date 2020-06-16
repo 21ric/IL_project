@@ -8,10 +8,6 @@ from torch.utils.data import DataLoader
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
-from sklearn.neural_network import MLPClassifier
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 
 import numpy as np
 from PIL import Image
@@ -27,7 +23,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -36,9 +32,20 @@ BETA = 0.8
 #transofrmation for exemplars
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
-bce = nn.BCEWithLogitsLoss()
-losses ={'bce': [bce,bce]}
+#possible losses
+losses = { 'bce': nn.BCEWithLogitsLoss(),
+           'l1': nn.L1Loss(),
+           'mse': nn.MSELoss(),
+           'kl': nn.KLDivLoss(reduction='batchmean'),
+           'bce_sum': nn.BCEWithLogitsLoss(reduction='sum')}
+
+
+#possible classifier
+models = {'svc': LinearSVC(),
+          'knn': KNeighborsClassifier(n_neighbors=3),
+          'svc-rbf': SVC()}
+          'nme': None }
+    
 
 #define function to apply to network outputs
 def modify_output_for_loss(loss_name, output):        
@@ -58,7 +65,7 @@ def modify_output_for_loss(loss_name, output):
     
 #ICARL MODEL
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, class_balanced_loss=False, proportional_loss=False, add_samples=False):
+    def __init__(self, n_classes, class_map, map_reverse, clf_loss, dist_loss, classifier, lr, add_samples=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
 
@@ -67,20 +74,31 @@ class iCaRL(nn.Module):
         self.exemplar_sets = []
         
         self.lr = lr
-        self.loss_config = loss_config
-        self.clf_loss = losses[loss_config][0]
-        self.dist_loss = losses[loss_config][1]
+        self.loss_config = [clf_loss, dist_loss]
+        
+        if not add_samples:
+            self.clf_loss = losses[clf_loss]
+            self.dist_loss = losses[dist_loss]
+        
+        #reduction sum is needed when adding new samples
+        else:
+            self.clf_loss = losses['bce_sum']
+            self.dist_loss = losses['bce_sum']
 
+        #exemplars
         self.exemplar_means = []
         self.compute_means = True 
         self.new_means = [] #use mean of all data for new samples
+        self.exemplars_per_class = 0
               
         self.class_map = class_map #needed to map real label to fake label
         self.map_reverse = map_reverse
         
-        self.exemplars_per_class = 0
+        #use a different classifier
         self.train_model = True
-        self.model = None
+        self.model = models[classifier]
+        
+        #choose if create new samples
         self.add_samples = add_samples
 
         
@@ -111,7 +129,10 @@ class iCaRL(nn.Module):
         #incrementing number of classes
         self.add_classes(n)
         
-        #storing previous network
+        #obtaining previous outputs and previous network
+        q, previous_net = get_previous_outputs(self, loader)
+        
+        """
         previous_net = copy.deepcopy(self.features_extractor)
         
         previous_net.to(DEVICE)
@@ -127,7 +148,7 @@ class iCaRL(nn.Module):
                 g = F.softmax(g,dim=1)
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
-        
+        """
         
         self.features_extractor.train(True)
         #defining optimizer and resetting learning rate
@@ -175,36 +196,26 @@ class iCaRL(nn.Module):
                 #computing classification loss
                 loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
-                #computing classification loss  with added samples, skipping first iteration 
-                
-                if self.add_samples and self.n_known > 0:
-                    
-                    #loss for samples and added samples
-                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                    clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
-                    #average loss
-                    loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)                   
-
                     
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
                     
-                    
-                    if self.add_samples:                      
+                    q_i = q[indexes]
+
+                    if self.add_samples:
+                        #classification loss with added samples
+                        clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                        clf_loss_new = bce_sum(new_out[:, self.n_known:], new_targets[:, self.n_known:])                  
+                        #average loss
+                        loss = (clf_loss + clf_loss_new)/((len(out)+len(new_out))*10)  
+                        
+                        
                         #with torch.no_grad():   
                         previous_net.to(DEVICE)
                         previous_net.train(False)
                         #q_i = torch.sigmoid(previous_net(imgs))
-                        q_i_new = torch.sigmoid(previous_net(new_samples))
-                                             
-                        q_i = q[indexes]
-                        #q_i_ex = q_i[(labels < self.n_known)]
-                        #q_i_sample = q_i[(labels >= self.n_known)]
-                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
+                        q_i_new = torch.sigmoid(previous_net(new_samples))                    
 
-                        #dist_loss_ex =  coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
-                        #dist_loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
-                            
                         #computing sum of losses
                         dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
                         dist_loss_new = bce_sum(new_out[:, :self.n_known], q_i_new[:, :self.n_known])
@@ -213,8 +224,6 @@ class iCaRL(nn.Module):
                         dist_loss = (dist_loss+ dist_loss_new)/((len(out)+len(new_out))*self.n_known)
 
                     else:
-                        q_i = q[indexes]
-                        #computing dist loss
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
 
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
@@ -351,8 +360,31 @@ class iCaRL(nn.Module):
         for y, exemplars in enumerate(self.exemplar_sets):
             dataset.append(exemplars, [map_reverse[y]]*len(exemplars))
             
-
+            
+    
+    #GET PREVIOUS OUTPUTS
+    #get output of previous step network, and previous network
+    @torch.no_grad()
+    def get_previous_outputs(self, loader):
         
+        previous_net = copy.deepcopy(self.features_extractor)
+        previous_net.to(DEVICE)
+        q = torch.zeros(len(loader.dataset), self.n_classes).to(DEVICE)
+        for images, labels, indexes in loader:
+            previous_net.train(False)
+            images = Variable(images).to(DEVICE)
+            indexes = indexes.to(DEVICE)
+            g = previous_net.forward(images)
+            if self.loss_config == 'bce':
+                g = torch.sigmoid(g)
+            else: 
+                g = F.softmax(g,dim=1)
+            q[indexes] = g.data
+        q = Variable(q).to(DEVICE)
+        
+        return q, previous_net
+            
+  
         
     #MIXED UP SAMPLES
     #creating samples by combining samples
@@ -369,18 +401,10 @@ class iCaRL(nn.Module):
         for _ in range(len(samples)-len(exemplars)):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
-            #indexes 1 exemplars 1 training sample
-            #j1, j2 = np.random.randint(0, len(samples)), np.random.randint(0, len(exemplars))
-
-            #weights of linear combinatioins
-            #w1, w2 = np.random.uniform(0.1,0.9), np.random.uniform(0.1,0.9)
+            #weight of combination
             w = 0.6
-
-            #creating new samples
-            #exemplar + exemplar
+            #creating new sample
             new_sample1, new_target1 = w*exemplars[i1]+(1-w)*exemplars[i2], w*ex_labels[i1]+(1-w)*ex_labels[i2]
-            #exemplar + samples
-            #new_sample2, new_target2 = w*samples[j1]+(1-w)*exemplars[j2], w*samples_labels[j1]+(1-w)*ex_labels[j2]
        
             new_samples.extend([new_sample1])
             new_targets.extend([new_target1])
@@ -487,12 +511,17 @@ class iCaRL(nn.Module):
     
     #GET FEATURES AND MEAN OF IMAGES
     @torch.no_grad()
-    def get_features_and_mean(self, images):
+    def get_features_and_mean(self, images, tensor=False):
         features = []
         self.features_extractor.to(DEVICE)
         self.features_extractor.train(False)
         for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            
+            if not tensor:
+                x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            else:
+                x = img
+                
             feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
             feature = feature / np.linalg.norm(feature) #l2 norm
             features.append(feature[0])
@@ -508,7 +537,15 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def compute_exemplars_mean(self):
         
+        exemplar_means = []
+        for exemplars in self.exemplar_sets[:self.n_known]:
+            _, mean = self.get_features_and_mean(exemplars)
+            exemplar_means.append(mean)
         
+        self.exemplar_means = exemplar_means
+        self.exemplar_means.extend(self.new_means)
+        
+        """
         exemplar_means = []
         self.features_extractor.train(False)
         for exemplars in self.exemplar_sets[:self.n_known]:
@@ -528,7 +565,7 @@ class iCaRL(nn.Module):
 
         self.exemplar_means = exemplar_means
         self.exemplar_means.extend(self.new_means)
-        
+        """
 
         
     #CLASSIFICATION
@@ -536,7 +573,7 @@ class iCaRL(nn.Module):
     def classify(self, x, classifier, train_dataset=None):
 
         #Using NME as classifier
-        if classifier == 'nme':
+        if self.model is None:
             
             #computing mean only if first iteration
             if self.compute_means:
@@ -549,7 +586,7 @@ class iCaRL(nn.Module):
             preds = []
             
             #computing features of images to be classified
-            #print('computing pca')
+            
             x = x.to(DEVICE)
             self.features_extractor.train(False)
             feature = self.features_extractor.extract_features(x)
@@ -567,14 +604,19 @@ class iCaRL(nn.Module):
                 
             return preds
 
-        # Using KNN, SVC, 3-layers MLP as classifier
-        elif classifier == 'knn' or classifier == 'svc' or classifier == 'svc-rbf':
+        # Using KNN, SVC, SVC-rbf as classifier
+        else:
 
             if self.train_model:
                 X_train, y_train = [], []
-
-                #computing features on exemplars to create X_train, y_train
                 
+                #computing features on exemplars to create X_train, y_train
+                for i, exemplars in enumerate(self.exemplar_sets):
+                    features, _ = self.get_features_and_mean(exemplars)
+                    X_train.append(features)
+                    y_train.append([i]*len(features))
+                
+                """
                 self.features_extractor.train(False)
                 for i, exemplars in enumerate(self.exemplar_sets):
                     for ex in  exemplars:
@@ -584,21 +626,16 @@ class iCaRL(nn.Module):
                         feature.data = feature.data / torch.norm(feature.data, p=2)
                         X_train.append(feature.cpu().numpy())
                         y_train.append(i)
-                
-                #choice of the model
-                if classifier == 'knn':
-                    model = KNeighborsClassifier(n_neighbors=3)
-                elif classifier == 'svc':
-                    model = LinearSVC()
-                elif classifier == 'svc-rbf':
-                    model = SVC()
+                """
 
                 #fitting the model
-                model.fit(X_train, y_train)
+                self.model.fit(X_train, y_train)
                 
-                self.model = model
                 self.train_model = False
-
+            
+            features, _ = self.get_features_and_mean(self, x, tensor=True)
+            X = features
+            """
             #computing features of images to be classified
             x = x.to(DEVICE)
             self.features_extractor.train(False)
@@ -610,8 +647,7 @@ class iCaRL(nn.Module):
                 feat = feat / torch.norm(feat, p=2)
 
                 X.append(feat.cpu().numpy())
-            
-            
+            """
             #getting predictions
             preds = self.model.predict(X)
             
