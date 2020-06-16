@@ -366,7 +366,7 @@ class iCaRL(nn.Module):
         new_targets = []
 
         #creating 2*BATCH_SIZE new samples
-        for _ in range(0):
+        for _ in range(30):
             #indexes of 2 exemplars
             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
             #indexes 1 exemplars 1 training sample
@@ -377,7 +377,7 @@ class iCaRL(nn.Module):
 
             #creating new samples
             #exemplar + exemplar
-            new_sample1, new_target1 = 0.6*exemplars[i1]+(1-0.6)*exemplars[i2], 0.6*ex_labels[i1]+(1-0.6)*ex_labels[i2]
+            new_sample1, new_target1 = 0.8*exemplars[i1]+(1-0.2)*exemplars[i2], 0.8*ex_labels[i1]+(1-0.2)*ex_labels[i2]
             #exemplar + samples
             #new_sample2, new_target2 = w2*exemplars[j1]+(1-w2)*exemplars[j2], w2*ex_labels[j1]+(1-w2)*ex_labels[j2]
        
