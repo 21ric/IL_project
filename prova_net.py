@@ -363,9 +363,6 @@ class iCaRL(nn.Module):
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                   
-                  if iter!= 0:
-                    print('dist loss', dist_contr)
-                    print('clf loss', clf_contr)
                 print('-'*30)
             i+=1
         return
