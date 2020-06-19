@@ -193,7 +193,8 @@ class iCaRL(nn.Module):
                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
                             #new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
                             #new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
-                            w = np.random.uniform(0.1,0.9)
+                            #w = np.random.uniform(0.1,0.9)
+                            w=0.4
                             new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
                             new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
 
@@ -260,6 +261,7 @@ class iCaRL(nn.Module):
                         
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                
                 #computing distillation loss
                 if self.n_known > 0 :
                     if self.class_balanced_loss or self.proportional_loss:
