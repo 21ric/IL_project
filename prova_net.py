@@ -212,12 +212,17 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
                 
-                if self.proportional_loss and iter !=0:              
-                    mixed_out = self(mixed_up_points)
-                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                if self.proportional_loss:              
+                    
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     
-                    loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points)*10))
+                    if iter!= 0:
+                        mixed_out = self(mixed_up_points)
+                        clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                        loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points))*10)
+                        
+                    else:
+                        loss = clf_loss/(len(out)*10)
                 
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
