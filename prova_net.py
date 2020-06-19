@@ -25,7 +25,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -169,6 +169,8 @@ class iCaRL(nn.Module):
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+                
+                
             self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
@@ -212,20 +214,57 @@ class iCaRL(nn.Module):
                 
                 if self.proportional_loss and iter !=0:              
                     mixed_out = self(mixed_up_points)
+                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                    
+                    loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points)*10))
+                
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                
+                if self.n_known > 0 :
+                    if self.proportional_loss:
+                        
+                        f_ex.to(DEVICE)
+                        f_ex.train(False)
+                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
+                        q_i = q[indexes]
+
+                        #q_i_sample = torch.zeros(len(q_i_sample), self.n_known).to(DEVICE)
+                        
+                        """
+                        dist_loss_ex =  coeff_old * bce_sum(ex_out[:, :self.n_known], q_i_ex[:, :self.n_known])
+                        dist_loss_sample = coeff_new * bce_sum(sample_out[:, :self.n_known], q_i_sample[:, :self.n_known])
+                        """
+                        dist_loss = bce_sum(out[:, :self.n_known],q_i[:, :self.n_known])
+                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
+                        
+                        dist_loss =(dist_loss+dist_loss_mixed)/((len(out)+len(mixed_up_points))*self.n_known)
+                        
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    
+                    else:
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        
+                                                        
                 
                 #computing classification loss
-                if self.class_balanced_loss or self.proportional_loss:
-                                                            
-                    
+                #if self.class_balanced_loss or self.proportional_loss:                                          
+                    """
                     ex_out = out[(labels < self.n_known)] #masking: taking only outputs of images of new classes
                     sample_out = out[(labels >= self.n_known)] #masking: taking only outputs of images of old classes
                     
                     labels_ex = labels_hot[(labels < self.n_known)] #masking: taking only true labels of images of new classes
                     labels_sample = labels_hot[(labels >= self.n_known)] #masking: taking only true labels of images of old classes
+                    """
+                   
                     
                     
-                    
-                    
+                    """
                     if self.class_balanced_loss:
                         #taking coefficients for new images (coeff_new), exemplars (coeff_old)
                         coeff_new, coeff_old = get_balanced_coefficients(BETA, card_new=500,num_new_classes=(self.n_classes-self.n_known),num_old_classes=self.n_known, i=iter, card_old=self.exemplars_per_class)
@@ -234,12 +273,15 @@ class iCaRL(nn.Module):
                     else:
                         #coeff_new , coeff_old = 1, (500/self.exemplars_per_class) * (iter/(iter+1)) if self.exemplars_per_class else 1
                         coeff_new , coeff_old = 1, 1
-                        
+                    """
+                    """    
                     clf_loss_ex =  bce_sum(ex_out[:, self.n_known:], labels_ex[:, self.n_known:]) #calculating clf loss on exemplars
                     clf_loss_sample =  bce_sum(sample_out[:, self.n_known:], labels_sample[:, self.n_known:]) #calculating clf loss on new images
+                    """
+                    """
                     if iter !=0:
                         clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
-                    
+                    """
                     #loss_ex = coeff_old * bce_sum(ex_out, labels_ex)
                     #loss_sample = coeff_new * bce_sum(sample_out, labels_sample)
                     
@@ -247,21 +289,26 @@ class iCaRL(nn.Module):
                     #print('loss sample', loss_sample)
                     
                     
-                    
+                    """
                     if self.class_balanced_loss:
                         #loss = loss_sample/(len(sample)*10)
                         loss = (clf_loss_ex + clf_loss_sample)/(len(out)*10)
                         
                     else:
+                    """
+                    """
+                    if self.proportional_loss:
                         if iter != 0:
                             loss = (clf_loss_ex + clf_loss_sample + clf_loss_mixedup)/((len(ex_out)+len(sample_out)+len(mixed_out))*10)
                         else:
                             loss = (clf_loss_ex + clf_loss_sample )/((len(ex_out)+len(sample_out))*10)
                         #loss = loss_sample/(len(sample_out)*10)
-                        
+                    """
+                """       
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                
+                """
+                """
                 #computing distillation loss
                 if self.n_known > 0 :
                     if self.class_balanced_loss or self.proportional_loss:
@@ -304,10 +351,13 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                         clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                """
                 
                 #backward pass()
                 loss.backward()
                 optimizer.step()
+                
+                
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
                 for param_group in optimizer.param_groups:
