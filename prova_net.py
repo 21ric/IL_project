@@ -250,7 +250,7 @@ class iCaRL(nn.Module):
                     sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])
                     
                     
-                    loss = (0.7*ex_loss + 0.3*sample_loss)/(len(out)*10)
+                    loss = (2*ex_loss + sample_loss)/(len(out)*10)
                     
                 
                 else:
