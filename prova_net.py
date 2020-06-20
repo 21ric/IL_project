@@ -309,9 +309,11 @@ class iCaRL(nn.Module):
                       else:
                         new_ex += img
                       
-                    
                     new_ex = new_ex /len(c)
-
+                    trans = transforms.ToPILImage()
+                    new_ex = trans(new_ex)
+                    new_ex = list(new_ex.getdata())
+                    
                     
                     if cond:
                         print("new ex\n\n", len(new_ex), "\n")
