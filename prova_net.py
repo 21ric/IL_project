@@ -288,12 +288,12 @@ class iCaRL(nn.Module):
                 chuncks = np.array_split(ex_array, m)
 
                 for chunck in chuncks:
-                    new_ex = null
+                    new_ex = None
                     for i, el in enumerate(chunck):
                         if i==0:
-                            new_ex = el;
+                            new_ex = el
                         else:
-                            new_ex += el;
+                            new_ex += el
                     
                     combined_exemplars.append(new_ex/len(chunck))
                 
