@@ -286,6 +286,9 @@ class iCaRL(nn.Module):
                 combined_exemplars = []
                 ex_array = np.array(exemplars)
                 chuncks = np.array_split(ex_array, m)
+                
+                if cond:
+                    print(chuncks[0])
 
                 for chunck in chuncks:
                     new_ex = None
@@ -294,6 +297,10 @@ class iCaRL(nn.Module):
                             new_ex = el
                         else:
                             new_ex += el
+                    
+                    if cond:
+                        print(new_ex)
+                        cond = False
                     
                     combined_exemplars.append(new_ex/len(chunck))
                 
