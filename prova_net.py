@@ -237,16 +237,17 @@ class iCaRL(nn.Module):
                         loss = clf_loss/(len(out)*10)
                         
                 elif self.loss1:
+                    print('2loss')
                     exemplars = out[(labels<self.n_known)]
                     samples = out[(labels>=self.n_known)]
                     
                     ex_label = labels_hot[(labels<self.n_known)]
                     sample_label = labels_hot[(labels>=self.n_known)]
                     
-                    ex_loss = bce_sum(exemplars[:, self.n_known:], ex_label[:, self.n_known:])/(len(exemplars)*10)
-                    sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])/(len(samples)*10)
+                    ex_loss = bce_sum(exemplars[:, self.n_known:], ex_label[:, self.n_known:])
+                    sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])
                     
-                    loss = 0.7*ex_loss + 0.3*sample_loss
+                    loss = (0.7*ex_loss + 0.3*sample_loss)/(len(out)*10)
                     
                 
                 else:
