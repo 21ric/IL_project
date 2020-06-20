@@ -290,7 +290,7 @@ class iCaRL(nn.Module):
                 for chunck in chuncks:
                     new_ex = null
                     for i, el in enumerate(chunck):
-                        if i=0:
+                        if i==0:
                             new_ex = el;
                         else:
                             new_ex += el;
