@@ -287,7 +287,7 @@ class iCaRL(nn.Module):
                 ex_array = np.array(exemplars)
                 chuncks = np.array_split(ex_array, m)
                 
-                print('M', m, "\n\n\)
+                print('M', m, "\n\n\")
                 
                 print('len chunks', len(chuncks))
                 
