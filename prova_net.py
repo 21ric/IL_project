@@ -293,7 +293,7 @@ class iCaRL(nn.Module):
 
                 for chunck in chuncks:
                     
-                    class_mean = np.mean(chunck)
+                    class_mean = np.mean(chunck, axis=1)
 
                     
                     if cond:
