@@ -66,7 +66,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         print('Constructing exemplar sets ...')
         print('-'*30)
         """
-        
+        print('Constructing exemplar sets ...')
         for y in classes_groups[i]:
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m*2, random_flag)
         
@@ -76,7 +76,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         net.reduce_exemplars_set(m, combine=True)
         
         print('len prev ex', len(net.exemplar_sets))
-        print('Constructing exemplar sets ...')
+      
         print('-'*30)
         
         print('Testing ...')
