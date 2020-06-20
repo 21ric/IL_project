@@ -197,8 +197,11 @@ class iCaRL(nn.Module):
                             #new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
                             #w = np.random.uniform(0.1,0.9)
                             w=0.4
-                            new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
-                            new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
+                            #new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
+                            #new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
+                            
+                            new_point = exemplars[i1]
+                            new_target = ex_labels[i1]
 
                             mixed_up_points.append(new_point)
                             mixed_up_targets.append(new_target)
