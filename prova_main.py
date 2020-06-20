@@ -44,6 +44,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         if undersample and i != 0:            
             train_dataset.resample(resize_factor = (net.n_known*m)/5000)
             print('Resamplig to size', len(train_dataset)) 
+            
         print('-'*30)
         print(f'Known classes: {net.n_known}')
         print('-'*30)
@@ -55,15 +56,29 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         net.exemplars_per_class = m
         
         
+        """
         if i != 0:
             print('Reducing exemplar sets ...')
             print('-'*30)
-            net.reduce_exemplars_set(m)
+            net.reduce_exemplars_set(m, combine=True)
+        
         print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
         print('-'*30)
+        """
+        
         for y in classes_groups[i]:
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag)
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m*2, random_flag)
+        
+        
+        print('Combining exemplar sets ...')
+        print('-'*30)
+        net.reduce_exemplars_set(m, combine=True)
+        
+        print('len prev ex', len(net.exemplar_sets))
+        print('Constructing exemplar sets ...')
+        print('-'*30)
+        
         print('Testing ...')
         print('-'*30)
         print('New classes')
@@ -87,6 +102,10 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         print('lunghezza nuove medie', len(net.new_means))
         net.n_known = net.n_classes
         
+        
+        print('Combining exemplar sets ...')
+        print('-'*30)
+        net.reduce_exemplars_set(m2, combine=True)
         #if undersample:
             #return new_acc_list, old_acc_list, all_acc_list
     return new_acc_list, old_acc_list, all_acc_list
