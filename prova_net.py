@@ -288,6 +288,7 @@ class iCaRL(nn.Module):
                 chuncks = np.array_split(ex_array, m)
                 
                 if cond:
+                    print("list of ex\n\n")
                     print(chuncks[0])
 
                 for chunck in chuncks:
@@ -299,6 +300,7 @@ class iCaRL(nn.Module):
                             new_ex += el
                     
                     if cond:
+                        print("new ex\n\n")
                         print(new_ex)
                         cond = False
                     
