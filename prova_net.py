@@ -78,7 +78,7 @@ def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classe
         
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, loss1=False proportional_loss=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, loss1=False, proportional_loss=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
         self.n_classes = 0 #number of seen classes
