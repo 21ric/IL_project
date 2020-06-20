@@ -290,7 +290,7 @@ class iCaRL(nn.Module):
                 for chunck in chuncks:
                     combined_exemplars.append(np.sum(chunck)/len(chunck))
                 
-                self.exemplars_sets[y] = combined_exemplars
+                self.exemplar_sets[y] = combined_exemplars
                 
                     
                     
