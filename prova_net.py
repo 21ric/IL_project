@@ -244,8 +244,11 @@ class iCaRL(nn.Module):
                     ex_label = labels_hot[(labels<self.n_known)]
                     sample_label = labels_hot[(labels>=self.n_known)]
                     
+                    
+                    
                     ex_loss = bce_sum(exemplars[:, self.n_known:], ex_label[:, self.n_known:])
                     sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])
+                    print("exloss",ex_loss.item() )
                     
                     loss = (0.7*ex_loss + 0.3*sample_loss)/(len(out)*10)
                     
