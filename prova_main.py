@@ -102,10 +102,6 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         print('lunghezza nuove medie', len(net.new_means))
         net.n_known = net.n_classes
         
-        
-        print('Combining exemplar sets ...')
-        print('-'*30)
-        net.reduce_exemplars_set(m2, combine=True)
         #if undersample:
             #return new_acc_list, old_acc_list, all_acc_list
     return new_acc_list, old_acc_list, all_acc_list
