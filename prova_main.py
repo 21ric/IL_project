@@ -15,7 +15,7 @@ BATCH_SIZE = 128
 CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
-def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False, class_balanced_loss=False, proportional_loss=False, pca=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, loss1=False, undersample=False, resize_factor=0.5, random_flag=False, proportional_loss=False):
     utils.set_seed(0)
     path='orders/'
     classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+dict_num+'.pickle',
@@ -24,7 +24,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
     print(classes_groups, class_map, map_reverse)
 
     #net = iCaRL(0, class_map, loss_config=loss_config,lr=lr, class_balanced_loss=class_balanced_loss, proportional_loss=proportional_loss)
-    net = iCaRL(0, class_map, map_reverse=map_reverse, loss_config=loss_config,lr=lr, class_balanced_loss=class_balanced_loss, proportional_loss=proportional_loss)
+    net = iCaRL(0, class_map, map_reverse=map_reverse, loss1=loss1, loss_config=loss_config,lr=lr, proportional_loss=proportional_loss)
 
     new_acc_list = []
     old_acc_list = []
@@ -42,7 +42,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
         if undersample and i != 0:            
-            train_dataset.resample(resize_factor = (net.n_known*m)/5000)
+            train_dataset.resample(resize_factor = (net.n_known)/5000)
             print('Resamplig to size', len(train_dataset)) 
             
         print('-'*30)

@@ -19,6 +19,9 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
+
+
+
 ####Hyper-parameters####
 LR = 2
 WEIGHT_DECAY = 0.00001
@@ -30,8 +33,12 @@ DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
 ########################
+
+
+
 #transofrmation for exemplars
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+
 #different combination of classification/distillation losses
 bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
@@ -71,7 +78,7 @@ def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classe
         
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, class_balanced_loss=False, proportional_loss=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, loss1=False proportional_loss=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
         self.n_classes = 0 #number of seen classes
@@ -93,6 +100,9 @@ class iCaRL(nn.Module):
         self.pca = None
         self.train_model = True
         self.model = None
+        
+        self.loss1
+    
     #forward pass
     def forward(self, x):
         x = self.features_extractor(x)
@@ -226,6 +236,19 @@ class iCaRL(nn.Module):
                         
                     else:
                         loss = clf_loss/(len(out)*10)
+                        
+                elif self.loss1:
+                    exemplars = out[(labels<self.n_known)]
+                    samples = out[(labels>=self.n_known)]
+                    
+                    ex_label = labels_hot[(labels<self.n_known)]
+                    sample_label = labels_hot[(labels<self.n_known)]
+                    
+                    ex_loss = bce_sum(exemplars[:, self.n_known:], ex_label[:, self.n_known:])/(len(exemplars)*10)
+                    sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])/(len(samples)*10)
+                    
+                    loss = 0.7*ex_loss + 0.3*sample_loss
+                    
                 
                 else:
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
