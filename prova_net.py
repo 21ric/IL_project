@@ -274,59 +274,11 @@ class iCaRL(nn.Module):
     @torch.no_grad()
     def reduce_exemplars_set(self, m, combine=False):        
         #reducing by discarding last elements
-        if not combine:
-            
-            for y, exemplars in enumerate(self.exemplar_sets):
-                self.exemplar_sets[y] = exemplars[:m]
-        
-        cond = True
-        if combine:
-            for y, exemplars in enumerate(self.exemplar_sets):
-                
-                combined_exemplars = []
-                ex_array = np.array(exemplars)
-                chuncks = np.array_split(ex_array, m)
-                
-                print('M', m, "\n\n")
-                
-                print('len chunks', len(chuncks))
-                
-                if cond:
-                    print("list of ex\n\n", len(chuncks[0]), len(chuncks[0][0]), "\n" )
-                    print(chuncks[0])
 
-                for c in chuncks:
-                    
-                    new_ex = None
-                    for j,el in enumerate(c):
-                      
-                      
-                      img = transform(Image.fromarray(el))
-                      
-                      if j ==0:
-                        new_ex = img
-                      
-                      else:
-                        new_ex += img
-                      
-                    new_ex = new_ex /len(c)
-                    trans = transforms.ToPILImage()
-                    new_ex = trans(new_ex)
-                    new_ex = list(new_ex.getdata())
-                    
-                    
-                    if cond:
-                        print("new ex\n\n", len(new_ex), "\n")
-                        print(new_ex)
-                        cond = False
-                    
-                    combined_exemplars.append(new_ex.numpy())
-                
-                self.exemplar_sets[y] = np.array(combined_exemplars)
-                
-                    
-                    
-                
+        for y, exemplars in enumerate(self.exemplar_sets):
+            self.exemplar_sets[y] = exemplars[:m]
+        
+
                       
     #construct exemplars set. if recompute=True we are creating a new exemplar set strating from a previous one
     @torch.no_grad()
