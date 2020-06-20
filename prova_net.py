@@ -279,18 +279,18 @@ class iCaRL(nn.Module):
             for y, exemplars in enumerate(self.exemplar_sets):
                 self.exemplar_sets[y] = exemplars[:m]
         
+        cond = True
         if combine:
             for y, exemplars in enumerate(self.exemplar_sets):
                 
                 combined_exemplars = []
                 ex_array = np.array(exemplars)
                 chuncks = np.array_split(ex_array, m)
-                
-                
+
                 for chunck in chuncks:
                     combined_exemplars.append(np.sum(chunck)/len(chunck))
                 
-                self.exemplar_sets[y] = combined_exemplars
+                self.exemplar_sets[y] = np.array(combined_exemplars)
                 
                     
                     
