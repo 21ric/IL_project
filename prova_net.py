@@ -297,12 +297,13 @@ class iCaRL(nn.Module):
 
                 for c in chuncks:
                     
-                    for i,el in enumerate(c):
+                    new_ex = None
+                    for j,el in enumerate(c):
                       
-                      new_ex = None
+                      
                       img = transform(Image.fromarray(el))
                       
-                      if i ==0:
+                      if j ==0:
                         new_ex = img
                       
                       else:
