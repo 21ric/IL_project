@@ -458,10 +458,9 @@ class iCaRL(nn.Module):
             
             #computing mean only if first iteration
             if self.compute_means:
-                if pca:
-                    self.compute_exemplars_mean(pca=pca)
-                else:
-                    self.compute_exemplars_mean(pca=pca)
+                
+                
+                self.compute_exemplars_mean(pca=pca)
                     
             self.compute_means = False 
             exemplar_means = self.exemplar_means
@@ -505,11 +504,7 @@ class iCaRL(nn.Module):
                         y_train.append(i)
                 
                 
-                if pca:
-                    pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=30))])                  
-                    X_train = pipe.fit_transform(X_train)
-                    self.pca = pipe
-                    print('end-pca')
+                
                 
                 #choice of the model
                 if classifier == 'knn':
@@ -543,12 +538,12 @@ class iCaRL(nn.Module):
             
             return preds
     #method to classify all batches of the test dataloader
-    def classify_all(self, test_dataset, map_reverse, classifier, pca, train_dataset=None):
+    def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         running_corrects = 0
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            preds = self.classify(imgs, classifier, pca=pca, train_dataset=train_dataset)
+            preds = self.classify(imgs, classifier, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
             preds = [map_reverse[pred] for pred in preds]
