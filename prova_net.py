@@ -288,7 +288,14 @@ class iCaRL(nn.Module):
                 chuncks = np.array_split(ex_array, m)
 
                 for chunck in chuncks:
-                    combined_exemplars.append(np.sum(chunck)/len(chunck))
+                    new_ex = null
+                    for i, el in enumerate(chunck):
+                        if i=0:
+                            new_ex = el;
+                        else:
+                            new_ex += el;
+                    
+                    combined_exemplars.append(new_ex/len(chunck))
                 
                 self.exemplar_sets[y] = np.array(combined_exemplars)
                 
