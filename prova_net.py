@@ -191,7 +191,7 @@ class iCaRL(nn.Module):
                         mixed_up_targets = []
 
                         #for i in range(128 - len(exemplars)):
-                        for j in range(128 - len(exemplars)):
+                        for j in range(20):
                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
                             #new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
                             #new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
