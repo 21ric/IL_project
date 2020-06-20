@@ -306,7 +306,7 @@ class iCaRL(nn.Module):
                         new_ex = img
                       
                       else:
-                        new_ex + = img
+                        new_ex += img
                       
                     
                     new_ex = new_ex /len(c)
