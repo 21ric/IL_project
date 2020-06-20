@@ -287,21 +287,37 @@ class iCaRL(nn.Module):
                 ex_array = np.array(exemplars)
                 chuncks = np.array_split(ex_array, m)
                 
+                print('M', m, "\n\n\)
+                
+                print('len chunks', len(chuncks))
+                
                 if cond:
                     print("list of ex\n\n", len(chuncks[0]), len(chuncks[0][0]), "\n" )
                     print(chuncks[0])
 
-                for chunck in chuncks:
+                for c in chuncks:
                     
-                    class_mean = np.mean(chunck, axis=1)
+                    for i,el in c:
+                      
+                      new_ex = None
+                      img = transform(Image.fromarray(el))
+                      
+                      if i ==0:
+                        new_ex = img
+                      
+                      else:
+                        new_ex + = img
+                      
+                    
+                    new_ex = new_ex /len(c)
 
                     
                     if cond:
-                        print("new ex\n\n", len(class_mean), "\n")
-                        print(class_mean)
+                        print("new ex\n\n", len(new_ex), "\n")
+                        print(new_ex)
                         cond = False
                     
-                    combined_exemplars.append(class_mean)
+                    combined_exemplars.append(new_ex.numpy())
                 
                 self.exemplar_sets[y] = np.array(combined_exemplars)
                 
