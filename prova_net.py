@@ -293,7 +293,7 @@ class iCaRL(nn.Module):
 
                 for chunck in chuncks:
                     
-                    _, class_mean = self.get_features_and_mean(chunck.tolist())
+                    class_mean = np.mean(chunck)
 
                     
                     if cond:
