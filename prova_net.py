@@ -284,7 +284,7 @@ class iCaRL(nn.Module):
                 
                 combined_exemplars = []
                 ex_array = np.array(exemplars)
-                chuncks = ex_array.split(m)
+                chuncks = np.array_split(ex_array, m)
                 
                 
                 for chunck in chuncks:
