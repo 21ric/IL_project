@@ -101,7 +101,7 @@ class iCaRL(nn.Module):
         self.train_model = True
         self.model = None
         
-        self.loss1
+        self.loss1 = loss1
     
     #forward pass
     def forward(self, x):
