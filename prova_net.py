@@ -94,7 +94,6 @@ class iCaRL(nn.Module):
         self.class_map = class_map #needed to map real label to fake label
         self.map_reverse = map_reverse
         
-        self.class_balanced_loss = class_balanced_loss
         self.proportional_loss = proportional_loss
         self.exemplars_per_class = 0
         self.pca = None
