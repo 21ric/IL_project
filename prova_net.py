@@ -297,7 +297,7 @@ class iCaRL(nn.Module):
 
                 for c in chuncks:
                     
-                    for i,el in c:
+                    for i,el in enumerate(c):
                       
                       new_ex = None
                       img = transform(Image.fromarray(el))
