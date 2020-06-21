@@ -10,16 +10,11 @@ from PIL import Image
 from resnet import resnet32
 import copy
 import random
-import utils
-import math
+
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
-from sklearn.neural_network import MLPClassifier
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from imblearn.over_sampling import SMOTE
-
 
 
 ####Hyper-parameters####
@@ -63,26 +58,6 @@ def modify_output_for_loss(loss_name, output):
     if loss_name == "kl":
         return F.log_softmax(output, dim=1)
 
-
-def balanced_coeff(beta, card):
-    return(1-beta)/(1-beta**card)
-
-
-def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classes, card_old=None):
-    if i == 0:
-        coeff = balanced_coeff(beta, card_new)
-        rescale_factor = num_new_classes/(coeff*num_new_classes)
-        
-        #return coeff*rescale_factor, 0
-        return coeff, 0
-    
-    else:
-        
-        coeff_new = balanced_coeff(beta, card_new)
-        coeff_old = balanced_coeff(beta, card_old)
-        rescale_factor = (num_new_classes+num_old_classes)/(coeff_new*card_new+coeff_old*card_old)
-        #return coeff_new*rescale_factor, coeff_old*rescale_factor
-        return coeff_new, coeff_old
         
     
 class iCaRL(nn.Module):
