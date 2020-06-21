@@ -26,7 +26,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
-NUM_EPOCHS_RETRAIN = 70
+NUM_EPOCHS_RETRAIN = 40
 BETA = 0.8
 ########################
 
@@ -259,7 +259,7 @@ class iCaRL(nn.Module):
         f_prev_net.to(DEVICE)
         
         self.features_extractor.train(True)
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.5, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
         i = 0
         self.features_extractor.to(DEVICE)
         
@@ -268,7 +268,7 @@ class iCaRL(nn.Module):
             
             train_loss = 0.0
             
-            if epoch in STEPDOWN_EPOCHS:
+            if epoch in [20]:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
             
