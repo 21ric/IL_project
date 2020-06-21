@@ -131,7 +131,7 @@ class iCaRL(nn.Module):
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
         print('Datset extended to {} elements'.format(len(dataset)))
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last = True)
         
         #incrementing number of classes
         self.add_classes(n)
@@ -309,7 +309,7 @@ class iCaRL(nn.Module):
         
         # Create Exemplars' Dataloader
         dataset = TensorDataset(exemplars_list,labels) # create your datset
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last = True)
         
         # Check loader length
         print(len(loader.dataset))
