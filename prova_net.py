@@ -313,7 +313,7 @@ class iCaRL(nn.Module):
                 q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
                 
                 sample_labels = torch.zeros(len(sample_out), self.n_classes).to(DEVICE)
-                ex_labels = q_i2[(labels<=self.n_known)]
+                ex_labels = q_i2[(labels<self.n_known)]
                 
                 dist2_loss_samples =  bce_sum(sample_out[:, :self.n_known], sample_labels[:, :self.n_known])
                 dist2_loss_ex = bce_sum(ex_out[:, :self.n_known], ex_labels[:, :self.n_known])
