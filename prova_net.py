@@ -284,8 +284,6 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
                 
-                # Compute classification loss. Images are only exemplars
-                loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 
                 # Teacher 1 : new ex. classes
                 # Compute distillation loss (based on last net) : only exemplars of new classes are considered
