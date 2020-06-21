@@ -352,8 +352,8 @@ class iCaRL(nn.Module):
                 out = self(imgs)
                 
                 # Compute classification loss. Images are only exemplars
-                loss = self.clf_loss(out[:,:], labels_hot[:, :])
-                #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                #loss = self.clf_loss(out[:,:], labels_hot[:, :])
+                
                 
                 # Compute distillation loss (based on old outputs) 
                 f_ex.to(DEVICE)
@@ -361,7 +361,8 @@ class iCaRL(nn.Module):
                 q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
                 dist_loss = self.dist_loss(out[:, :], q_i[:, :]) #distillation loss between actual outputs and previous outputs
 
-                loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                loss = dist_loss
 
                 loss.backward()
                 optimizer.step()
