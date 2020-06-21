@@ -283,7 +283,7 @@ class iCaRL(nn.Module):
                 
                 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss.item()))
+                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                   
@@ -291,6 +291,7 @@ class iCaRL(nn.Module):
             i+=1
         return
     
+    #
     
     # perform another training, only on exemplars.
     def train_on_exemplars(self, class_map, map_reverse, iter):
@@ -378,7 +379,7 @@ class iCaRL(nn.Module):
             tot_loss = loss/len(loader)
                 
             if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss.item()))
+                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
