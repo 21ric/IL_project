@@ -47,7 +47,10 @@ mse = nn.MSELoss()
 bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss(reduction='batchmean')
 ce = nn.CrossEntropyLoss()
+
 losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
+
+
 #define function to apply to network outputs
 def modify_output_for_loss(loss_name, output):        
     #BCEWithLogits doesn't need to apply sigmoid func
@@ -59,8 +62,12 @@ def modify_output_for_loss(loss_name, output):
     # KL loss needs input to be log-softmax
     if loss_name == "kl":
         return F.log_softmax(output, dim=1)
+
+
 def balanced_coeff(beta, card):
     return(1-beta)/(1-beta**card)
+
+
 def get_balanced_coefficients(beta, card_new, i, num_new_classes, num_old_classes, card_old=None):
     if i == 0:
         coeff = balanced_coeff(beta, card_new)
