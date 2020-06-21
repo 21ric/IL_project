@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import transforms
 from torch.autograd import Variable
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
 from PIL import Image
 from resnet import resnet32
@@ -31,6 +31,7 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
+NUM_EPOCHS_RETRAIN = 70
 BETA = 0.8
 ########################
 
@@ -294,7 +295,79 @@ class iCaRL(nn.Module):
         return
     
     
+    # perform another training, only on exemplars.
+    def train_on_exemplars(self, class_map, map_reverse, iter):
     
+        exemplars_list = []
+        labels = []
+
+        for y, exemplars in enumerate(self.exemplar_sets):
+            for ex in exemplars:
+                exemplars_list.append(np.array(transform(Image.fromarray(ex))))
+                labels.append(map_reverse[y])
+        
+        exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
+        labels = torch.Tensor(labels)
+        print('Creating ex. dataloader')
+        
+        # Create Exemplars' Dataloader
+        dataset = TensorDataset(exemplars_list,labels) # create your datset
+        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        
+        # Check loader length
+        print(len(loader.dataset))
+        
+        # Save an instance of the last model (the one trained with distillation)
+        f_ex = copy.deepcopy(self.features_extractor)
+        
+        self.features_extractor.train(True)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.2, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        i = 0
+        self.features_extractor.to(DEVICE)
+        
+        # Perform training
+        for epoch in range(NUM_EPOCHS_RETRAIN):
+            
+            if epoch in STEPDOWN_EPOCHS:
+              for param_group in optimizer.param_groups:
+                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
+            
+            self.features_extractor.train(True)
+            for imgs, labels in loader:
+                imgs = Variable(imgs).to(DEVICE)
+                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
+                labels = Variable(seen_labels).to(DEVICE)
+                
+                labels_hot=torch.eye(self.n_classes)[labels] #one hot for classification loss
+                labels_hot = labels_hot.to(DEVICE)
+                
+                optimizer.zero_grad()
+                out = self(imgs)
+                
+                # Compute classification loss. Images are only exemplars
+                loss = self.clf_loss(out[:,:], labels_hot[:, :])
+                #loss = self.clf_loss(out[:, self.n_known:self.n_classes], labels_hot[:, self.n_known:self.n_classes])
+                
+                # Compute distillation loss (based on old outputs) 
+                f_ex.to(DEVICE)
+                f_ex.train(False)
+                q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
+                dist_loss = self.dist_loss(out[:, :], q_i[:, :]) #distillation loss between actual outputs and previous outputs
+
+                loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+
+                loss.backward()
+                optimizer.step()
+                
+            if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
+                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                for param_group in optimizer.param_groups:
+                  print('Learning rate:{}'.format(param_group['lr']))
+                print('-'*30)
+            i+=1
+
+
+
     
     #reduce exemplars lists
     @torch.no_grad()
