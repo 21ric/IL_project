@@ -164,6 +164,9 @@ class iCaRL(nn.Module):
         self.features_extractor.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
             
+            
+            tot_loss = 0
+            
             #reducing learning 
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
@@ -265,8 +268,13 @@ class iCaRL(nn.Module):
                         out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                         q_i = q[indexes]
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                        clf_contr, dist_contr = (1/(iter+1))*loss , (iter/(iter+1))*dist_loss
+                        
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        
+                        tot_loss +=loss
+                        
+                
+                tot_loss = tot_loss/len(loader)
                         
                 
                 #backward pass()
@@ -275,7 +283,7 @@ class iCaRL(nn.Module):
                 
                 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                   
@@ -322,6 +330,8 @@ class iCaRL(nn.Module):
         # Perform training
         for epoch in range(NUM_EPOCHS_RETRAIN):
             
+            tot_loss = 0
+            
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
@@ -358,13 +368,17 @@ class iCaRL(nn.Module):
                 #loss = 0.5*dist_loss + 0.5*dist2_loss
 
                 loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
+                
+                tot_loss +=loss
 
 
                 loss.backward()
                 optimizer.step()
                 
+            tot_loss = loss/len(loader)
+                
             if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, loss.item()))
+                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss.item()))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
