@@ -1,14 +1,8 @@
 from prova_net import iCaRL
-from torchvision import transforms
-from torch.utils.data import DataLoader, Subset
-from dataset import CIFAR100
 import numpy as np
-from sklearn.model_selection import train_test_split
-import math
 import utils
-import copy
 import torch
-from torch.autograd import Variable
+
 
 
 
