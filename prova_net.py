@@ -83,6 +83,8 @@ class iCaRL(nn.Module):
         self.train_model = True
         self.model = None
         
+        self.prev_net = None
+        
         self.loss1 = loss1
     
     #forward pass
@@ -125,18 +127,22 @@ class iCaRL(nn.Module):
         print('New classes:{}'.format(n))
         print('-'*30)
             
-        
-        
+
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
         print('Datset extended to {} elements'.format(len(dataset)))
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
+        
         #incrementing number of classes
         self.add_classes(n)
+        
         #storing outputs of previous network
         self.features_extractor.to(DEVICE)
         f_ex = copy.deepcopy(self.features_extractor)
         f_ex.to(DEVICE)
+        # save the instance of the model in attributes 
+        self.prev_net = f_ex
+       
         q = torch.zeros(len(dataset), self.n_classes).to(DEVICE)
         for images, labels, indexes in loader:
             f_ex.train(False)
@@ -150,6 +156,7 @@ class iCaRL(nn.Module):
             q[indexes] = g.data
         q = Variable(q).to(DEVICE)
         self.features_extractor.train(True)
+        
         #defining optimizer and resetting learning rate
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=self.lr, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
         #training phase
@@ -299,8 +306,13 @@ class iCaRL(nn.Module):
         # Check loader length
         print(len(loader.dataset))
         
-        # Save an instance of the last model (the one trained with distillation)
+        # Save an instance of the very last model (the one trained with distillation)
         f_ex = copy.deepcopy(self.features_extractor)
+        
+        # Save the previous model, the one referring to the previous incremental step
+        f_prev_net = self.prev_net
+        f_prev_net.train(False)
+        f_prev_net.to(DEVICE)
         
         self.features_extractor.train(True)
         optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.2, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
@@ -329,15 +341,22 @@ class iCaRL(nn.Module):
                 # Compute classification loss. Images are only exemplars
                 #loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 
-                
-                # Compute distillation loss (based on old outputs) 
+                # Teacher 1 : new ex. classes
+                # Compute distillation loss (based on last net) : only exemplars of new classes are considered
                 f_ex.to(DEVICE)
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
-                dist_loss = self.dist_loss(out[:, :], q_i[:, :]) #distillation loss between actual outputs and previous outputs
-
+                dist_loss = bce_sum(out[:, :], q_i[:, :]) #distillation loss between actual outputs and last outputs
+                
+                # Teacher 2 : old ex. classes
+                # Compute second distillation loss (based on previous net) : only exemplars of old classes are considered
+                f_prev_net.to(DEVICE)
+                f_prev_net.train(False)
+                q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
+                dist2_loss = bce_sum(out[:, :], q_i2[:, :]) # distillation loss between actual outputs and previous outputs
+                
                 #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                loss = dist_loss
+                loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2loss
 
                 loss.backward()
                 optimizer.step()
