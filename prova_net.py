@@ -183,32 +183,7 @@ class iCaRL(nn.Module):
                 #computing one hots of labels
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
-                if self.proportional_loss:
-                    
-                    if iter !=0:
-                        #mix up augmentation
-                        exemplars = imgs[(labels < self.n_known)]
-                        ex_labels = labels_hot[(labels < self.n_known)]
-                        mixed_up_points = []
-                        mixed_up_targets = []
-
-                        #for i in range(128 - len(exemplars)):
-                        for j in range(20):
-                            i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
-                            #new_point = 0.4*exemplars[i1]+0.6*exemplars[i2]
-                            #new_target = 0.4*ex_labels[i1]+0.6*ex_labels[i2]
-                            #w = np.random.uniform(0.1,0.9)
-                            w=0.4
-                            #new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
-                            #new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
-                            
-                            new_point = exemplars[i1]
-                            new_target = ex_labels[i1]
-
-                            mixed_up_points.append(new_point)
-                            mixed_up_targets.append(new_target)
-                        mixed_up_points = torch.stack(mixed_up_points)
-                        mixed_up_targets = torch.stack(mixed_up_targets)
+                
                     
                         
                 #zeroing the gradients
@@ -216,65 +191,28 @@ class iCaRL(nn.Module):
                 
                 #computing outputs
                 out = self(imgs)
+   
                 
-                if self.proportional_loss:              
-                    
-                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                    
-                    if iter!= 0:
-                        mixed_out = self(mixed_up_points)
-                        clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
-                        loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points))*10)
-                        
-                    else:
-                        loss = clf_loss/(len(out)*10)
-                        
-                elif self.loss1:
-                    
-                    exemplars = out[(labels<self.n_known)]
-                    samples = out[(labels>=self.n_known)]
-                    
-                    ex_label = labels_hot[(labels<self.n_known)]
-                    sample_label = labels_hot[(labels>=self.n_known)]
-                    
-                    
-                    
-                    ex_loss = bce_sum(exemplars[:, self.n_known:], ex_label[:, self.n_known:])
-                    sample_loss = bce_sum(samples[:, self.n_known:], sample_label[:, self.n_known:])
-                    
-                    
-                    loss = (2*ex_loss + sample_loss)/(len(out)*10)
-                    
                 
-                else:
-                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                
+                
                 
                 if self.n_known > 0 :
-                    if self.proportional_loss:
-                        
-                        f_ex.to(DEVICE)
-                        f_ex.train(False)
-                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
-                        q_i = q[indexes]
-
-                        dist_loss = bce_sum(out[:, :self.n_known],q_i[:, :self.n_known])
-                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
-                        
-                        dist_loss =(dist_loss+dist_loss_mixed)/((len(out)+len(mixed_up_points))*self.n_known)
-                        
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                     
-                    else:
-                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
-                        q_i = q[indexes]
-                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                        
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                        
-                        tot_loss += loss.item()
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    q_i = q[indexes]
+                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                    
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    
+                    tot_loss += loss.item()
                         
                 
-                tot_loss = tot_loss/len(loader)
+                    tot_loss = tot_loss/len(loader)
+                
+                else:
+                    tot_loss += loss.item()
                         
                 
                 #backward pass()
@@ -324,7 +262,7 @@ class iCaRL(nn.Module):
         f_prev_net.to(DEVICE)
         
         self.features_extractor.train(True)
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.5, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=1, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
         i = 0
         self.features_extractor.to(DEVICE)
         
