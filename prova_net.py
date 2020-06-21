@@ -323,7 +323,7 @@ class iCaRL(nn.Module):
         f_prev_net.to(DEVICE)
         
         self.features_extractor.train(True)
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=1, weight_decay=WEIGHT_DECAY, momentum=MOMENTUM)
         i = 0
         self.features_extractor.to(DEVICE)
         
