@@ -376,7 +376,7 @@ class iCaRL(nn.Module):
                 loss.backward()
                 optimizer.step()
                 
-            tot_loss = loss/len(loader)
+            tot_loss = tot_loss/len(loader)
                 
             if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
                 print('Epoch {} Loss:{:.4f}'.format(i, tot_loss))
