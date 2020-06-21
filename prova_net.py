@@ -308,7 +308,7 @@ class iCaRL(nn.Module):
                 
                 #loss =  (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
                 
-                loss =  (iter/(iter+1))*dist2_loss
+                loss =  loss + (iter/(iter+1))*dist2_loss
                 
                 train_loss += loss.item() * imgs.size(0) 
                         
