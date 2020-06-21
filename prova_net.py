@@ -356,11 +356,10 @@ class iCaRL(nn.Module):
                 dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known]) # distillation loss between actual outputs and previous outputs
                 
                 #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-<<<<<<< HEAD
-                loss = 0.5*dist_loss + 0.5*dist2_loss
-=======
+                #loss = 0.5*dist_loss + 0.5*dist2_loss
+
                 loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
->>>>>>> 835da4fe345904568fc7e8410eb31527bd004fc1
+
 
                 loss.backward()
                 optimizer.step()
