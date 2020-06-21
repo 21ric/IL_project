@@ -259,7 +259,7 @@ class iCaRL(nn.Module):
         f_prev_net.to(DEVICE)
         
         self.features_extractor.train(True)
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=2, weight_decay=0.00001, momentum=MOMENTUM)
+        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.2, weight_decay=0.00001, momentum=MOMENTUM)
         i = 0
         self.features_extractor.to(DEVICE)
         
@@ -284,6 +284,7 @@ class iCaRL(nn.Module):
                 optimizer.zero_grad()
                 out = self(imgs)
                 
+                loss = nn.CrossEntropyLoss()(out, labels)
                 
                 # Teacher 1 : new ex. classes
                 # Compute distillation loss (based on last net) : only exemplars of new classes are considered
@@ -294,7 +295,7 @@ class iCaRL(nn.Module):
                 
                 
                 
-                dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:])/(len(out)*10)
+                #dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:])/(len(out)*10)
                 
                 # Teacher 2 : old ex. classes
                 # Compute second distillation loss (based on previous net) : only exemplars of old classes are considered
@@ -303,9 +304,9 @@ class iCaRL(nn.Module):
                 q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
                 
                 
-                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])/(len(out)*self.n_known)
+                #dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])/(len(out)*self.n_known)
                 
-                loss =  (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
+                #loss =  (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
                 
                 
                 train_loss += loss.item() * imgs.size(0) 
@@ -548,9 +549,7 @@ class iCaRL(nn.Module):
                         feature.data = feature.data / torch.norm(feature.data, p=2)
                         X_train.append(feature.cpu().numpy())
                         y_train.append(i)
-                
-                
-                
+                       
                 
                 #choice of the model
                 if classifier == 'knn':
