@@ -23,7 +23,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 NUM_EPOCHS_RETRAIN = 70
@@ -298,7 +298,7 @@ class iCaRL(nn.Module):
                 
                 sample_labels = q_i[(labels < self.n_known)]
                 
-                ex_labels = torch.zeros(len(ex_out), self.n_classes).to(DEVICE)
+                ex_labels = torch.sigmoid(torch.zeros(len(ex_out), self.n_classes).to(DEVICE))
                 
                 
                 dist_loss_samples = bce_sum(sample_out[:, self.n_known:], sample_labels[:, self.n_known:]) #distillation loss between actual outputs and last outputs
