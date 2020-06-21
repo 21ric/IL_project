@@ -268,7 +268,7 @@ class iCaRL(nn.Module):
             
             train_loss = 0.0
             
-            if epoch in [25, 50]:
+            if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
             
