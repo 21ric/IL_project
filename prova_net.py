@@ -374,7 +374,24 @@ class iCaRL(nn.Module):
             i+=1
 
 
-
+    
+    # Compute means of the new classes
+    @torch.no_grad()
+    def compute_new_means(self, images):
+        
+        features = []
+        self.features_extractor.to(DEVICE)
+        self.features_extractor.train(False)
+        
+        for img in images:
+            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
+            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
+            feature = feature / np.linalg.norm(feature)
+            features.append(feature[0])
+        class_mean = np.mean(features, axis=0)
+        class_mean = class_mean / np.linalg.norm(class_mean)
+        self.new_means.append(class_mean)
+    
     
     #reduce exemplars lists
     @torch.no_grad()
