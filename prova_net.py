@@ -298,7 +298,7 @@ class iCaRL(nn.Module):
                 
                 sample_labels = q_i[(labels >= self.n_known)]
                 
-                ex_labels = torch.sigmoid(torch.zeros(len(ex_out), self.n_classes).to(DEVICE))
+                ex_labels = torch.zeros(len(ex_out), self.n_classes).to(DEVICE)
                 
                 
                 dist_loss_samples = bce_sum(sample_out[:, self.n_known:], sample_labels[:, self.n_known:]) #distillation loss between actual outputs and last outputs
