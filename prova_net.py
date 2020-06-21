@@ -294,9 +294,9 @@ class iCaRL(nn.Module):
                 q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
                 
                 ex_out = out[(labels < self.n_known)]
-                sample_out = out[(labels < self.n_known)]
+                sample_out = out[(labels >= self.n_known)]
                 
-                sample_labels = q_i[(labels < self.n_known)]
+                sample_labels = q_i[(labels >= self.n_known)]
                 
                 ex_labels = torch.sigmoid(torch.zeros(len(ex_out), self.n_classes).to(DEVICE))
                 
