@@ -271,7 +271,7 @@ class iCaRL(nn.Module):
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                         
-                        tot_loss +=loss
+                        tot_loss += loss.item()
                         
                 
                 tot_loss = tot_loss/len(loader)
@@ -370,7 +370,7 @@ class iCaRL(nn.Module):
 
                 loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
                 
-                tot_loss +=loss
+                tot_loss += loss.item()
 
 
                 loss.backward()
