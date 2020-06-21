@@ -165,7 +165,7 @@ class iCaRL(nn.Module):
         for epoch in range(NUM_EPOCHS):
             
             
-            tot_loss = 0
+            train_loss = 0.0
             
             #reducing learning 
             if epoch in STEPDOWN_EPOCHS:
@@ -205,23 +205,20 @@ class iCaRL(nn.Module):
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                    
-                    tot_loss += loss.item()
-                        
+                   
                 
-                    tot_loss = tot_loss/len(loader)
-                
-                else:
-                    tot_loss += loss.item()
+                train_loss += loss.item() * imgs.size(0) 
                         
                 
                 #backward pass()
                 loss.backward()
                 optimizer.step()
+            
+            train_loss = train_loss / len(loader.dataset)
                 
                 
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss))
+                print('Epoch {} Loss:{:.4f}'.format(i, train_loss))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                   
@@ -269,7 +266,7 @@ class iCaRL(nn.Module):
         # Perform training
         for epoch in range(NUM_EPOCHS_RETRAIN):
             
-            tot_loss = 0
+            train_loss = 0.0
             
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
@@ -308,16 +305,15 @@ class iCaRL(nn.Module):
 
                 loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
                 
-                tot_loss += loss.item()
-
-
+                train_loss += loss.item() * imgs.size(0) 
+                        
                 loss.backward()
                 optimizer.step()
                 
-            tot_loss = tot_loss/len(loader)
+            train_loss = train_loss / len(loader.dataset)
                 
             if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, tot_loss))
+                print('Epoch {} Loss:{:.4f}'.format(i, train_loss))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                 print('-'*30)
