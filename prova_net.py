@@ -285,7 +285,7 @@ class iCaRL(nn.Module):
                 out = self(imgs)
                 
                 # Compute classification loss. Images are only exemplars
-                #loss = self.clf_loss(out[:,:], labels_hot[:, :])
+                loss = self.clf_loss(out[:,:], labels_hot[:, :])
                 
                 # Teacher 1 : new ex. classes
                 # Compute distillation loss (based on last net) : only exemplars of new classes are considered
@@ -293,6 +293,8 @@ class iCaRL(nn.Module):
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
                 
+                
+                """
                 ex_out = out[(labels < self.n_known)]
                 sample_out = out[(labels >= self.n_known)]
                 
@@ -305,6 +307,9 @@ class iCaRL(nn.Module):
                 dist_loss_ex = bce_sum(ex_out[:, self.n_known:], ex_labels[:, self.n_known:])
                 
                 dist_loss = (dist_loss_ex + dist_loss_samples)/(len(out)*10)
+                """
+                
+                dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:])/(len(out)*10)
                 
                 # Teacher 2 : old ex. classes
                 # Compute second distillation loss (based on previous net) : only exemplars of old classes are considered
@@ -312,6 +317,8 @@ class iCaRL(nn.Module):
                 f_prev_net.train(False)
                 q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
                 
+                
+                """
                 sample_labels = torch.zeros(len(sample_out), self.n_classes).to(DEVICE)
                 ex_labels = q_i2[(labels<self.n_known)]
                 
@@ -324,8 +331,13 @@ class iCaRL(nn.Module):
                 
                 #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 #loss = 0.5*dist_loss + 0.5*dist2_loss
-
-                loss = (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
+                
+                """
+                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])/(len(out)*self.n_known)
+                
+                loss = loss + (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
+                
+                loss = 0.5*loss
                 
                 train_loss += loss.item() * imgs.size(0) 
                         
