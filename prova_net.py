@@ -352,7 +352,7 @@ class iCaRL(nn.Module):
                 f_prev_net.to(DEVICE)
                 f_prev_net.train(False)
                 q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
-                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])(len(out)*self.n_known)  # distillation loss between actual outputs and previous outputs
+                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])/(len(out)*self.n_known)  # distillation loss between actual outputs and previous outputs
                 
                 #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 #loss = 0.5*dist_loss + 0.5*dist2_loss
