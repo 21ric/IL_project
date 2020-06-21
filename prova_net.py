@@ -346,14 +346,13 @@ class iCaRL(nn.Module):
                 f_ex.to(DEVICE)
                 f_ex.train(False)
                 q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
-                dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:]) #distillation loss between actual outputs and last outputs
-                
+                dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:])/(len(out)*10) #distillation loss between actual outputs and last outputs
                 # Teacher 2 : old ex. classes
                 # Compute second distillation loss (based on previous net) : only exemplars of old classes are considered
                 f_prev_net.to(DEVICE)
                 f_prev_net.train(False)
                 q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
-                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known]) # distillation loss between actual outputs and previous outputs
+                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])(len(out)*self.n_known)  # distillation loss between actual outputs and previous outputs
                 
                 #loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                 #loss = 0.5*dist_loss + 0.5*dist2_loss
