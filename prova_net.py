@@ -554,7 +554,6 @@ class iCaRL(nn.Module):
             #computing mean only if first iteration
             if self.compute_means:
                 
-                
                 self.compute_exemplars_mean()
                     
             self.compute_means = False 
@@ -580,6 +579,7 @@ class iCaRL(nn.Module):
                 preds.append(np.argmin(np.array(measures)))
                 
             return preds
+        
         # Using KNN, SVC, 3-layers MLP as classifier
         elif classifier == 'knn' or classifier == 'svc' or classifier == 'rand-forest':
             if self.train_model:
@@ -621,10 +621,8 @@ class iCaRL(nn.Module):
             #l2 normalization
             for feat in feature:
                 feat = feat / torch.norm(feat, p=2)
-                if pca:
-                    X.append(np.squeeze(self.pca.transform(feat.unsqueeze(0).cpu().numpy())))
-                else:
-                    X.append(feat.cpu().numpy())
+               
+                X.append(feat.cpu().numpy())
             
             
             #getting predictions
@@ -643,7 +641,8 @@ class iCaRL(nn.Module):
             preds = self.classify(imgs, classifier, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
-            preds = [map_reverse[pred] for pred in preds.cpu().numpy()]         
+            #preds = [map_reverse[pred] for pred in preds.cpu().numpy()]
+            [map_reverse[pred] for pred in preds]
             
             #computing accuracy
             running_corrects += (preds == labels.numpy()).sum()
