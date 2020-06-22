@@ -219,13 +219,13 @@ class iCaRL(nn.Module):
                     #for _ in range(50):
                     for j in range(len(exemplars)-1):
                         
-                            #i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+                            i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
                             
                             w=0.4
                             
-                            new_point = w*exemplars[j] + (1-w)*exemplars[j+1]
-                            new_target = w*ex_labels[j] + (1-w)*ex_labels[j+1]
-                            new_q_i = w*q_i_ex[j] + (1-w)*q_i_ex[j+1]
+                            new_point = w*exemplars[i1] + (1-w)*exemplars[i2]
+                            new_target = w*ex_labels[i1] + (1-w)*ex_labels[i2]
+                            new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
 
                             mix_up_points.append(new_point)
                             mix_up_targets.append(new_target)
