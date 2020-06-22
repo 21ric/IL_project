@@ -61,7 +61,7 @@ def modify_output_for_loss(loss_name, output):
         
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, loss1=False, proportional_loss=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, mix_up=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
         self.n_classes = 0 #number of seen classes
@@ -77,7 +77,7 @@ class iCaRL(nn.Module):
         self.class_map = class_map #needed to map real label to fake label
         self.map_reverse = map_reverse
         
-        self.proportional_loss = proportional_loss
+        self.mix_up = mix_up
         self.exemplars_per_class = 0
         self.pca = None
         self.train_model = True
@@ -85,7 +85,6 @@ class iCaRL(nn.Module):
         
         self.prev_net = None
         
-        self.loss1 = loss1
     
     #forward pass
     def forward(self, x):
@@ -191,20 +190,69 @@ class iCaRL(nn.Module):
                 
                 #computing outputs
                 out = self(imgs)
+                
+                
+                if self.mix_up and self.n_known > 0:
+
+                    #mix up augmentation
+                    exemplars = imgs[(labels < self.n_known)]
+                    ex_labels = labels_hot[(labels < self.n_known)]
+                    mixed_up_points = []
+                    mixed_up_targets = []
+
+                    #for i in range(128 - len(exemplars)):
+                    for j in range(20):
+                        i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+
+                        w=0.4
+                        new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
+                        new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
+
+                        new_point = exemplars[i1]
+                        new_target = ex_labels[i1]
+
+                        mixed_up_points.append(new_point)
+                        mixed_up_targets.append(new_target)
+                        
+                    mixed_up_points = torch.stack(mixed_up_points)
+                    mixed_up_targets = torch.stack(mixed_up_targets)
+                    
+                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
+
+                    
+                    mixed_out = self(mixed_up_points)
+                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                    loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points))*10)
    
                 
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
-                
-                
+                #DISTILLATION LOSS
                 if self.n_known > 0 :
                     
-                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
-                    q_i = q[indexes]
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                    if self.mix_up:
+                        
+                        f_ex.to(DEVICE)
+                        f_ex.train(False)
+                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
+                        q_i = q[indexes]
+
+                        dist_loss = bce_sum(out[:, :self.n_known],q_i[:, :self.n_known])
+                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
+
+                        dist_loss =(dist_loss+dist_loss_mixed)/((len(out)+len(mixed_up_points))*self.n_known)
+
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        
+                        
+                    else:
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
                    
                 
                 train_loss += loss.item() * imgs.size(0) 
