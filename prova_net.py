@@ -15,7 +15,7 @@ import random
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
-from sklearn.decomposition import PCA
+
 
 
 ####Hyper-parameters####
@@ -80,7 +80,8 @@ class iCaRL(nn.Module):
         
         self.mix_up = mix_up
         self.exemplars_per_class = 0
-        self.pca = None
+
+
         self.train_model = True
         self.model = None
         
@@ -521,69 +522,32 @@ class iCaRL(nn.Module):
     
     #method to compute means of exemplars
     @torch.no_grad()
-    def compute_exemplars_mean(self, pca=False):
+    def compute_exemplars_mean(self):
         
-        if not pca:
         
-            exemplar_means = []
-            self.features_extractor.train(False)
-            for exemplars in self.exemplar_sets[:self.n_known]:
-                features = []
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / torch.norm(feature.data, p=2)
-                    features.append(feature)
-                features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
-                exemplar_means.append(mu_y.cpu())
-            self.exemplar_means = exemplar_means
-            self.exemplar_means.extend(self.new_means)
+        exemplar_means = []
+        self.features_extractor.train(False)
+        for exemplars in self.exemplar_sets[:self.n_known]:
+            features = []
+            for ex in  exemplars:
+                ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
+                feature = self.features_extractor.extract_features(ex.unsqueeze(0))
+                feature = feature.squeeze()
+                feature.data = feature.data / torch.norm(feature.data, p=2)
+                features.append(feature)
+            features = torch.stack(features)
+            mu_y = features.mean(0).squeeze()
+            mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+            exemplar_means.append(mu_y.cpu())
+        self.exemplar_means = exemplar_means
+        self.exemplar_means.extend(self.new_means)
             
-        else:
-            self.features_extractor.train(False)
-            for exemplars in self.exemplar_sets:
-                features = []
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / torch.norm(feature.data, p=2)
-                    features.append(feature.cpu().numpy())
-            
-            
-            pca = PCA(n_components=30)
-            pca.fit(features)
-            
-            
-            exemplar_means = []
-            for exemplars in self.exemplar_sets:
-                features = []
-                for ex in  exemplars:
-                    ex = Variable(transform(Image.fromarray(ex))).to(DEVICE)
-                    feature = self.features_extractor.extract_features(ex.unsqueeze(0))
-                    feature = feature.squeeze()
-                    feature.data = feature.data / torch.norm(feature.data, p=2)
-                    features.append(pca.transform(feature.unsqueeze(0).cpu().numpy()))
-                    
-                features = torch.from_numpy(np.array(features))
-            
-                #features = torch.stack(features)
-                mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
-                exemplar_means.append(mu_y.cpu())
-            
-            self.exemplar_means = exemplar_means
-            
-            
-            self.pca = pca
+        
             
         
     #classification method
     @torch.no_grad()
-    def classify(self, x, classifier, pca=False, train_dataset=None):
+    def classify(self, x, classifier, train_dataset=None):
         #Using NME as classifier
         if classifier == 'nme':
             
@@ -591,7 +555,7 @@ class iCaRL(nn.Module):
             if self.compute_means:
                 
                 
-                self.compute_exemplars_mean(pca=pca)
+                self.compute_exemplars_mean()
                     
             self.compute_means = False 
             exemplar_means = self.exemplar_means
@@ -606,8 +570,6 @@ class iCaRL(nn.Module):
             for feat in feature:
                 measures = []
                 feat = feat / torch.norm(feat, p=2) #l2 norm
-                if pca:
-                    feat = torch.from_numpy(self.pca.transform(feat.unsqueeze(0).cpu().numpy()))
                
                     
                 #print('computing distance')
