@@ -44,7 +44,7 @@ bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss()
 ce = nn.CrossEntropyLoss()
 
-losses = {'bce': [bce, bce], 'kl': [kl,kl],'l1': [l1, l1], 'mse': [mse,mse]}
+losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
 
 
 #define function to apply to network outputs
@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
 
-                out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
                 if self.mix_up and self.n_known > 0:
@@ -259,7 +259,7 @@ class iCaRL(nn.Module):
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
-                    #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
