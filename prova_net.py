@@ -24,7 +24,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 NUM_EPOCHS_RETRAIN = 30
@@ -260,13 +260,7 @@ class iCaRL(nn.Module):
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
-                    
-                    q_i = q[indexes]
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                    
-                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-
-                   
+                
                 
                 train_loss += loss.item() * imgs.size(0) 
                         
