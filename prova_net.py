@@ -422,7 +422,7 @@ class iCaRL(nn.Module):
             
             new_exemplars.append(np.concatenate((exemplars, np.array(oversampled))))
         
-        self.exemplar_sets = np.array(new_exemplars)
+        self.exemplar_sets = new_exemplars
             
         
     
