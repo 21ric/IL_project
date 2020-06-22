@@ -592,6 +592,7 @@ class iCaRL(nn.Module):
             
             if classifier == 'fc':
                  self.feature_extractor.train(False)
+                 self.features_extractor.to(DEVICE)
                  outputs =self.feature_extractor(imgs)
                  _, preds = torch.max(outputs.data, 1)
 
