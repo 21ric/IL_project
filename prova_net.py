@@ -411,8 +411,8 @@ class iCaRL(nn.Module):
             
             for _ in range(m):
                 i = np.random.randint(0, original_lenght)
-                exemplars.append(exemplars[i])
-                
+                #exemplars.append(exemplars[i])
+                exemplars = np.concatenate((exemplars, np.array(exemplars[i])))
         
     
     
