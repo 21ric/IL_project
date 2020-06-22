@@ -674,13 +674,14 @@ class iCaRL(nn.Module):
                  self.features_extractor.to(DEVICE)
                  outputs =self.features_extractor(imgs)
                  _, preds = torch.max(outputs.data, 1)
+                 
 
             
             else:
                 preds = self.classify(imgs, classifier, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
-            preds = [map_reverse[pred] for pred in preds]
+            preds = [map_reverse[pred] for pred in preds.cpu().numpy()]         
             
             #computing accuracy
             running_corrects += (preds == labels.numpy()).sum()
