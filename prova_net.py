@@ -12,6 +12,7 @@ import copy
 import random
 
 
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 from sklearn.decomposition import PCA
@@ -608,7 +609,7 @@ class iCaRL(nn.Module):
                 
             return preds
         # Using KNN, SVC, 3-layers MLP as classifier
-        elif classifier == 'knn' or classifier == 'svc' or classifier == 'svc-rbf':
+        elif classifier == 'knn' or classifier == 'svc' or classifier == 'rand-forest':
             if self.train_model:
                 X_train, y_train = [], []
                 #computing features on exemplars to create X_train, y_train
@@ -631,6 +632,9 @@ class iCaRL(nn.Module):
                     model = LinearSVC()
                 elif classifier == 'svc-rbf':
                     model = SVC()
+                
+                elif classifier == 'rand-forest':
+                    model = RandomForestClassifier()
                 #fitting the model
                 model.fit(X_train, y_train)
                 
