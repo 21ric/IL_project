@@ -218,6 +218,7 @@ class iCaRL(nn.Module):
                         
                     mixed_up_points = torch.stack(mixed_up_points)
                     mixed_up_targets = torch.stack(mixed_up_targets)
+                    print('len mixed up', len(mixed_up_points))
                     
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
 
