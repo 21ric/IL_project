@@ -63,7 +63,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
             
         
         if oversample and i !=0:
-            net.oversample_exemplars(20)
+            net.oversample_exemplars(2000)
             print('Oversampling exemplars')
             
         print('-'*30)
