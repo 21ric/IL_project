@@ -239,11 +239,14 @@ class iCaRL(nn.Module):
     def oversample_exemplars(self, m):
         
               
-        all_exemplars = np.array([])
+        all_exemplars = None
         
         for  exemplars in self.exemplar_sets:
             
-            all_exemplars=np.concatenate((all_exemplars, exemplars))
+            if all_exemplars is None:
+                all_exemplars = exemplars
+            else:
+                all_exemplars=np.concatenate((all_exemplars, exemplars))
         
         
         
