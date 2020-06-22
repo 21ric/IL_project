@@ -675,16 +675,8 @@ class iCaRL(nn.Module):
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
             #classification with fully conntected layers
-            if classifier == 'fc':
-                 self.features_extractor.train(False)
-                 self.features_extractor.to(DEVICE)
-                 outputs =self.features_extractor(imgs)
-                 _, preds = torch.max(outputs.data, 1)
-                 
-
             
-            else:
-                preds = self.classify(imgs, classifier, train_dataset=train_dataset)
+            preds = self.classify(imgs, classifier, train_dataset=train_dataset)
             
             #mapping back fake lable to true label
             preds = [map_reverse[pred] for pred in preds.cpu().numpy()]         
