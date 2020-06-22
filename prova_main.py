@@ -93,21 +93,6 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
            net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag)
         
         print('len exemplars of previous classes', len(net.exemplar_sets))
-        
-        # If not first iteration, perform a second training, only on the exemplars (old+new classes)
-        if (i !=0 and second_training==True):
-            print('Training on exemplars...')
-            print('-'*30)
-
-            #net.new_means=[]
-            net.train_on_exemplars(class_map, map_reverse, iter = i)
-
-            net.new_means=[]
-            print('Recomputing new means ...')
-            print('-'*30)
-
-            for y in classes_groups[i]:
-               net.compute_new_means(train_dataset.get_class_imgs(y))
        
       
         print('-'*30)
