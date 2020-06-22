@@ -54,8 +54,10 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
         
         if undersample and i != 0: # Undersampling the dataset (experiment)  
+        
+            print('known', net.n_known)
             
-            resize_factor = MEMORY_SIZE/(net.n_known*500)
+            resize_factor = MEMORY_SIZE/(10*i*500)
             train_dataset.resample(resize_factor = resize_factor)
             print('Resamplig to size', len(train_dataset)) 
             
