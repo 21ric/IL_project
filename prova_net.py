@@ -44,7 +44,7 @@ bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
 kl = nn.KLDivLoss()
 ce = nn.CrossEntropyLoss()
 
-losses = {'bce': [bce, bce], 'kl': [kl,kl],'l1': [l1, l1], 'mse': [mse,mse]}
+losses = {'bce': [bce, bce], 'kl': [bce,kl],'l1': [bce, l1], 'mse': [bce,mse]}
 
 
 #define function to apply to network outputs
@@ -192,7 +192,7 @@ class iCaRL(nn.Module):
                 #computing outputs
                 out = self(imgs)
 
-                out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
                 if self.mix_up and self.n_known > 0:
@@ -259,7 +259,7 @@ class iCaRL(nn.Module):
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
 
-                    #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
@@ -663,11 +663,12 @@ class iCaRL(nn.Module):
     def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         running_corrects = 0
+
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            
+            #classification with fully conntected layers
             if classifier == 'fc':
-                 self.feature_extractor.train(False)
+                 self.features_extractor.train(False)
                  self.features_extractor.to(DEVICE)
                  outputs =self.feature_extractor(imgs)
                  _, preds = torch.max(outputs.data, 1)
