@@ -24,7 +24,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -200,16 +200,74 @@ class iCaRL(nn.Module):
                 #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                if self.mix_up and self.n_known > 0:
+                    
+                    
+                    q_i = q[indexes]
+                    
+                    q_i_ex = q_i[(labels < self.n_known)]
+                    
+                    exemplars = imgs[(labels < self.n_known)]
+                    
+                    ex_labels = labels_hot[(labels < self.n_known)]
+                    
+                    mix_up_points = []
+                    mix_up_targets = []
+                    mix_up_q_i = []
+                    
+                    #create 50 mixed up per batch adding 1950 samples in total
+                    for _ in range(50):
+                            
+                            i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+                            
+                            w=0.4
+                            
+                            new_point = w*exemplars[i1] + (1-w)*exemplars[i2]
+                            new_target = w*ex_labels[i1] + (1-w)*ex_labels[i2]
+                            new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
+
+                            mix_up_points.append(new_point)
+                            mix_up_targets.append(new_target)
+                            mix_up_q_i.append(new_q_i)
+                            
+                    mix_up_points = torch.stack(mix_up_points)
+                    mix_up_targets = torch.stack(mix_up_targets)
+                    mix_up_q_i = torch.stack(mix_up_q_i)
+                    
+                    
+                    mix_out = self(mix_up_points)
+                    
+                    
+                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                    clf_loss_mix_up = bce_sum(mix_out[:, self.n_known:], mix_up_targets[:, self.n_known:])
+                    
+                    loss = (clf_loss+clf_loss_mix_up)/((len(out)+len(mix_out))*10)
+                    
+                
+                    
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
                 
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
-
-                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
-                    q_i = q[indexes]
-                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
+                    
+                    if self.mix_up:
+                        q_i = q[indexes]
+                        
+                        dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
+                        dist_loss_mix_up = bce_sum(mix_out[:, :self.n_known], mix_up_q_i[:, :self.n_known] )
+                        
+                        dist_loss = (dist_loss + dist_loss_mix_up)/((len(out)+len(mix_out))*self.n_known)
+                        
+                    
+                    else:
+        
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
            
                 
