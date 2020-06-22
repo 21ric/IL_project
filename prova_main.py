@@ -15,7 +15,7 @@ MEMORY_SIZE = 2000
 
 
 
-def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False resize_factor=0.5, random_flag=False, mix_up=False, second_training=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False, resize_factor=0.5, random_flag=False, mix_up=False, second_training=False):
     utils.set_seed(0)
     
     
