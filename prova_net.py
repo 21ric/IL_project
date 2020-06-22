@@ -401,6 +401,19 @@ class iCaRL(nn.Module):
         class_mean = np.mean(features, axis=0)
         class_mean = class_mean / np.linalg.norm(class_mean)
         self.new_means.append(class_mean)
+        
+    
+    def oversample_exemplars(self, m):
+        
+        for exemplars in self.exemplar_sets:
+            
+            original_lenght = len(exemplars)
+            
+            for _ in range(m):
+                i = np.random.randint(0, original_lenght)
+                exemplars.append(exemplars[i])
+                
+        
     
     
     #reduce exemplars lists

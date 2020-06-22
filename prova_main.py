@@ -15,7 +15,7 @@ MEMORY_SIZE = 2000
 
 
 
-def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, resize_factor=0.5, random_flag=False, mix_up=False, second_training=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False resize_factor=0.5, random_flag=False, mix_up=False, second_training=False):
     utils.set_seed(0)
     
     
@@ -56,6 +56,11 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         if undersample and i != 0: # Undersampling the dataset (experiment)       
             train_dataset.resample(resize_factor = (net.n_known)/5000)
             print('Resamplig to size', len(train_dataset)) 
+            
+        
+        if oversample and i !=0:
+            net.oversample_exemplars(20)
+            print('Oversampling exemplars')
             
         print('-'*30)
         print(f'Known classes: {net.n_known}')
