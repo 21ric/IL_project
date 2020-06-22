@@ -12,6 +12,7 @@ import copy
 import random
 
 
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 from sklearn.decomposition import PCA
@@ -40,7 +41,7 @@ bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
 bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
-kl = nn.KLDivLoss(reduction='batchmean')
+kl = nn.KLDivLoss()
 ce = nn.CrossEntropyLoss()
 
 losses = {'bce': [bce, bce], 'kl': [kl,kl],'l1': [l1, l1], 'mse': [mse,mse]}
@@ -61,7 +62,7 @@ def modify_output_for_loss(loss_name, output):
         
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, loss1=False, proportional_loss=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, mix_up=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
         self.n_classes = 0 #number of seen classes
@@ -77,7 +78,7 @@ class iCaRL(nn.Module):
         self.class_map = class_map #needed to map real label to fake label
         self.map_reverse = map_reverse
         
-        self.proportional_loss = proportional_loss
+        self.mix_up = mix_up
         self.exemplars_per_class = 0
         self.pca = None
         self.train_model = True
@@ -85,7 +86,6 @@ class iCaRL(nn.Module):
         
         self.prev_net = None
         
-        self.loss1 = loss1
     
     #forward pass
     def forward(self, x):
@@ -191,21 +191,80 @@ class iCaRL(nn.Module):
                 
                 #computing outputs
                 out = self(imgs)
+
                 out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
+                if self.mix_up and self.n_known > 0:
+
+                    #mix up augmentation
+                    exemplars = imgs[(labels < self.n_known)]
+                    ex_labels = labels_hot[(labels < self.n_known)]
+                    mixed_up_points = []
+                    mixed_up_targets = []
+
+                    #for i in range(128 - len(exemplars)):
+                    for j in range(20):
+                        i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
+
+                        w=0.4
+                        new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
+                        new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
+
+                        new_point = exemplars[i1]
+                        new_target = ex_labels[i1]
+
+                        mixed_up_points.append(new_point)
+                        mixed_up_targets.append(new_target)
+                        
+                    mixed_up_points = torch.stack(mixed_up_points)
+                    mixed_up_targets = torch.stack(mixed_up_targets)
+                    #print('len mixed up', len(mixed_up_points))
+                    
+                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
+
+                    
+                    mixed_out = self(mixed_up_points)
+                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
+                    loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points))*10)
+   
                 
-                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                else:
+                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
                 
-                
+                #DISTILLATION LOSS
                 if self.n_known > 0 :
                     
+
+                    if self.mix_up:
+                        
+                        f_ex.to(DEVICE)
+                        f_ex.train(False)
+                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
+                        q_i = q[indexes]
+
+                        dist_loss = bce_sum(out[:, :self.n_known],q_i[:, :self.n_known])
+                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
+
+                        dist_loss =(dist_loss+dist_loss_mixed)/((len(out)+len(mixed_up_points))*self.n_known)
+
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+                        
+                        
+                    else:
+                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                        q_i = q[indexes]
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                        
+                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+
                     #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+
                    
                 
                 train_loss += loss.item() * imgs.size(0) 
@@ -343,6 +402,19 @@ class iCaRL(nn.Module):
         class_mean = np.mean(features, axis=0)
         class_mean = class_mean / np.linalg.norm(class_mean)
         self.new_means.append(class_mean)
+        
+    
+    def oversample_exemplars(self, m):
+        
+        for exemplars in self.exemplar_sets:
+            
+            original_lenght = len(exemplars)
+            
+            for _ in range(m):
+                i = np.random.randint(0, original_lenght)
+                #exemplars.append(exemplars[i])
+                exemplars = np.concatenate((exemplars, np.array(exemplars[i])))
+        
     
     
     #reduce exemplars lists
@@ -537,7 +609,7 @@ class iCaRL(nn.Module):
                 
             return preds
         # Using KNN, SVC, 3-layers MLP as classifier
-        elif classifier == 'knn' or classifier == 'svc' or classifier == 'svc-rbf':
+        elif classifier == 'knn' or classifier == 'svc' or classifier == 'rand-forest':
             if self.train_model:
                 X_train, y_train = [], []
                 #computing features on exemplars to create X_train, y_train
@@ -560,6 +632,9 @@ class iCaRL(nn.Module):
                     model = LinearSVC()
                 elif classifier == 'svc-rbf':
                     model = SVC()
+                
+                elif classifier == 'rand-forest':
+                    model = RandomForestClassifier()
                 #fitting the model
                 model.fit(X_train, y_train)
                 
