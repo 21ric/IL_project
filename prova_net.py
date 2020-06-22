@@ -623,6 +623,8 @@ class iCaRL(nn.Module):
             preds = self.model.predict(X)
             
             return preds
+        
+        
     #method to classify all batches of the test dataloader
     def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
