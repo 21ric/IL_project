@@ -15,7 +15,7 @@ MEMORY_SIZE = 2000
 
 
 
-def incremental_learning(dict_num, loss_config, classifier, lr, loss1=False, undersample=False, resize_factor=0.5, random_flag=False, proportional_loss=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, loss1=False, undersample=False, resize_factor=0.5, random_flag=False, proportional_loss=False, second_training=False):
     utils.set_seed(0)
     
     
@@ -86,7 +86,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, loss1=False, und
         print('len exemplars of previous classes', len(net.exemplar_sets))
         
         # If not first iteration, perform a second training, only on the exemplars (old+new classes)
-        if i !=0:
+        if (i !=0 and second_training==True):
             print('Training on exemplars...')
             print('-'*30)
 
