@@ -24,7 +24,7 @@ WEIGHT_DECAY = 0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 NUM_EPOCHS_RETRAIN = 30
@@ -417,10 +417,12 @@ class iCaRL(nn.Module):
                 i = np.random.randint(0, original_lenght)
                 #exemplars.append(exemplars[i])
                 oversampled.append(exemplars[i])
+                
+                
             
             new_exemplars.append(np.concatenate((exemplars, np.array(oversampled))))
         
-        self.exemplar_sets = new_exemplars
+        self.exemplar_sets = np.array(new_exemplars)
             
         
     
