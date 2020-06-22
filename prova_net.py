@@ -190,12 +190,9 @@ class iCaRL(nn.Module):
                 
                 #computing outputs
                 out = self(imgs)
-<<<<<<< HEAD
-=======
+
                 out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
->>>>>>> d87dd4b2f164164e5b7c3bb6140db77b55ae6200
-                
                 
                 if self.mix_up and self.n_known > 0:
 
@@ -237,7 +234,7 @@ class iCaRL(nn.Module):
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
                     
-<<<<<<< HEAD
+
                     if self.mix_up:
                         
                         f_ex.to(DEVICE)
@@ -259,13 +256,13 @@ class iCaRL(nn.Module):
                         dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                         
                         loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-=======
+
                     #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                     q_i = q[indexes]
                     dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
->>>>>>> d87dd4b2f164164e5b7c3bb6140db77b55ae6200
+
                    
                 
                 train_loss += loss.item() * imgs.size(0) 
