@@ -588,11 +588,12 @@ class iCaRL(nn.Module):
     def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         running_corrects = 0
+
         for imgs, labels, _ in  test_dataloader:
             imgs = Variable(imgs).cuda()
-            
+            #classification with fully conntected layers
             if classifier == 'fc':
-                 self.feature_extractor.train(False)
+                 self.features_extractor.train(False)
                  self.features_extractor.to(DEVICE)
                  outputs =self.feature_extractor(imgs)
                  _, preds = torch.max(outputs.data, 1)
