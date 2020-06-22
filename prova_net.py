@@ -27,7 +27,6 @@ STEPDOWN_FACTOR = 5
 NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
-NUM_EPOCHS_RETRAIN = 30
 BETA = 0.8
 ########################
 
@@ -121,7 +120,7 @@ class iCaRL(nn.Module):
          
     
     #updating representation
-    def update_representation(self, dataset, class_map, map_reverse, iter):
+    def update_representation(self, dataset, class_map, map_reverse, iter, double_ex=False):
         #computing number of new classes
         targets = list(set(dataset.targets))
         n = len(targets)
@@ -131,6 +130,11 @@ class iCaRL(nn.Module):
 
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
+        
+        #overSampling
+        if double_ex:
+            self.add_exemplars(dataset, map_reverse)
+        
         print('Datset extended to {} elements'.format(len(dataset)))
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last = True)
         
@@ -283,120 +287,6 @@ class iCaRL(nn.Module):
     
     #
     
-    # perform another training, only on exemplars.
-    def train_on_exemplars(self, class_map, map_reverse, iter):
-    
-        exemplars_list = []
-        labels = []
-
-        for y, exemplars in enumerate(self.exemplar_sets):
-            for ex in exemplars:
-                exemplars_list.append(np.array(transform(Image.fromarray(ex))))
-                labels.append(map_reverse[y])
-        
-        exemplars_list = torch.Tensor(exemplars_list) # transform to torch tensor
-        labels = torch.Tensor(labels)
-        print('Creating ex. dataloader')
-        
-        # Create Exemplars' Dataloader
-        dataset = TensorDataset(exemplars_list,labels) # create your datset
-        loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last = True)
-        
-        # Check loader length
-        print(len(loader.dataset))
-        
-        # Save an instance of the very last model (the one trained with distillation)
-        f_ex = copy.deepcopy(self.features_extractor)
-        
-        # Save the previous model, the one referring to the previous incremental step
-        f_prev_net = self.prev_net
-        f_prev_net.train(False)
-        f_prev_net.to(DEVICE)
-        
-        self.features_extractor.train(True)
-        optimizer = optim.SGD(self.features_extractor.parameters(), lr=0.2, weight_decay=0.00001, momentum=MOMENTUM)
-        i = 0
-        self.features_extractor.to(DEVICE)
-        
-        # Perform training
-        for epoch in range(NUM_EPOCHS_RETRAIN):
-            
-            train_loss = 0.0
-            
-            if epoch in STEPDOWN_EPOCHS:
-              for param_group in optimizer.param_groups:
-                param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
-            
-            self.features_extractor.train(True)
-            for imgs, labels in loader:
-                imgs = Variable(imgs).to(DEVICE)
-                seen_labels = torch.LongTensor([class_map[label] for label in labels.numpy()])
-                labels = Variable(seen_labels).to(DEVICE)
-                
-                labels_hot=torch.eye(self.n_classes)[labels] #one hot for classification loss
-                labels_hot = labels_hot.to(DEVICE)
-                
-                optimizer.zero_grad()
-                out = self(imgs)
-                
-                loss = nn.CrossEntropyLoss()(out, labels)
-                
-                # Teacher 1 : new ex. classes
-                # Compute distillation loss (based on last net) : only exemplars of new classes are considered
-                f_ex.to(DEVICE)
-                f_ex.train(False)
-                
-                q_i = torch.sigmoid(f_ex.forward(imgs)) #forward pass on previous net
-                
-                
-                
-                dist_loss = bce_sum(out[:, self.n_known:], q_i[:, self.n_known:])/(len(out)*10)
-                
-                # Teacher 2 : old ex. classes
-                # Compute second distillation loss (based on previous net) : only exemplars of old classes are considered
-                f_prev_net.to(DEVICE)
-                f_prev_net.train(False)
-                q_i2 = torch.sigmoid(f_prev_net.forward(imgs))
-                
-                
-                dist2_loss = bce_sum(out[:, :self.n_known], q_i2[:, :self.n_known])/(len(out)*self.n_known)
-                
-                #loss =  (1/(iter+1))*dist_loss + (iter/(iter+1))*dist2_loss
-                
-                loss =  loss + (iter/(iter+1))*dist2_loss
-                
-                train_loss += loss.item() * imgs.size(0) 
-                        
-                loss.backward()
-                optimizer.step()
-                
-            train_loss = train_loss / len(loader.dataset)
-                
-            if i % 10 == 0 or i == (NUM_EPOCHS_RETRAIN-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, train_loss))
-                for param_group in optimizer.param_groups:
-                  print('Learning rate:{}'.format(param_group['lr']))
-                print('-'*30)
-            i+=1
-
-
-    
-    # Compute means of the new classes
-    @torch.no_grad()
-    def compute_new_means(self, images):
-        
-        features = []
-        self.features_extractor.to(DEVICE)
-        self.features_extractor.train(False)
-        
-        for img in images:
-            x = Variable(transform(Image.fromarray(img))).to(DEVICE)
-            feature = self.features_extractor.extract_features(x.unsqueeze(0)).data.cpu().numpy()
-            feature = feature / np.linalg.norm(feature)
-            features.append(feature[0])
-        class_mean = np.mean(features, axis=0)
-        class_mean = class_mean / np.linalg.norm(class_mean)
-        self.new_means.append(class_mean)
         
     
     def oversample_exemplars(self, m):
