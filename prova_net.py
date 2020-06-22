@@ -200,71 +200,18 @@ class iCaRL(nn.Module):
                 #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
-                if self.mix_up and self.n_known > 0:
-
-                    #mix up augmentation
-                    exemplars = imgs[(labels < self.n_known)]
-                    ex_labels = labels_hot[(labels < self.n_known)]
-                    mixed_up_points = []
-                    mixed_up_targets = []
-
-                    #for i in range(128 - len(exemplars)):
-                    for j in range(20):
-                        i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
-
-                        w=0.4
-                        new_point = w*exemplars[i1]+(1-w)*exemplars[i2]
-                        new_target = w*ex_labels[i1]+(1-w)*ex_labels[i2]
-
-                        new_point = exemplars[i1]
-                        new_target = ex_labels[i1]
-
-                        mixed_up_points.append(new_point)
-                        mixed_up_targets.append(new_target)
-                        
-                    mixed_up_points = torch.stack(mixed_up_points)
-                    mixed_up_targets = torch.stack(mixed_up_targets)
-                    #print('len mixed up', len(mixed_up_points))
-                    
-                    clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-
-                    
-                    mixed_out = self(mixed_up_points)
-                    clf_loss_mixedup = bce_sum(mixed_out[:, self.n_known:], mixed_up_targets[:, self.n_known:])
-                    loss = (clf_loss+clf_loss_mixedup)/((len(out)+len(mixed_up_points))*10)
-   
-                
-                else:
-                    loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
+                loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
                 
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
+
+                    out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
+                    q_i = q[indexes]
+                    dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                     
-
-                    if self.mix_up:
-                        
-                        f_ex.to(DEVICE)
-                        f_ex.train(False)
-                        q_i_mixed = torch.sigmoid(f_ex(mixed_up_points))
-                        q_i = q[indexes]
-
-                        dist_loss = bce_sum(out[:, :self.n_known],q_i[:, :self.n_known])
-                        dist_loss_mixed = bce_sum(mixed_out[:, :self.n_known], q_i_mixed[:, :self.n_known])
-
-                        dist_loss =(dist_loss+dist_loss_mixed)/((len(out)+len(mixed_up_points))*self.n_known)
-
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-                        
-                        
-                    else:
-                        out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
-                        q_i = q[indexes]
-                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
-                        
-                        loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
-
-                
+                    loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
+           
                 
                 train_loss += loss.item() * imgs.size(0) 
                         
@@ -288,26 +235,34 @@ class iCaRL(nn.Module):
     #
     
         
-    
+    #MIXED UP EXEMPLARS
     def oversample_exemplars(self, m):
+        
+              
+        all_exemplars = np.array([])
+        
+        for  exemplars in self.exemplar_sets:
+            
+            all_exemplars=np.concatenate((all_exemplars, exemplars))
+        
+        
+        
+        W = 0.4
+        
         
         new_exemplars = []
         
-        for i, exemplars in enumerate(self.exemplar_sets):
+        for _ in range(m):
             
-            original_lenght = len(exemplars)
-            oversampled = []
+            i1, i2 = np.random.randint(0, len(all_exemplars)), np.random.randint(0, len(all_exemplars))
             
-            for _ in range(m):
-                i = np.random.randint(0, original_lenght)
-                #exemplars.append(exemplars[i])
-                oversampled.append(exemplars[i])
-                
-                
+            new_ex = W*all_exemplars[i1]+(1-W)*all_exemplars[i2]
             
-            new_exemplars.append(np.concatenate((exemplars, np.array(oversampled))))
+            new_exemplars.append(new_ex)
+            
         
-        self.exemplar_sets = new_exemplars
+        #Label of mixed unused during training only output of previous network is relevant
+        self.exemplar_sets[0] = self.exemplar_sets[0].extend(new_exemplars)
             
         
     
