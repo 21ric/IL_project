@@ -416,7 +416,7 @@ class iCaRL(nn.Module):
                 #exemplars.append(exemplars[i])
                 oversampled.append(exemplars[i])
             
-            exemplars = np.concatenate((exemplars, np.array(oversamples)))
+            exemplars = np.concatenate((exemplars, np.array(oversampled)))
     
     
     #reduce exemplars lists
