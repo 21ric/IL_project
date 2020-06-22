@@ -406,6 +406,8 @@ class iCaRL(nn.Module):
     
     def oversample_exemplars(self, m):
         
+        new_exemplars = []
+        
         for i, exemplars in enumerate(self.exemplar_sets):
             
             original_lenght = len(exemplars)
@@ -416,7 +418,9 @@ class iCaRL(nn.Module):
                 #exemplars.append(exemplars[i])
                 oversampled.append(exemplars[i])
             
-            self.exemplar_sets[i] = np.concatenate((exemplars, np.array(oversampled)))
+            new_exemplars.append(np.concatenate((exemplars, np.array(oversampled))))
+        
+        self.exemplar_sets = new_exemplars
             
         
     
