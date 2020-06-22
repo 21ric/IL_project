@@ -40,7 +40,7 @@ bce = nn.BCEWithLogitsLoss()
 l1 = nn.L1Loss()
 mse = nn.MSELoss()
 bce_sum = nn.BCEWithLogitsLoss(reduction='sum')
-kl = nn.KLDivLoss(reduction='batchmean')
+kl = nn.KLDivLoss()
 ce = nn.CrossEntropyLoss()
 
 losses = {'bce': [bce, bce], 'kl': [kl,kl],'l1': [l1, l1], 'mse': [mse,mse]}
