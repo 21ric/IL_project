@@ -131,7 +131,7 @@ class iCaRL(nn.Module):
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
         
-        #overSampling
+        #overSampling the exemplars, doubling their size
         if double_ex:
             self.add_exemplars(dataset, map_reverse)
         
@@ -169,15 +169,13 @@ class iCaRL(nn.Module):
         self.features_extractor.to(DEVICE)
         for epoch in range(NUM_EPOCHS):
             
-            
             train_loss = 0.0
             
             #reducing learning 
             if epoch in STEPDOWN_EPOCHS:
               for param_group in optimizer.param_groups:
                 param_group['lr'] = param_group['lr']/STEPDOWN_FACTOR
-                
-                
+                   
             self.features_extractor.train(True)
             for imgs, labels, indexes in loader:
                 imgs = imgs.to(DEVICE)
@@ -188,35 +186,30 @@ class iCaRL(nn.Module):
                 #computing one hots of labels
                 labels_hot=torch.eye(self.n_classes)[labels]
                 labels_hot = labels_hot.to(DEVICE)
-                
-                    
-                        
+                         
                 #zeroing the gradients
                 optimizer.zero_grad()
                 
                 #computing outputs
                 out = self(imgs)
    
-                
-                if self.mix_up and self.n_known > 0:
-                    
+                if self.mix_up and self.n_known > 0: # Mix up exemplars pipeline, starting from the 2nd iteration
                     
                     q_i = q[indexes]
+                    q_i_ex = q_i[(labels < self.n_known)] #taking exemplars' outputs from the prev network
                     
-                    q_i_ex = q_i[(labels < self.n_known)]
-                    
-                    exemplars = imgs[(labels < self.n_known)]
-                    
-                    ex_labels = labels_hot[(labels < self.n_known)]
+                    exemplars = imgs[(labels < self.n_known)] #taking exemplars' images of the current batch
+                    ex_labels = labels_hot[(labels < self.n_known)] #computing one-hot labels of exemplars of the current batch
                     
                     mix_up_points = []
                     mix_up_targets = []
                     
-                    
                     #create 50 mixed up per batch adding 1950 samples in total
                     #for _ in range(50):
-                    for j in range(len(exemplars)-1):
-                        
+                    #for j in range(len(exemplars)-1):
+                    for j in range(len(exemplars)):
+                            
+                            #selecting two random indexes
                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
                             
                             w=0.4
@@ -225,25 +218,25 @@ class iCaRL(nn.Module):
                             new_target = w*ex_labels[i1] + (1-w)*ex_labels[i2]
                             #new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
 
-                            mix_up_points.append(new_point)
-                            mix_up_targets.append(new_target)
+                            mix_up_points.append(new_point) #add augmented exemplar to the list
+                            mix_up_targets.append(new_target) #add the respective new label to the list
                             #mix_up_q_i.append(new_q_i)
                             
                     mix_up_points = torch.stack(mix_up_points)
                     mix_up_targets = torch.stack(mix_up_targets)
                     #mix_up_q_i = torch.stack(mix_up_q_i)
                     
-                    
+                    # Output of augmented exemplars
                     mix_out = self(mix_up_points)
                     
                     f_ex.to(DEVICE)
                     f_ex.train(False)
-                    mix_up_q_i = f_ex(mix_up_points)
-                    
+                    mix_up_q_i = f_ex(mix_up_points) #calculating previous network's output of augmented exemplars
                     
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     clf_loss_mix_up = bce_sum(mix_out[:, self.n_known:], mix_up_targets[:, self.n_known:])
                     
+                    # classification loss 
                     loss = (clf_loss+clf_loss_mix_up)/((len(out)+len(mix_out))*10)
                     
                 
@@ -255,38 +248,34 @@ class iCaRL(nn.Module):
                 
                 #DISTILLATION LOSS
                 if self.n_known > 0 :
-                    
-                    
-                    if self.mix_up:
+                    if self.mix_up: # Mix up augmentation
                         q_i = q[indexes]
                         
                         dist_loss = bce_sum(out[:, :self.n_known], q_i[:, :self.n_known])
                         dist_loss_mix_up = bce_sum(mix_out[:, :self.n_known], mix_up_q_i[:, :self.n_known] )
                         
                         dist_loss = (dist_loss + dist_loss_mix_up)/((len(out)+len(mix_out))*self.n_known)
-                        
-                    
+
                     else:
-        
                         out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
                         q_i = q[indexes]
-                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
                         
+                        #calculate dist loss based on the outputs of the prev network
+                        dist_loss = self.dist_loss(out[:, :self.n_known], q_i[:, :self.n_known])
+                     
+                    # Total loss is made of a "classification loss" and a "distillation loss" factor
                     loss = (1/(iter+1))*loss + (iter/(iter+1))*dist_loss
            
-                
                 train_loss += loss.item() * imgs.size(0) 
                         
-                
-                #backward pass()
+                # Backward pass
                 loss.backward()
                 optimizer.step()
             
-            train_loss = train_loss / len(loader.dataset)
-                
-                
+            train_loss = train_loss / len(loader.dataset) #calculating the average loss
+                    
             if i % 10 == 0 or i == (NUM_EPOCHS-1):
-                print('Epoch {} Loss:{:.4f}'.format(i, train_loss))
+                print('Epoch {} Avg Loss:{:.4f}'.format(i, train_loss))
                 for param_group in optimizer.param_groups:
                   print('Learning rate:{}'.format(param_group['lr']))
                   
