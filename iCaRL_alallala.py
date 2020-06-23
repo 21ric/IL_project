@@ -109,7 +109,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
         if i == 0:
             all_acc_list.append(new_acc)
         
-       if i > 0:
+        if i > 0:
 
             previous_classes = np.array([])
             prevs = []
