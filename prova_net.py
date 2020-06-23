@@ -204,6 +204,7 @@ class iCaRL(nn.Module):
                     
                     mix_up_points = []
                     mix_up_targets = []
+                    mix_up_q_i = []
                     
                     #create 50 mixed up per batch adding 1950 samples in total
                     #for _ in range(50):
@@ -217,15 +218,18 @@ class iCaRL(nn.Module):
                             
                             new_point = w*exemplars[i1] + (1-w)*exemplars[i2]
                             new_target = w*ex_labels[i1] + (1-w)*ex_labels[i2]
+                            new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
                             #new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
 
                             mix_up_points.append(new_point) #add augmented exemplar to the list
                             mix_up_targets.append(new_target) #add the respective new label to the list
-                            #mix_up_q_i.append(new_q_i)
+                            mix_up_q_i.append(new_q_i)
+                            
                             
                     mix_up_points = torch.stack(mix_up_points)
                     mix_up_targets = torch.stack(mix_up_targets)
-                    #mix_up_q_i = torch.stack(mix_up_q_i)
+                    mix_up_q_i = torch.stack(mix_up_q_i)
+                    
                     
                     # Output of augmented exemplars
                     mix_out = self(mix_up_points)
