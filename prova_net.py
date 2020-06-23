@@ -133,7 +133,8 @@ class iCaRL(nn.Module):
         
         #overSampling the exemplars, doubling their size
         if double_ex:
-            self.add_exemplars(dataset, map_reverse)
+            for i in range( (iter+1)//2 ):
+                self.add_exemplars(dataset, map_reverse)
         
         print('Datset extended to {} elements'.format(len(dataset)))
         loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4, drop_last = True)
