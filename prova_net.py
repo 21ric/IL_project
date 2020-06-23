@@ -213,7 +213,7 @@ class iCaRL(nn.Module):
                     
                     mix_up_points = []
                     mix_up_targets = []
-                    mix_up_q_i = []
+                    
                     
                     #create 50 mixed up per batch adding 1950 samples in total
                     #for _ in range(50):
@@ -225,18 +225,22 @@ class iCaRL(nn.Module):
                             
                             new_point = w*exemplars[i1] + (1-w)*exemplars[i2]
                             new_target = w*ex_labels[i1] + (1-w)*ex_labels[i2]
-                            new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
+                            #new_q_i = w*q_i_ex[i1] + (1-w)*q_i_ex[i2]
 
                             mix_up_points.append(new_point)
                             mix_up_targets.append(new_target)
-                            mix_up_q_i.append(new_q_i)
+                            #mix_up_q_i.append(new_q_i)
                             
                     mix_up_points = torch.stack(mix_up_points)
                     mix_up_targets = torch.stack(mix_up_targets)
-                    mix_up_q_i = torch.stack(mix_up_q_i)
+                    #mix_up_q_i = torch.stack(mix_up_q_i)
                     
                     
                     mix_out = self(mix_up_points)
+                    
+                    f_ex.to(DEVICE)
+                    f_ex.train(False)
+                    mix_up_q_i = f_ex(mix_up_points)
                     
                     
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
