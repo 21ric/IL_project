@@ -1,4 +1,4 @@
-from prova_net import iCaRL
+from alallala_net import iCaRL
 import numpy as np
 import utils
 import torch
