@@ -36,7 +36,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
     acc_per_group_list = []
     
     # Perform 10 iterations
-    for i in range(int(100/CLASSES_BATCH)):
+    for i in range(int(20/CLASSES_BATCH)):
         
         print('-'*30)
         print(f'**** Iteration {i+1} / {int(100/CLASSES_BATCH)} ****')
