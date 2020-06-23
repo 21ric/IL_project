@@ -523,7 +523,7 @@ class iCaRL(nn.Module):
         
         
     #method to classify all batches of the test dataloader
-    def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None):
+    def classify_all(self, test_dataset, map_reverse, classifier, train_dataset=None,prnt=False):
         test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         running_corrects = 0
 
