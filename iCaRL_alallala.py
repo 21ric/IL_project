@@ -1,22 +1,10 @@
-from iCaRL_net_alallala import iCaRL
-
-from torchvision import transforms
-from torch.utils.data import DataLoader, Subset
-
-from dataset import CIFAR100
-
+from prova_net import iCaRL
 import numpy as np
-
-from sklearn.model_selection import train_test_split
-
-import math
-
 import utils
-
-import copy
-
 import torch
-from torch.autograd import Variable
+
+
+
 
 ####Hyper-parameters####
 DEVICE = 'cuda'
@@ -25,111 +13,103 @@ CLASSES_BATCH = 10
 MEMORY_SIZE = 2000
 ########################
 
-def incremental_learning(dict_num,loss_config,classifier,lr,experiment_config,ex_config,num_ex):
 
+
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False, resize_factor=0.5, random_flag=False, mix_up=False, second_training=False, double_ex=False):
     utils.set_seed(0)
-
+    
+    
     path='orders/'
-    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+ dict_num +'.pickle',
+    classes_groups, class_map, map_reverse = utils.get_class_maps_from_files(path+'classgroups'+dict_num+'.pickle',
                                                                              path+'map'+ dict_num +'.pickle',
                                                                              path+'revmap'+ dict_num +'.pickle')
+    
+    #print classes mapped to fake class
     print(classes_groups, class_map, map_reverse)
 
-    net = iCaRL(0, class_map, loss_config=loss_config,lr=lr)
+    #net = iCaRL(0, class_map, loss_config=loss_config,lr=lr, class_balanced_loss=class_balanced_loss, proportional_loss=proportional_loss)
+    net = iCaRL(0, class_map, map_reverse=map_reverse, loss_config=loss_config,lr=lr, mix_up=mix_up)
 
     new_acc_list = []
     old_acc_list = []
     all_acc_list = []
     acc_per_group_list = []
-
+    
+    # Perform 10 iterations
     for i in range(int(100/CLASSES_BATCH)):
-
+        
         print('-'*30)
         print(f'**** Iteration {i+1} / {int(100/CLASSES_BATCH)} ****')
         print('-'*30)
-
+        
         torch.cuda.empty_cache()
-
+        
         net.new_means = []
         net.compute_means = True
-
+        net.train_model = True
+        
         print('Loading the Datasets ...')
         print('-'*30)
-
-
+        
+        # Load the dataset
         train_dataset, test_dataset = utils.get_train_test(classes_groups[i])
-
+        
+        if undersample and i != 0: # Undersampling the dataset (experiment)  
+        
+            print('known', net.n_known)
+            
+            resize_factor = MEMORY_SIZE/(10*i*500)
+            train_dataset.resample(resize_factor = resize_factor)
+            print('Resamplig to size', len(train_dataset)) 
+            
+        
+        if oversample and i !=0:
+            net.oversample_exemplars(2000)
+            print('Oversampling exemplars')
+            
         print('-'*30)
         print(f'Known classes: {net.n_known}')
         print('-'*30)
         print('Updating representation ...')
         print('-'*30)
-
-        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i)
-
-
-        #print('Reducing exemplar sets ...')
-        print('-'*30)
-
-        #m = MEMORY_SIZE // (net.n_classes)
         
-        #if experiment1 = True we are experiment with different number of exemplars per class based on age
-        if experiment_config: 
-
-          if ex_config == '15-15':
-              m = 15
+        # Perform the training as described in iCaRL Paper
+        net.update_representation(dataset=train_dataset, class_map=class_map, map_reverse=map_reverse, iter=i, double_ex=double_ex)
+        
+        m = MEMORY_SIZE // (net.n_classes)
+        net.exemplars_per_class = m
             
-          elif ex_config == '30-15':
+        # Reduce exemplar sets only if not first iteration, selecting only first m elements of each class
+        if i != 0:
+            print('Reducing exemplar sets ...')
+            print('-'*30)
+            net.reduce_exemplars_set(m)
         
-            if i<=4:
-                 m = 30
-            else:
-                 m = 15
-
-          elif ex_config == '15-30':
-              
-            if i<=4:
-                 m = 15
-            else:
-                 m = 30   
-        #otherwise we are exemperiment the fixed number of exemplars per class needed to reach the iCaRL performance 
-        else:
-       
-             m = num_ex  
-
-        
-        '''
-        m_list = [m]*(i+1)
-        index_list = np.arange(i+1)
-        print(f"index list is {index_list}")
-        print(f"m list before changes is {m_list}")
-        for elem in index_list:
-            m_list[elem] = m_list[elem] - (elem)*2
-            m_list[elem] = m_list[elem] + (i - elem)*2
-        print(f"m list after changes is {m_list}")
-        '''
-        #net.reduce_exemplars_set(m_list[:-1])
-        #net.reduce_exemplars_set(m)
+        print('len prev ex', len(net.exemplar_sets))
         print('Constructing exemplar sets ...')
-        #print(f'chosen configuration: {ex_config}')
         print('-'*30)
-
-        for y in classes_groups[i]:
-           #net.construct_exemplars_set(train_dataset.get_class_imgs(y), m_list[-1], random_flag=False)
-           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag=False) 
         
-
+        # Construct, at each iteration, new exemplars for the new classes
+        for y in classes_groups[i]:
+           net.construct_exemplars_set(train_dataset.get_class_imgs(y), m, random_flag)
+        
+        print('len exemplars of previous classes', len(net.exemplar_sets))
+       
+      
+        print('-'*30)
+        
         print('Testing ...')
         print('-'*30)
-
         print('New classes')
-        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier,prnt=True)
-
+        
+        # Classify on new classes
+        new_acc = net.classify_all(test_dataset, map_reverse, classifier=classifier, train_dataset=train_dataset)
         new_acc_list.append(new_acc)
+        
         if i == 0:
             all_acc_list.append(new_acc)
- 
-        if i > 0:
+        
+       if i > 0:
 
             previous_classes = np.array([])
             prevs = []
