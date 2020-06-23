@@ -234,9 +234,9 @@ class iCaRL(nn.Module):
                     # Output of augmented exemplars
                     mix_out = self(mix_up_points)
                     
-                    f_ex.to(DEVICE)
-                    f_ex.train(False)
-                    mix_up_q_i = f_ex(mix_up_points) #calculating previous network's output of augmented exemplars
+                    #f_ex.to(DEVICE)
+                    #f_ex.train(False)
+                    #mix_up_q_i = f_ex(mix_up_points) #calculating previous network's output of augmented exemplars
                     
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
                     clf_loss_mix_up = bce_sum(mix_out[:, self.n_known:], mix_up_targets[:, self.n_known:])
