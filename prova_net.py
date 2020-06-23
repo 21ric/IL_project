@@ -196,8 +196,6 @@ class iCaRL(nn.Module):
                 
                 #computing outputs
                 out = self(imgs)
-
-                #out = modify_output_for_loss(self.loss_config, out) # Change logits for L1, MSE, KL
    
                 
                 if self.mix_up and self.n_known > 0:
@@ -251,6 +249,7 @@ class iCaRL(nn.Module):
                 
                     
                 else:
+                    # classification loss
                     loss = self.clf_loss(out[:, self.n_known:], labels_hot[:, self.n_known:])
                 
                 
@@ -295,44 +294,37 @@ class iCaRL(nn.Module):
             i+=1
         return
     
-    #
+    
     
         
-    #MIXED UP EXEMPLARS
-    def oversample_exemplars(self, m):
-        
+    #MIXED UP EXEMPLARS: this function is called from the 2nd iteration.
+    # It performs mix up augmentation on the exemplars before training.
+    def oversample_exemplars(self, m):     
               
-        all_exemplars = None
+        all_exemplars = None #an array that contains all the stored exemplars
         
-        for  exemplars in self.exemplar_sets:
-            
-            if all_exemplars is None:
+        for  exemplars in self.exemplar_sets:      
+            if all_exemplars is None: #first iteration
                 all_exemplars = exemplars
             else:
                 all_exemplars=np.concatenate((all_exemplars, exemplars))
         
+        print(f"len all_exemplars: {len(all_exemplars)}")
+        W = 0.4        
+        new_exemplars = [] 
         
-        
-        W = 0.4
-        
-        
-        new_exemplars = []
-        
-        for _ in range(m):
-            
-            i1, i2 = np.random.randint(0, len(all_exemplars)), np.random.randint(0, len(all_exemplars))
-            
-            new_ex = W*all_exemplars[i1]+(1-W)*all_exemplars[i2]
-            
+        for _ in range(m):    
+            # take two random exemplars
+            i1, i2 = np.random.randint(0, len(all_exemplars)), np.random.randint(0, len(all_exemplars))    
+            # create the new augmented exemplar image
+            new_ex = W*all_exemplars[i1]+(1-W)*all_exemplars[i2]   
+            # append the new created exemplar to the list
             new_exemplars.append(new_ex)
-            
-        
+                
         #Label of mixed unused during training only output of previous network is relevant
         self.exemplar_sets[0] = self.exemplar_sets[0].extend(new_exemplars)
             
-        
-    
-    
+          
     #reduce exemplars lists
     @torch.no_grad()
     def reduce_exemplars_set(self, m, combine=False):        
