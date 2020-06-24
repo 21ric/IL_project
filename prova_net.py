@@ -20,7 +20,7 @@ from sklearn.svm import LinearSVC, SVC
 
 ####Hyper-parameters####
 LR = 2
-WEIGHT_DECAY = 0.000005 #0.00001
+WEIGHT_DECAY = 0.000001 #0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
@@ -209,7 +209,7 @@ class iCaRL(nn.Module):
                     #create 50 mixed up per batch adding 1950 samples in total
                     #for _ in range(50):
                     #for j in range(len(exemplars)-1):
-                    for j in range(70):
+                    for j in range(200):
                             
                             #selecting two random indexes
                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
