@@ -239,10 +239,11 @@ class iCaRL(nn.Module):
                     mix_up_q_i = torch.sigmoid(f_ex(mix_up_points))#calculating previous network's output of augmented exemplars
                     
                     clf_loss = bce_sum(out[:, self.n_known:], labels_hot[:, self.n_known:])
-                    clf_loss_mix_up = bce_sum(mix_out[:, self.n_known:], mix_up_targets[:, self.n_known:])
+                    #clf_loss_mix_up = bce_sum(mix_out[:, self.n_known:], mix_up_targets[:, self.n_known:])
                     
                     # classification loss 
-                    loss = (clf_loss+clf_loss_mix_up)/((len(out)+len(mix_out))*10)
+                    #loss = (clf_loss+clf_loss_mix_up)/((len(out)+len(mix_out))*10)
+                    loss = clf_loss/(len(out)*10)
                     
                 
                     
