@@ -20,7 +20,7 @@ from sklearn.svm import LinearSVC, SVC
 
 ####Hyper-parameters####
 LR = 2
-WEIGHT_DECAY = 0.000001 #0.00001
+WEIGHT_DECAY = 0.00001 #0.000001 #0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
