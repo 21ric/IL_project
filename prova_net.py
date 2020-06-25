@@ -209,7 +209,7 @@ class iCaRL(nn.Module):
                     #create 50 mixed up per batch adding 1950 samples in total
                     #for _ in range(50):
                     #for j in range(len(exemplars)-1):
-                    for j in range(200):
+                    for j in range(150):
                             
                             #selecting two random indexes
                             i1, i2 = np.random.randint(0, len(exemplars)), np.random.randint(0, len(exemplars))
