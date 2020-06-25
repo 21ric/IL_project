@@ -445,13 +445,13 @@ class iCaRL(nn.Module):
                 
                 core_indexes = DBSCAN(eps=0.3).fit(features).core_sample_indices_
                 features = features[core_indexes]
-                features = np.expand_dims(features, axis=2)
+                
                 
                 #torch.as_tensor(features)
                 
                 print("DBscan len after", len(features))
                 print("SHAPE", features.shape)
-                mean_ = np.mean(features)
+                mean_ = np.mean(features, axis=0)
                 
                 print("BEFORE NORM", mean_)
                 print("MEAN SHAPE", mean_.shape)
