@@ -443,7 +443,7 @@ class iCaRL(nn.Module):
                 
                 features = features.cpu().numpy()
                 
-                core_indexes = DBSCAN(eps=0.3, metric='l2', mi_samples=3).fit(features).core_sample_indices_
+                core_indexes = DBSCAN(eps=0.3, metric='l2', min_samples=3).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
                 
