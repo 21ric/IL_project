@@ -447,8 +447,8 @@ class iCaRL(nn.Module):
                 #torch.as_tensor(features)
                 
                 print("DBscan len after", len(features))
-                
-                exemplar_means.append(np.mean(features))
+                mean_ = np.mean(features)
+                exemplar_means.append(mean_/np.linalg(mean_))
                 
             
             else:
