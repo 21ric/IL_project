@@ -17,6 +17,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 
 
+from sklearn.cluster import DBSCAN
+
+
 
 ####Hyper-parameters####
 LR = 2
@@ -24,7 +27,7 @@ WEIGHT_DECAY = 0.00001 #0.000001 #0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -61,7 +64,7 @@ def modify_output_for_loss(loss_name, output):
         
     
 class iCaRL(nn.Module):
-    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, mix_up=False):
+    def __init__(self, n_classes, class_map, map_reverse, loss_config, lr, mix_up=False, dbscan=False):
         super(iCaRL, self).__init__()
         self.features_extractor = resnet32(num_classes=n_classes)
         self.n_classes = 0 #number of seen classes
@@ -85,6 +88,8 @@ class iCaRL(nn.Module):
         self.model = None
         
         self.prev_net = None
+        
+        self.dbscan = dbscan
         
     
     #forward pass
@@ -197,7 +202,6 @@ class iCaRL(nn.Module):
                 if self.mix_up and self.n_known > 0: # Mix up exemplars pipeline, starting from the 2nd iteration
                     
                     q_i = q[indexes]
-                    q_i_ex = q_i[(labels < self.n_known)] #taking exemplars' outputs from the prev network
                     
                     exemplars = imgs[(labels < self.n_known)] #taking exemplars' images of the current batch
                     ex_labels = labels_hot[(labels < self.n_known)] #computing one-hot labels of exemplars of the current batch
@@ -428,8 +432,23 @@ class iCaRL(nn.Module):
                 feature.data = feature.data / torch.norm(feature.data, p=2)
                 features.append(feature)
             features = torch.stack(features)
+            
+            print("DBscan len before", len(features))
+            
+            if self.dbscan:
+                
+                features = features.numpy()
+                
+                core_indexes = DBSCAN().fit(features).core_sample_indices_
+                features = features[core_indexes]
+                
+                torch.from_numpy(features)
+                
+            print("DBscan len after", len(features))
+            
             mu_y = features.mean(0).squeeze()
             mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+            
             exemplar_means.append(mu_y.cpu())
         self.exemplar_means = exemplar_means
         self.exemplar_means.extend(self.new_means)

@@ -15,7 +15,7 @@ MEMORY_SIZE = 2000
 
 
 
-def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False, resize_factor=0.5, random_flag=False, mix_up=False, second_training=False, double_ex=False):
+def incremental_learning(dict_num, loss_config, classifier, lr, undersample=False, oversample=False, resize_factor=0.5, random_flag=False, mix_up=False, second_training=False, double_ex=False, dbscan=False):
     utils.set_seed(0)
     
     
@@ -28,7 +28,7 @@ def incremental_learning(dict_num, loss_config, classifier, lr, undersample=Fals
     print(classes_groups, class_map, map_reverse)
 
     #net = iCaRL(0, class_map, loss_config=loss_config,lr=lr, class_balanced_loss=class_balanced_loss, proportional_loss=proportional_loss)
-    net = iCaRL(0, class_map, map_reverse=map_reverse, loss_config=loss_config,lr=lr, mix_up=mix_up)
+    net = iCaRL(0, class_map, map_reverse=map_reverse, loss_config=loss_config,lr=lr, mix_up=mix_up, dbscan=dbscan)
 
     new_acc_list = []
     old_acc_list = []
