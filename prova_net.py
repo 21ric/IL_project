@@ -441,7 +441,7 @@ class iCaRL(nn.Module):
                 
                 features = features.cpu().numpy()
                 
-                core_indexes = DBSCAN(eps=0.05).fit(features).core_sample_indices_
+                core_indexes = DBSCAN(eps=0.5).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
                 #torch.as_tensor(features)
