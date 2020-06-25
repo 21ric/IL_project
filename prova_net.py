@@ -27,7 +27,7 @@ WEIGHT_DECAY = 0.00001 #0.000001 #0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 70
+NUM_EPOCHS = 2
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -451,6 +451,9 @@ class iCaRL(nn.Module):
                 print("DBscan len after", len(features))
                 mean_ = np.mean(features)
                 mean_ = mean_ / np.linalg.norm(mean_)
+                
+                print(mean_)
+                
                 exemplar_means.append(mean_)
                 
             
