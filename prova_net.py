@@ -131,9 +131,9 @@ class iCaRL(nn.Module):
         #adding exemplars to dataset
         self.add_exemplars(dataset, map_reverse)
         
-        #overSampling the exemplars, doubling their size
+        #overSampling the exemplars, triplicating their size
         if double_ex:
-            for i in range( (iter+1)//2 ):
+            for i in range(2):
                 self.add_exemplars(dataset, map_reverse)
         
         print('Datset extended to {} elements'.format(len(dataset)))
