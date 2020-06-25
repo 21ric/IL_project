@@ -27,7 +27,7 @@ WEIGHT_DECAY = 0.00001 #0.000001 #0.00001
 BATCH_SIZE = 128
 STEPDOWN_EPOCHS = [49, 63]
 STEPDOWN_FACTOR = 5
-NUM_EPOCHS = 2
+NUM_EPOCHS = 70
 DEVICE = 'cuda'
 MOMENTUM = 0.9
 BETA = 0.8
@@ -441,7 +441,7 @@ class iCaRL(nn.Module):
                 
                 features = features.cpu().numpy()
                 
-                core_indexes = DBSCAN(eps=0.3).fit(features).core_sample_indices_
+                core_indexes = DBSCAN(eps=0.05).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
                 #torch.as_tensor(features)
