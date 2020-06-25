@@ -449,6 +449,7 @@ class iCaRL(nn.Module):
                 #torch.as_tensor(features)
                 
                 print("DBscan len after", len(features))
+                print("SHAPE", features.shape)
                 mean_ = np.mean(features, axis=1)
                 mean_ = mean_ / np.linalg.norm(mean_)
                 
