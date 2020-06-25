@@ -431,7 +431,9 @@ class iCaRL(nn.Module):
                 feature = feature.squeeze()
                 feature.data = feature.data / torch.norm(feature.data, p=2)
                 features.append(feature)
-            features = torch.stack(features)
+
+            if not self.dbscan:
+                features = torch.stack(features)
             
             
             
