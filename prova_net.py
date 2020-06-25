@@ -439,10 +439,10 @@ class iCaRL(nn.Module):
                 
                 features = features.cpu().numpy()
                 
-                core_indexes = DBSCAN().fit(features).core_sample_indices_
+                core_indexes = DBSCAN(eps=0.3).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
-                torch.from_numpy(features)
+                torch.as_tensor(features)
                 
             print("DBscan len after", len(features))
             
