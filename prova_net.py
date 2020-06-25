@@ -454,6 +454,7 @@ class iCaRL(nn.Module):
                 mean_ = np.mean(features)
                 
                 print("BEFORE NORM", mean_)
+                print("MEAN SHAPE", mean_.shape)
                 
                 mean_ = mean_ / np.linalg.norm(mean_)
                 
