@@ -433,23 +433,32 @@ class iCaRL(nn.Module):
                 features.append(feature)
             features = torch.stack(features)
             
-            print("DBscan len before", len(features))
+            
             
             if self.dbscan:
+                
+                print("DBscan len before", len(features))
                 
                 features = features.cpu().numpy()
                 
                 core_indexes = DBSCAN(eps=0.3).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
-                torch.as_tensor(features)
+                #torch.as_tensor(features)
                 
-            print("DBscan len after", len(features))
+                print("DBscan len after", len(features))
+                
+                exemplar_means.append(np.mean(features))
+                
             
-            mu_y = features.mean(0).squeeze()
-            mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+            else:
             
-            exemplar_means.append(mu_y.cpu())
+                mu_y = features.mean(0).squeeze()
+                mu_y.data = mu_y.data / torch.norm(mu_y.data, p=2) #l2 norm
+            
+                exemplar_means.append(mu_y.cpu())
+                
+                
         self.exemplar_means = exemplar_means
         self.exemplar_means.extend(self.new_means)
             
