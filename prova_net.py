@@ -448,7 +448,8 @@ class iCaRL(nn.Module):
                 
                 print("DBscan len after", len(features))
                 mean_ = np.mean(features)
-                exemplar_means.append(mean_/np.linalg(mean_))
+                mean_ = mean_ / np.linalg.norm(mean_)
+                exemplar_means.append(mean_)
                 
             
             else:
