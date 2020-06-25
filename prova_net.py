@@ -443,13 +443,13 @@ class iCaRL(nn.Module):
                 
                 features = features.cpu().numpy()
                 
-                core_indexes = DBSCAN(eps=0.5).fit(features).core_sample_indices_
+                core_indexes = DBSCAN(eps=0.3).fit(features).core_sample_indices_
                 features = features[core_indexes]
                 
                 #torch.as_tensor(features)
                 
                 print("DBscan len after", len(features))
-                mean_ = np.mean(features)
+                mean_ = np.mean(features, axis=1)
                 mean_ = mean_ / np.linalg.norm(mean_)
                 
                 print(mean_)
