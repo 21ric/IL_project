@@ -437,7 +437,7 @@ class iCaRL(nn.Module):
             
             if self.dbscan:
                 
-                features = features.numpy()
+                features = features.cpu().numpy()
                 
                 core_indexes = DBSCAN().fit(features).core_sample_indices_
                 features = features[core_indexes]
