@@ -441,7 +441,7 @@ class iCaRL(nn.Module):
                 
                 print("DBscan len before", len(features))
                 
-                #features = features.cpu().numpy()
+                features = features.cpu().numpy()
                 
                 core_indexes = DBSCAN(eps=0.5).fit(features).core_sample_indices_
                 features = features[core_indexes]
